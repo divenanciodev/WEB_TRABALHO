@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comunidade • SheTech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/comunidade.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <span class="logo-mark">◆</span>
+        <span class="logo-text">SheTech</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="dashboard.html" class="nav-item" data-page="dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Início</span>
+      </a>
+      <a href="projetos.html" class="nav-item" data-page="projetos">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Projetos</span>
+      </a>
+      <a href="eventos.html" class="nav-item" data-page="eventos">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-label">Eventos</span>
+      </a>
+      <a href="comunidade.html" class="nav-item active" data-page="comunidade">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-label">Comunidade</span>
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="perfil.html" class="nav-item" data-page="perfil">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Perfil</span>
+      </a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M6.34 6.34L4.93 4.93M12 2v2M12 20v2"/></svg>
+        <span class="nav-label">Configurações</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <img id="sidebar-avatar" src="https://i.pravatar.cc/40?img=47" alt="Usuária" class="user-thumb" />
+      <div class="user-info">
+        <span class="user-name" id="sidebar-name">Ana Luiza</span>
+        <span class="user-role">Desenvolvedora</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" id="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="community-search" placeholder="Buscar posts, links ou membros..." />
+        <kbd class="search-kbd">⌘K</kbd>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn notif-btn" id="notif-btn" onclick="toggleNotifications()" title="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-dot" id="notif-dot"></span>
+        </button>
+
+        <!-- Notification dropdown -->
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-header">
+            <span>Notificações</span>
+            <button class="mark-all-btn" onclick="markAllRead()">Marcar todas como lidas</button>
+          </div>
+          <div class="notif-list">
+            <div class="notif-item unread">
+              <div class="notif-avatar" style="background:#f0d0e8">💜</div>
+              <div class="notif-body"><strong>Carla Mendes</strong> curtiu sua postagem<span class="notif-time">2min</span></div>
+            </div>
+            <div class="notif-item unread">
+              <div class="notif-avatar" style="background:#d0e8f0">🔗</div>
+              <div class="notif-body"><strong>Bia Torres</strong> adicionou um novo link<span class="notif-time">14min</span></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-avatar" style="background:#e8f0d0">🎉</div>
+              <div class="notif-body"><strong>Novo evento</strong>: Workshop de React avançado<span class="notif-time">1h</span></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-avatar" style="background:#f0e8d0">💬</div>
+              <div class="notif-body"><strong>Julia Costa</strong> comentou no seu post<span class="notif-time">3h</span></div>
+            </div>
+          </div>
+          <a href="notificacoes.html" class="notif-all-link">Ver todas as notificações</a>
+        </div>
+
+        <a href="perfil.html" class="topbar-user">
+          <img id="top-avatar" src="https://i.pravatar.cc/36?img=47" alt="Usuária" />
+          <span id="top-name">Ana Luiza</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="page-content">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Comunidade</h1>
+          <p class="page-subtitle">Conecte-se, compartilhe e inspire outras mulheres na tech</p>
+        </div>
+        <div class="community-stats">
+          <div class="stat-pill">
+            <span class="stat-num">847</span>
+            <span class="stat-label">membras</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-num">124</span>
+            <span class="stat-label">posts hoje</span>
+          </div>
+          <div class="stat-pill online-pill">
+            <span class="online-dot"></span>
+            <span class="stat-num">38</span>
+            <span class="stat-label">online</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-wrapper">
+        <div class="tabs">
+          <button class="tab active" id="tab-feed" onclick="switchTab('feed')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+            Feed
+          </button>
+          <button class="tab" id="tab-links" onclick="switchTab('links')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Links
+          </button>
+          <button class="tab" id="tab-members" onclick="switchTab('members')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Membros
+          </button>
+        </div>
+        <div class="tab-indicator" id="tab-indicator"></div>
+      </div>
+
+      <!-- FEED -->
+      <div id="section-feed" class="section">
+        <div class="feed-layout">
+          <div class="feed-main">
+
+            <!-- Composer -->
+            <div class="composer card">
+              <div class="composer-top">
+                <img src="https://i.pravatar.cc/44?img=47" alt="Você" class="composer-avatar" />
+                <div class="composer-field" id="composer-field" onclick="expandComposer()" contenteditable="true" data-placeholder="Compartilhe algo com a comunidade..."></div>
+              </div>
+              <div id="media-preview" class="media-preview" style="display:none">
+                <img id="preview-img" alt="Preview" />
+                <button class="remove-media" onclick="clearMedia()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div class="composer-footer" id="composer-footer">
+                <div class="composer-actions">
+                  <label class="action-btn" title="Foto">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Foto</span>
+                    <input type="file" accept="image/*,video/*" hidden id="post-file" onchange="previewMedia(event)">
+                  </label>
+                  <button class="action-btn" onclick="addLink()" title="Link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span>Link</span>
+                  </button>
+                  <button class="action-btn" onclick="addEmoji()" title="Emoji">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    <span>Emoji</span>
+                  </button>
+                </div>
+                <button class="btn-publish" onclick="createPost()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Publicar
+                </button>
+              </div>
+            </div>
+
+            <!-- Feed list -->
+            <div id="feed-list"></div>
+
+            <!-- Skeleton loader -->
+            <div id="feed-skeleton" style="display:none">
+              <div class="skeleton-post card"></div>
+              <div class="skeleton-post card"></div>
+            </div>
+          </div>
+
+          <!-- Sidebar right -->
+          <aside class="feed-sidebar">
+            <div class="widget card">
+              <h3 class="widget-title">Trending na SheTech</h3>
+              <ul class="trending-list">
+                <li class="trending-item">
+                  <span class="trending-rank">01</span>
+                  <div>
+                    <span class="trending-tag">#carreira</span>
+                    <span class="trending-count">284 posts</span>
+                  </div>
+                </li>
+                <li class="trending-item">
+                  <span class="trending-rank">02</span>
+                  <div>
+                    <span class="trending-tag">#mentorias</span>
+                    <span class="trending-count">197 posts</span>
+                  </div>
+                </li>
+                <li class="trending-item">
+                  <span class="trending-rank">03</span>
+                  <div>
+                    <span class="trending-tag">#uxdesign</span>
+                    <span class="trending-count">156 posts</span>
+                  </div>
+                </li>
+                <li class="trending-item">
+                  <span class="trending-rank">04</span>
+                  <div>
+                    <span class="trending-tag">#codingtips</span>
+                    <span class="trending-count">112 posts</span>
+                  </div>
+                </li>
+                <li class="trending-item">
+                  <span class="trending-rank">05</span>
+                  <div>
+                    <span class="trending-tag">#mulhereslíderes</span>
+                    <span class="trending-count">98 posts</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="widget card">
+              <h3 class="widget-title">Membras ativas</h3>
+              <div class="active-members">
+                <div class="active-member" onclick="viewProfile(1)">
+                  <div class="member-thumb-wrap">
+                    <img src="https://i.pravatar.cc/36?img=5" alt="Carla">
+                    <span class="online-indicator"></span>
+                  </div>
+                  <div>
+                    <span class="active-name">Carla Mendes</span>
+                    <span class="active-role">Full Stack Dev</span>
+                  </div>
+                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
+                </div>
+                <div class="active-member" onclick="viewProfile(2)">
+                  <div class="member-thumb-wrap">
+                    <img src="https://i.pravatar.cc/36?img=9" alt="Bia">
+                    <span class="online-indicator"></span>
+                  </div>
+                  <div>
+                    <span class="active-name">Bia Torres</span>
+                    <span class="active-role">UX Designer</span>
+                  </div>
+                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
+                </div>
+                <div class="active-member" onclick="viewProfile(3)">
+                  <div class="member-thumb-wrap">
+                    <img src="https://i.pravatar.cc/36?img=16" alt="Julia">
+                    <span class="online-indicator"></span>
+                  </div>
+                  <div>
+                    <span class="active-name">Julia Costa</span>
+                    <span class="active-role">Data Scientist</span>
+                  </div>
+                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
+                </div>
+                <div class="active-member" onclick="viewProfile(4)">
+                  <div class="member-thumb-wrap">
+                    <img src="https://i.pravatar.cc/36?img=21" alt="Mariana">
+                  </div>
+                  <div>
+                    <span class="active-name">Mariana Lima</span>
+                    <span class="active-role">Product Manager</span>
+                  </div>
+                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- LINKS -->
+      <div id="section-links" class="section" style="display:none">
+        <div class="section-header">
+          <div>
+            <h2>Meus Links</h2>
+            <p class="section-sub">Recursos e referências salvas pela comunidade</p>
+          </div>
+          <button class="btn-primary" onclick="openModal('link-modal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Link
+          </button>
+        </div>
+
+        <div class="links-filter">
+          <button class="filter-chip active" onclick="filterLinks('todos', this)">Todos</button>
+          <button class="filter-chip" onclick="filterLinks('Tutorial', this)">Tutoriais</button>
+          <button class="filter-chip" onclick="filterLinks('Referência', this)">Referências</button>
+          <button class="filter-chip" onclick="filterLinks('Ferramenta', this)">Ferramentas</button>
+          <button class="filter-chip" onclick="filterLinks('Artigo', this)">Artigos</button>
+        </div>
+
+        <div id="links-grid" class="links-grid"></div>
+      </div>
+
+      <!-- MEMBROS -->
+      <div id="section-members" class="section" style="display:none">
+        <div class="section-header">
+          <div>
+            <h2>Membros da Comunidade</h2>
+            <p class="section-sub">847 mulheres transformando o mundo da tecnologia</p>
+          </div>
+          <div class="members-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Buscar membro..." oninput="filterMembers(this.value)" />
+          </div>
+        </div>
+
+        <div class="members-filter">
+          <button class="filter-chip active" onclick="filterMemberRole('todos', this)">Todas</button>
+          <button class="filter-chip" onclick="filterMemberRole('Desenvolvedora', this)">Devs</button>
+          <button class="filter-chip" onclick="filterMemberRole('Designer', this)">Designers</button>
+          <button class="filter-chip" onclick="filterMemberRole('Data', this)">Data</button>
+          <button class="filter-chip" onclick="filterMemberRole('Product', this)">Product</button>
+        </div>
+
+        <div id="members-grid" class="members-grid"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Modal Link -->
+  <div id="link-modal" class="modal-overlay" onclick="closeOnOverlay(event,'link-modal')">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Adicionar Link</h2>
+        <button class="modal-close" onclick="closeModal('link-modal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="link-form" onsubmit="saveLink(event)">
+        <div class="form-group">
+          <label for="link-titulo">Título</label>
+          <input type="text" id="link-titulo" placeholder="Nome do recurso" required />
+        </div>
+        <div class="form-group">
+          <label for="link-url">URL</label>
+          <input type="url" id="link-url" placeholder="https://..." required />
+        </div>
+        <div class="form-group">
+          <label for="link-desc">Descrição</label>
+          <textarea id="link-desc" placeholder="Descreva brevemente o recurso..." rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="link-categoria">Categoria</label>
+          <select id="link-categoria">
+            <option value="Tutorial">Tutorial</option>
+            <option value="Referência">Referência</option>
+            <option value="Ferramenta">Ferramenta</option>
+            <option value="Artigo">Artigo</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeModal('link-modal')">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Comentários -->
+  <div id="comments-modal" class="modal-overlay" onclick="closeOnOverlay(event,'comments-modal')">
+    <div class="modal-box modal-comments">
+      <div class="modal-header">
+        <h2>Comentários</h2>
+        <button class="modal-close" onclick="closeModal('comments-modal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="comments-list" class="comments-list"></div>
+      <div class="comment-input-wrap">
+        <img src="https://i.pravatar.cc/32?img=47" alt="Você" class="comment-avatar" />
+        <input type="text" id="comment-input" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter') submitComment()" />
+        <button class="comment-send" onclick="submitComment()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/comunidade.js"></script>
+</body>
+</html>s

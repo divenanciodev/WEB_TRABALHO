@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SheTech</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.css">
 </head>
 
@@ -28,7 +28,7 @@
         <div class="container">
             <h1>Conectando Meninas para Aprender, Criar e Inovar juntas.</h1>
             <p>Um espaço para compartilhar conhecimento, desenvolver projetos incríveis e transformar ideias em impacto real.</p>
-            <div class="hero-btns">
+            <div class="hero-btns" id="hero-auth-btns">
                 <a href="cadastro.html" class="btn btn-primary">Faça Parte Agora</a>
             </div>
         </div>
@@ -201,31 +201,8 @@
     </footer>
 
     <script src="js/app.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const projects = State.getProjects().slice(0, 3);
-            const events = State.getEvents().slice(0, 3);
-
-            const projectsContainer = document.getElementById('featured-projects');
-            projectsContainer.innerHTML = projects.map(p => `
-                <div class="card">
-                    <h3>${p.titulo}</h3>
-                    <p>${p.descricao}</p>
-                    <span class="badge">${p.categoria}</span>
-                </div>
-            `).join('');
-
-            const eventsContainer = document.getElementById('upcoming-events');
-            eventsContainer.innerHTML = events.map(e => `
-                <div class="card">
-                    <h3>${e.titulo}</h3>
-                    <p>Data: ${e.data}</p>
-                    <p>Local: ${e.local}</p>
-                    <span class="badge">${e.categoria}</span>
-                </div>
-            `).join('');
-        });
-    </script>
+    
+    <script src="js/index.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,223 @@
+/* ── LAYOUT DE DUAS COLUNAS ── */
+.config-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+/* ── NAV LATERAL DE SEÇÕES ── */
+.config-nav {
+    position: sticky;
+    top: 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--white, #fff);
+    border-radius: 16px;
+    padding: 12px;
+    border: 1px solid var(--gray-200, #eee);
+}
+.config-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--gray-600, #555);
+    font-weight: 500;
+    transition: background .15s, color .15s;
+}
+.config-nav-item i { font-size: 16px; }
+.config-nav-item:hover { background: var(--gray-100, #f5f5f5); }
+.config-nav-item.active {
+    background: #fce4ec;
+    color: var(--pink, #e91e63);
+    font-weight: 600;
+}
+.config-nav-danger { color: #e53935 !important; margin-top: 8px; }
+.config-nav-danger:hover { background: #ffebee !important; }
+.config-nav-danger.active { background: #ffebee !important; color: #e53935 !important; }
+
+/* ── SEÇÕES ── */
+.config-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.config-section {
+    padding: 28px;
+    scroll-margin-top: 88px;
+}
+.config-section-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gray-100, #f0f0f0);
+}
+.config-section-head > i {
+    font-size: 22px;
+    color: var(--pink, #e91e63);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.config-section-head h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+.config-section-head p {
+    font-size: 13px;
+    color: var(--gray-500, #888);
+    margin: 0;
+}
+
+/* ── LINHAS DE CONFIGURAÇÃO ── */
+.config-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100, #f5f5f5);
+    gap: 16px;
+}
+.config-row:last-of-type { border-bottom: none; }
+.config-row-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+.config-row-info strong { font-size: 14px; color: var(--ink, #111); font-weight: 600; }
+.config-row-info span   { font-size: 12px; color: var(--gray-500, #888); }
+.config-group-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--gray-400, #aaa);
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+/* ── FORMULÁRIO ── */
+.config-form { max-width: 600px; }
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+.form-group label { font-size: 13px; font-weight: 600; color: var(--ink, #333); }
+.form-group input,
+.form-group select {
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200, #ddd);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    background: var(--white, #fff);
+    color: var(--ink, #333);
+    transition: border-color .15s;
+    outline: none;
+}
+.form-group input:focus,
+.form-group select:focus { border-color: var(--pink, #e91e63); }
+.form-group input:disabled { background: var(--gray-100, #f5f5f5); cursor: not-allowed; color: var(--gray-500, #888); }
+.form-hint { font-size: 11px; color: var(--gray-400, #aaa); margin-top: -2px; }
+.form-actions { margin-top: 8px; }
+
+/* ── TOGGLE ── */
+.toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+.toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-track {
+    width: 44px; height: 24px;
+    background: var(--gray-200, #ddd);
+    border-radius: 24px;
+    position: relative;
+    transition: background .2s;
+}
+.toggle input:checked + .toggle-track { background: var(--pink, #e91e63); }
+.toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: left .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.toggle input:checked + .toggle-track .toggle-thumb { left: 23px; }
+
+/* ── TEMA ── */
+.theme-toggle-group { display: flex; gap: 8px; }
+.theme-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px;
+    border: 1.5px solid var(--gray-200, #ddd);
+    background: transparent; cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    color: var(--gray-600, #555);
+    transition: border-color .15s, color .15s, background .15s;
+}
+.theme-btn.active {
+    border-color: var(--pink, #e91e63);
+    color: var(--pink, #e91e63);
+    background: #fce4ec;
+}
+.theme-btn i { font-size: 15px; }
+
+/* ── COR DE DESTAQUE ── */
+.color-swatches { display: flex; gap: 8px; }
+.swatch {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer; transition: transform .15s, border-color .15s;
+}
+.swatch:hover     { transform: scale(1.15); }
+.swatch.active    { border-color: var(--ink, #333); }
+.swatch-pink      { background: #e91e63; }
+.swatch-purple    { background: #673ab7; }
+.swatch-teal      { background: #00bcd4; }
+.swatch-orange    { background: #ff5722; }
+
+/* ── ZONA DE PERIGO ── */
+.danger-zone {
+    border: 1px solid rgba(229, 57, 53, .25) !important;
+    background: rgba(229, 57, 53, .03);
+}
+.btn-danger {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 10px;
+    background: #e53935; color: #fff; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: opacity .15s;
+}
+.btn-danger:hover { opacity: .85; }
+.btn-danger-soft {
+    color: #e53935 !important;
+    border-color: rgba(229, 57, 53, .3) !important;
+}
+.btn-danger-soft:hover { background: #ffebee !important; }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+
+/* ── RESPONSIVO ── */
+@media (max-width: 860px) {
+    .config-layout { grid-template-columns: 1fr; }
+    .config-nav { position: static; flex-direction: row; flex-wrap: wrap; }
+    .config-nav-item { font-size: 12px; padding: 8px 10px; }
+}
+@media (max-width: 560px) {
+    .form-row { grid-template-columns: 1fr; }
+    .config-section { padding: 18px; }
+}

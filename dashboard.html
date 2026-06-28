@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard • SheTech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-mark">◆</span><span class="logo-text">She<span class="accent">Tech</span></span></div>
+    <nav class="nav">
+      <a href="dashboard.html" class="nav-item active" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+    </nav>
+    <div class="sidebar-foot" style="margin-top:auto"></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="page-title">Painel de Controle</h1>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notificações" onclick="window.location.href='notificacoes.html'">
+          <i class="lucide-bell"></i><span class="dot" id="notif-dot" style="display:none"></span>
+        </button>
+        <a href="perfil.html" class="me">
+          <img id="top-avatar" src="" alt="" /><span id="top-name">Olá</span>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- BOAS-VINDAS -->
+      <div class="welcome-strip" id="welcome-strip">
+        <div class="welcome-text">
+          <p class="welcome-sub">Bem-vinda de volta 👋</p>
+          <h2 class="welcome-name" id="welcome-name">Carregando...</h2>
+        </div>
+        <div class="welcome-chips">
+          <span class="chip chip-streak" id="chip-streak">🔥 &mdash; dias seguidos</span>
+          <span class="chip chip-member">✦ Membro SheTech</span>
+        </div>
+      </div>
+
+      <!-- CARDS DE MÉTRICAS -->
+      <div class="dashboard-grid">
+        <div class="card stat-card">
+          <h3><i class="lucide-folder-kanban"></i> Projetos Ativos</h3>
+          <div class="stat-num" id="dash-projects-count">0</div>
+          <p class="stat-sub">Trabalhando em novas ideias</p>
+          <a href="projetos.html" class="stat-link">Ver projetos →</a>
+        </div>
+        <div class="card stat-card">
+          <h3><i class="lucide-calendar-days"></i> Próximos Eventos</h3>
+          <div class="stat-num" id="dash-events-count">0</div>
+          <p class="stat-sub">Não perca nenhuma data</p>
+          <a href="eventos.html" class="stat-link">Ver eventos →</a>
+        </div>
+        <div class="card stat-card">
+          <h3><i class="lucide-users"></i> Conexões</h3>
+          <div class="stat-num" id="dash-members-count">0</div>
+          <p class="stat-sub">Membros na comunidade</p>
+          <a href="comunidade.html" class="stat-link">Ver comunidade →</a>
+        </div>
+        <div class="card stat-card stat-card-perfil">
+          <h3><i class="lucide-badge-check"></i> Perfil</h3>
+          <div class="stat-num" id="dash-profile-pct">—</div>
+          <div class="mini-bar-wrap"><div class="mini-bar" id="mini-bar"></div></div>
+          <a href="perfil.html" class="stat-link">Completar perfil →</a>
+        </div>
+      </div>
+
+      <!-- LINHA PRINCIPAL: ATIVIDADES + PROJETOS EM DESTAQUE -->
+      <div class="profile-grid">
+        <div class="col">
+          <div class="card">
+            <div class="card-head">
+              <h3><i class="lucide-activity"></i> Atividades Recentes</h3>
+              <a href="comunidade.html" class="link">Ver Feed</a>
+            </div>
+            <div id="recent-activity-list" style="display:flex;flex-direction:column;gap:12px">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando atividades...</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-head">
+              <h3><i class="lucide-star"></i> Projetos em Destaque</h3>
+              <a href="projetos.html" class="link">Ver Todos</a>
+            </div>
+            <div id="featured-projects-list" style="display:flex;flex-direction:column;gap:12px">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando projetos...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LINHA INFERIOR: AVISOS + PROGRESSO DO PERFIL -->
+      <div class="bottom-grid">
+
+        <!-- AVISOS DA PLATAFORMA -->
+        <div class="card avisos-card">
+          <div class="card-head">
+            <h3><i class="lucide-megaphone"></i> Avisos da Plataforma</h3>
+          </div>
+          <div class="avisos-lista" id="avisos-lista">
+            <div class="aviso-item aviso-destaque">
+              <span class="aviso-icon">📢</span>
+              <div>
+                <p class="aviso-titulo">Workshop de IA Generativa</p>
+                <p class="aviso-desc">Inscrições abertas para a próxima terça-feira. Vagas limitadas!</p>
+                <span class="aviso-tempo">há 2 horas</span>
+              </div>
+            </div>
+            <div class="aviso-item">
+              <span class="aviso-icon">🎓</span>
+              <div>
+                <p class="aviso-titulo">Nova trilha de UX Research</p>
+                <p class="aviso-desc">Acesso gratuito para todas as membros até o fim do mês.</p>
+                <span class="aviso-tempo">Ontem</span>
+              </div>
+            </div>
+            <div class="aviso-item">
+              <span class="aviso-icon">🤝</span>
+              <div>
+                <p class="aviso-titulo">Programa de mentorias aberto</p>
+                <p class="aviso-desc">Candidate-se como mentora ou encontre uma mentora na sua área.</p>
+                <span class="aviso-tempo">3 dias atrás</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROGRESSO DO PERFIL -->
+        <div class="card progresso-card">
+          <div class="card-head">
+            <h3><i class="lucide-sparkles"></i> Complete seu Perfil</h3>
+            <span class="pct-badge" id="pct-badge">—</span>
+          </div>
+          <div class="progresso-bar-wrap">
+            <div class="progresso-bar" id="progresso-bar" style="width:0%"></div>
+          </div>
+          <ul class="checklist" id="checklist">
+            <li class="check-item done"><i class="lucide-check-circle"></i> Foto de perfil adicionada</li>
+            <li class="check-item done"><i class="lucide-check-circle"></i> Habilidades preenchidas</li>
+            <li class="check-item done"><i class="lucide-check-circle"></i> Experiência adicionada</li>
+            <li class="check-item pend"><i class="lucide-circle"></i> Adicione um link do LinkedIn</li>
+            <li class="check-item pend"><i class="lucide-circle"></i> Escreva uma bio de apresentação</li>
+          </ul>
+          <a href="perfil.html" class="btn-completar">Completar agora</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

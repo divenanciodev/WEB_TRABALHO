@@ -9,6 +9,7 @@ const Layout = {
         this.bindSidebarCollapse();
         this.initTopbar(options);
         this.highlightActiveNav(options.active || '');
+        this.updateSidebarCard(user);
         return user;
     },
 
@@ -26,6 +27,7 @@ const Layout = {
             toggle.type = 'button';
             toggle.className = 'sidebar-toggle';
             toggle.title = 'Recolher menu';
+            // Usando o ícone correto da Lucide para recolher/expandir
             toggle.innerHTML = `<i class="${collapsed ? 'lucide-panel-left-open' : 'lucide-panel-left'}"></i>`;
             sidebar.insertBefore(toggle, sidebar.firstChild);
         }
@@ -37,6 +39,23 @@ const Layout = {
             toggle.querySelector('i').className = isCollapsed ? 'lucide-panel-left-open' : 'lucide-panel-left';
             toggle.title = isCollapsed ? 'Expandir menu' : 'Recolher menu';
         };
+    },
+
+    updateSidebarCard(user) {
+        if (!user) return;
+        const sidebarFoot = document.querySelector('.sidebar-foot');
+        if (sidebarFoot) {
+            const year = user.data_cadastro ? new Date(user.data_cadastro).getFullYear() : new Date().getFullYear();
+            sidebarFoot.innerHTML = `
+                <div class="mini-card">
+                    <div class="mini-title">Membro SheTech</div>
+                    <div class="mini-sub">Desde ${year} · @${user.nome_usuario || 'membra'}</div>
+                    <button onclick="State.logout()" class="nav-item" style="width:100%;text-align:left;background:rgba(255,61,139,0.1);border:none;margin-top:12px;padding:8px 12px;color:var(--pink)">
+                        <i class="lucide-log-out"></i> <span class="nav-label">Sair</span>
+                    </button>
+                </div>
+            `;
+        }
     },
 
     initTopbar(options = {}) {
@@ -65,12 +84,6 @@ const Layout = {
         const notifs = State.getNotifications(user.email).filter(n => !n.lida);
         const dot = document.getElementById('notif-dot');
         if (dot) dot.style.display = notifs.length > 0 ? 'block' : 'none';
-
-        const memberSince = document.getElementById('sidebar-member-since');
-        if (memberSince) {
-            const year = user.data_cadastro ? new Date(user.data_cadastro).getFullYear() : new Date().getFullYear();
-            memberSince.innerText = `Desde ${year} · @${user.nome_usuario || 'membra'}`;
-        }
     },
 
     highlightActiveNav(active) {

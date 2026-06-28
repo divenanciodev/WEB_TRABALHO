@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projetos • SheTech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/projetos.css">
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-mark">◆</span>
+      <span class="logo-text">SheTech</span>
+    </div>
+    <nav class="nav">
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item active" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+    </nav>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <h1 class="page-title">Meus Projetos</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" id="btn-novo-projeto">
+          <i class="lucide-plus"></i> Novo Projeto
+        </button>
+        <a href="perfil.html" class="me">
+          <img id="top-avatar" src="https://i.pravatar.cc/80?img=47" alt="Avatar" />
+          <span id="top-name">Olá, Ana</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-mini">
+        <span class="stat-icon stat-icon--pink"><i class="lucide-folder-kanban"></i></span>
+        <div>
+          <div class="stat-mini-num" id="stat-total">0</div>
+          <div class="stat-mini-label">Total</div>
+        </div>
+      </div>
+      <div class="stat-mini">
+        <span class="stat-icon stat-icon--blue"><i class="lucide-loader"></i></span>
+        <div>
+          <div class="stat-mini-num" id="stat-em-dev">0</div>
+          <div class="stat-mini-label">Em desenvolvimento</div>
+        </div>
+      </div>
+      <div class="stat-mini">
+        <span class="stat-icon stat-icon--green"><i class="lucide-check-circle-2"></i></span>
+        <div>
+          <div class="stat-mini-num" id="stat-concluidos">0</div>
+          <div class="stat-mini-label">Concluídos</div>
+        </div>
+      </div>
+      <div class="stat-mini">
+        <span class="stat-icon stat-icon--orange"><i class="lucide-lightbulb"></i></span>
+        <div>
+          <div class="stat-mini-num" id="stat-planejamento">0</div>
+          <div class="stat-mini-label">Em planejamento</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <i class="lucide-search"></i>
+        <input type="text" id="search-input" placeholder="Buscar projeto..." />
+      </div>
+      <div class="filter-chips">
+        <button class="chip chip--active" data-filter="todos">Todos</button>
+        <button class="chip" data-filter="web">Web</button>
+        <button class="chip" data-filter="mobile">Mobile</button>
+        <button class="chip" data-filter="design">Design</button>
+        <button class="chip" data-filter="dados">Dados</button>
+        <button class="chip" data-filter="outros">Outros</button>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn view-btn--active" id="view-grid" title="Grade"><i class="lucide-layout-grid"></i></button>
+        <button class="view-btn" id="view-list" title="Lista"><i class="lucide-layout-list"></i></button>
+      </div>
+    </div>
+
+    <!-- Lista de projetos -->
+    <div id="projects-container" class="projects-grid"></div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state" style="display:none">
+      <div class="empty-icon"><i class="lucide-folder-open"></i></div>
+      <h3>Nenhum projeto encontrado</h3>
+      <p>Comece criando seu primeiro projeto ou ajuste os filtros.</p>
+      <button class="btn btn-primary" id="btn-empty-novo">
+        <i class="lucide-plus"></i> Criar projeto
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ===== MODAL CRIAR / EDITAR ===== -->
+  <div id="project-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h2 id="modal-title">Novo Projeto</h2>
+        <button class="modal-close" id="modal-close-btn" aria-label="Fechar"><i class="lucide-x"></i></button>
+      </div>
+
+      <form id="project-form" novalidate>
+        <input type="hidden" id="project-id" />
+
+        <!-- Título -->
+        <div class="form-group">
+          <label for="project-titulo">Título do Projeto <span class="req">*</span></label>
+          <input type="text" id="project-titulo" placeholder="Ex: App de Finanças Pessoais" required />
+        </div>
+
+        <!-- Categoria e Status -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="project-categoria">Categoria</label>
+            <select id="project-categoria">
+              <option value="Web">Web</option>
+              <option value="Mobile">Mobile</option>
+              <option value="Design">Design</option>
+              <option value="Dados">Dados</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="project-status">Status</label>
+            <select id="project-status">
+              <option value="Em Planejamento">Em Planejamento</option>
+              <option value="Em Desenvolvimento">Em Desenvolvimento</option>
+              <option value="Concluído">Concluído</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Progresso -->
+        <div class="form-group">
+          <label for="project-progresso">Progresso <span class="progresso-valor" id="progresso-label">0%</span></label>
+          <input type="range" id="project-progresso" min="0" max="100" value="0" class="range-input" />
+          <div class="range-track-labels">
+            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+          </div>
+        </div>
+
+        <!-- Link do repositório / demo -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="project-repo">Repositório</label>
+            <div class="input-icon-wrap">
+              <i class="lucide-github"></i>
+              <input type="url" id="project-repo" placeholder="https://github.com/..." />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="project-demo">Demo / Link</label>
+            <div class="input-icon-wrap">
+              <i class="lucide-link"></i>
+              <input type="url" id="project-demo" placeholder="https://..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tecnologias -->
+        <div class="form-group">
+          <label for="project-tech-input">Tecnologias</label>
+          <div class="tech-input-wrap">
+            <div class="tech-tags" id="tech-tags"></div>
+            <input type="text" id="project-tech-input" placeholder="Digite e pressione Enter..." />
+          </div>
+          <p class="form-hint">Ex: React, Node.js, Figma</p>
+        </div>
+
+        <!-- Descrição -->
+        <div class="form-group">
+          <label for="project-descricao">Descrição</label>
+          <textarea id="project-descricao" rows="3" placeholder="Qual problema esse projeto resolve? Qual é o seu objetivo?"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="modal-cancel-btn">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="lucide-check"></i> Salvar Projeto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETALHES ===== -->
+  <div id="detail-modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content modal-content--detail">
+      <div class="modal-header">
+        <h2 id="detail-title">—</h2>
+        <button class="modal-close" id="detail-close-btn" aria-label="Fechar"><i class="lucide-x"></i></button>
+      </div>
+      <div id="detail-body"></div>
+      <div class="form-actions" style="margin-top:24px">
+        <button class="btn btn-ghost" id="detail-edit-btn"><i class="lucide-pencil"></i> Editar</button>
+        <button class="btn btn-danger" id="detail-delete-btn"><i class="lucide-trash-2"></i> Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/projetos.js"></script>
+</body>
+</html>

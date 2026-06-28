@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Links - Mulheres na Tech</title>
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        .link-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .link-info h4 { margin-bottom: 0.2rem; color: var(--primary-color); }
+        .link-info p { font-size: 0.9rem; color: var(--gray); }
+        .link-actions { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo" style="margin-bottom: 2rem;">Mulheres na Tech</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="projetos.html">Projetos</a></li>
+                <li><a href="eventos.html">Eventos</a></li>
+                <li><a href="comunidade.html">Comunidade</a></li>
+                <li><a href="links.html" class="active">Meus Links</a></li>
+                <li><a href="perfil.html">Perfil</a></li>
+
+                <li><a href="configuracoes.html">Configurações</a></li>
+                <li style="margin-top: 2rem;"><button onclick="State.logout()" class="btn btn-outline" style="width: 100%;">Sair</button></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header style="background: transparent; box-shadow: none; padding: 0; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <h1>Meus Links</h1>
+                <button class="btn btn-primary" onclick="openAddModal()">+ Adicionar Link</button>
+            </header>
+
+            <div id="links-container">
+                <!-- Links here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Link -->
+    <div id="link-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Novo Link</h2>
+            <form id="link-form" style="margin-top: 1.5rem;">
+                <input type="hidden" id="link-id">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="link-titulo" required placeholder="Ex: Meu Portfólio">
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="link-url" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="link-descricao" placeholder="Breve descrição do link">
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <input type="text" id="link-categoria" placeholder="Ex: Portfólio, Recurso, Estudo">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar</button>
+                    <button type="button" class="btn btn-outline" onclick="UI.closeModal('link-modal')" style="flex: 1;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+  <script src="js/layout.js"></script>
+    
+    <script src="js/links.js"></script>
+</body>
+</html>

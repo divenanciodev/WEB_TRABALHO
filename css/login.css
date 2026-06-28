@@ -1,0 +1,9 @@
+/* ====== AUTH PAGES ====== */
+body.auth-page{display:block;background:var(--bg);min-height:100vh}
+.auth-header{background:var(--black);padding:16px 32px}
+.auth-header .logo{display:inline-flex;color:#fff}
+.auth-wrap{max-width:420px;margin:48px auto;padding:0 20px 60px}
+.auth-card{background:#fff;border:1px solid var(--gray-200);border-radius:20px;padding:36px;box-shadow:var(--shadow)}
+.auth-card h2{font-size:24px;text-align:center;margin-bottom:24px}
+.auth-card p{text-align:center;margin-top:16px;font-size:14px;color:var(--gray-500)}
+.auth-card a{color:var(--pink);font-weight:600}

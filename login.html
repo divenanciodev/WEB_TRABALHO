@@ -11,7 +11,8 @@
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
-  <link rel="stylesheet" href="css/she-style.css" />
+  <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 
 <body class="auth-page">
@@ -31,19 +32,9 @@
     </div>
   </div>
   <script src="js/app.js"></script>
-  <script>
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const user = State.getUsers().find(u => u.email === email);
-      if (user) {
-        State.setCurrentUser(user);
-        window.location.href = 'dashboard.html';
-      } else {
-        alert('Usuário não encontrado ou senha incorreta!');
-      }
-    });
-  </script>
+  <script src="js/layout.js"></script>
+  
+    <script src="js/login.js"></script>
 </body>
 
 </html>

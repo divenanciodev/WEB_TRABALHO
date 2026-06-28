@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Perfil • SheTech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/editar-perfil.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-mark">◆</span><span class="logo-text">She<span class="accent">Tech</span></span></div>
+    <nav class="nav">
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item active" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+    </nav>
+    <div class="sidebar-foot" style="margin-top:auto"></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="page-title">Editar Perfil</h1>
+      <div class="topbar-actions">
+        <a href="perfil.html" class="btn-topbar-cancel">Cancelar</a>
+        <a href="perfil.html" class="me"><img id="top-avatar" src="" alt="" /><span id="top-name">Olá</span></a>
+      </div>
+    </header>
+
+    <div class="page-content edit-layout">
+
+      <!-- COLUNA PRINCIPAL -->
+      <div class="edit-main">
+
+        <!-- SEÇÃO: IDENTIDADE -->
+        <div class="card edit-section">
+          <div class="edit-section-head">
+            <i class="lucide-user-circle"></i>
+            <div>
+              <h2>Identidade</h2>
+              <p>Como você aparece para outras membros.</p>
+            </div>
+          </div>
+
+          <div class="edit-avatar-row">
+            <div class="edit-avatar-wrap">
+              <img id="edit-avatar-preview" src="" alt="Foto de perfil" />
+              <label for="avatar-upload" class="avatar-cam-btn" title="Trocar foto">
+                <i class="lucide-camera"></i>
+              </label>
+              <input type="file" id="avatar-upload" hidden accept="image/*" />
+            </div>
+            <div class="avatar-hints">
+              <p class="avatar-hint-title">Foto de perfil</p>
+              <p class="avatar-hint-sub">JPG, PNG ou GIF · Máx. 2 MB</p>
+              <button type="button" class="btn-remove-avatar" id="btn-remove-avatar">
+                <i class="lucide-trash-2"></i> Remover foto
+              </button>
+            </div>
+          </div>
+
+          <form id="edit-profile-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="edit-name">Nome Completo <span class="req">*</span></label>
+                <input type="text" id="edit-name" placeholder="Seu nome completo" required maxlength="80" />
+                <span class="field-error" id="err-name"></span>
+              </div>
+              <div class="form-group">
+                <label for="edit-username">Nome de usuária (@) <span class="req">*</span></label>
+                <div class="input-prefix-wrap">
+                  <span class="input-prefix">@</span>
+                  <input type="text" id="edit-username" placeholder="seuuser" required maxlength="30" />
+                </div>
+                <span class="field-error" id="err-username"></span>
+              </div>
+              <div class="form-group">
+                <label for="edit-role">Cargo / Título</label>
+                <input type="text" id="edit-role" placeholder="Ex: Desenvolvedora Fullstack" maxlength="60" />
+              </div>
+              <div class="form-group">
+                <label for="edit-area">Área de atuação</label>
+                <select id="edit-area">
+                  <option value="">Selecione...</option>
+                  <option value="Desenvolvimento">Desenvolvimento</option>
+                  <option value="Design">Design / UX</option>
+                  <option value="Dados">Dados / IA</option>
+                  <option value="Produto">Produto</option>
+                  <option value="Segurança">Segurança</option>
+                  <option value="DevOps">DevOps / Cloud</option>
+                  <option value="Gestão">Gestão de TI</option>
+                  <option value="Outra">Outra</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label for="edit-bio">Biografia</label>
+                <textarea id="edit-bio" placeholder="Conte um pouco sobre você, sua trajetória e o que te motiva..." rows="4" maxlength="300"></textarea>
+                <div class="char-count"><span id="bio-count">0</span>/300</div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- SEÇÃO: HABILIDADES -->
+        <div class="card edit-section">
+          <div class="edit-section-head">
+            <i class="lucide-zap"></i>
+            <div>
+              <h2>Habilidades</h2>
+              <p>Adicione suas principais tecnologias e competências.</p>
+            </div>
+          </div>
+          <div class="skills-input-row">
+            <input type="text" id="skill-input" placeholder="Ex: React, Python, Figma..." maxlength="30" />
+            <button type="button" class="btn-add-skill" id="btn-add-skill">
+              <i class="lucide-plus"></i> Adicionar
+            </button>
+          </div>
+          <div class="skills-tags" id="skills-tags"></div>
+          <p class="skills-hint">Pressione Enter ou clique em Adicionar · Máx. 15 habilidades</p>
+        </div>
+
+        <!-- SEÇÃO: LINKS -->
+        <div class="card edit-section">
+          <div class="edit-section-head">
+            <i class="lucide-link"></i>
+            <div>
+              <h2>Links e Redes Sociais</h2>
+              <p>Compartilhe seu portfólio e presença online.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="edit-linkedin">
+                <i class="lucide-linkedin"></i> LinkedIn
+              </label>
+              <input type="url" id="edit-linkedin" placeholder="https://linkedin.com/in/seuuser" />
+            </div>
+            <div class="form-group">
+              <label for="edit-github">
+                <i class="lucide-github"></i> GitHub
+              </label>
+              <input type="url" id="edit-github" placeholder="https://github.com/seuuser" />
+            </div>
+            <div class="form-group">
+              <label for="edit-portfolio">
+                <i class="lucide-globe"></i> Portfólio / Site
+              </label>
+              <input type="url" id="edit-portfolio" placeholder="https://seusite.com" />
+            </div>
+            <div class="form-group">
+              <label for="edit-instagram">
+                <i class="lucide-instagram"></i> Instagram
+              </label>
+              <input type="text" id="edit-instagram" placeholder="@seuuser" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUNA LATERAL: PRÉVIA + AÇÕES -->
+      <aside class="edit-side">
+        <div class="card preview-card">
+          <p class="preview-label">Prévia do perfil</p>
+          <div class="preview-avatar-wrap">
+            <img id="preview-avatar-img" src="" alt="" />
+          </div>
+          <p class="preview-name"  id="preview-name">Seu Nome</p>
+          <p class="preview-role"  id="preview-role">Cargo</p>
+          <p class="preview-bio"   id="preview-bio">Sua bio aparecerá aqui.</p>
+          <div class="preview-skills" id="preview-skills"></div>
+        </div>
+
+        <div class="edit-actions-sticky">
+          <button type="submit" form="edit-profile-form" class="btn btn-primary btn-full">
+            <i class="lucide-check"></i> Salvar Alterações
+          </button>
+          <a href="perfil.html" class="btn btn-ghost btn-full">Cancelar</a>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/editar-perfil.js"></script>
+</body>
+</html>
