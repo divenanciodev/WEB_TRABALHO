@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Links - Mulheres na Tech</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .link-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .link-info h4 { margin-bottom: 0.2rem; color: var(--primary-color); }
+        .link-info p { font-size: 0.9rem; color: var(--gray); }
+        .link-actions { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo" style="margin-bottom: 2rem;">Mulheres na Tech</div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="projetos.html">Projetos</a></li>
+                <li><a href="eventos.html">Eventos</a></li>
+                <li><a href="comunidade.html">Comunidade</a></li>
+                <li><a href="links.html" class="active">Meus Links</a></li>
+                <li><a href="perfil.html">Perfil</a></li>
+
+                <li><a href="configuracoes.html">Configurações</a></li>
+                <li style="margin-top: 2rem;"><button onclick="State.logout()" class="btn btn-outline" style="width: 100%;">Sair</button></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header style="background: transparent; box-shadow: none; padding: 0; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <h1>Meus Links</h1>
+                <button class="btn btn-primary" onclick="openAddModal()">+ Adicionar Link</button>
+            </header>
+
+            <div id="links-container">
+                <!-- Links here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Link -->
+    <div id="link-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Novo Link</h2>
+            <form id="link-form" style="margin-top: 1.5rem;">
+                <input type="hidden" id="link-id">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="link-titulo" required placeholder="Ex: Meu Portfólio">
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="link-url" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="link-descricao" placeholder="Breve descrição do link">
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <input type="text" id="link-categoria" placeholder="Ex: Portfólio, Recurso, Estudo">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar</button>
+                    <button type="button" class="btn btn-outline" onclick="UI.closeModal('link-modal')" style="flex: 1;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const user = State.getCurrentUser();
+        if (!user) window.location.href = 'login.html';
+
+        function renderLinks() {
+            const container = document.getElementById('links-container');
+            const links = State.getLinks(user.email);
+            
+            if (links.length === 0) {
+                container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--gray);">Você ainda não salvou nenhum link.</p></div>';
+                return;
+            }
+
+            container.innerHTML = links.map(link => `
+                <div class="card link-card">
+                    <div class="link-info">
+                        <h4>${link.titulo}</h4>
+                        <p>${link.descricao || 'Sem descrição'}</p>
+                        <a href="${link.url}" target="_blank" style="color: var(--accent-color); font-size: 0.8rem;">${link.url}</a>
+                        <br>
+                        <span class="badge">${link.categoria || 'Geral'}</span>
+                    </div>
+                    <div class="link-actions">
+                        <button onclick="toggleFav(${link.id})" class="btn btn-outline fav-btn ${link.favorito ? 'active' : ''}" title="Favoritar">★</button>
+                        <button onclick="editLink(${link.id})" class="btn btn-outline" title="Editar">✎</button>
+                        <button onclick="deleteLink(${link.id})" class="btn btn-outline" style="border-color: #ff4444; color: #ff4444;" title="Excluir">🗑</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('link-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('link-id').value;
+            const linkData = {
+                id: id ? parseInt(id) : null,
+                titulo: document.getElementById('link-titulo').value,
+                url: document.getElementById('link-url').value,
+                descricao: document.getElementById('link-descricao').value,
+                categoria: document.getElementById('link-categoria').value,
+                proprietaria_id: user.email,
+                favorito: id ? State.getLinks(user.email).find(l => l.id == id).favorito : false
+            };
+            
+            State.saveLink(linkData);
+            UI.closeModal('link-modal');
+            renderLinks();
+            State.addNotification(user.email, `Link "${linkData.titulo}" salvo com sucesso!`);
+            UI.updateNotificationBadge();
+        });
+
+        function deleteLink(id) {
+            if (confirm('Tem certeza que deseja excluir este link?')) {
+                State.deleteLink(id);
+                renderLinks();
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('link-form').reset();
+            document.getElementById('link-id').value = '';
+            document.getElementById('modal-title').innerText = 'Novo Link';
+            UI.showModal('link-modal');
+        }
+
+        function editLink(id) {
+            const link = State.getLinks(user.email).find(l => l.id === id);
+            if (!link) return;
+            document.getElementById('link-id').value = link.id;
+            document.getElementById('link-titulo').value = link.titulo;
+            document.getElementById('link-url').value = link.url;
+            document.getElementById('link-descricao').value = link.descricao || '';
+            document.getElementById('link-categoria').value = link.categoria || '';
+            document.getElementById('modal-title').innerText = 'Editar Link';
+            UI.showModal('link-modal');
+        }
+
+        function toggleFav(id) {
+            State.toggleFavoriteLink(id);
+            renderLinks();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLinks);
+    </script>
+</body>
+</html>

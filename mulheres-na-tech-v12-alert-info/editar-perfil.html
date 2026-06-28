@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Editar Perfil • She.Tech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+<link rel="stylesheet" href="css/she-style.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-mark">◆</span>
+      <span class="logo-text">She<span class="accent">.Tech</span></span>
+    </div>
+    <nav class="nav">
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item active" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+    </nav>
+    <div class="sidebar-foot" style="margin-top:auto">
+      <div class="mini-card">
+        <div class="mini-title">Membro She.Tech</div>
+        <div class="mini-sub" id="sidebar-member-since">Desde 2026</div>
+      </div>
+      <button onclick="State.logout()" class="nav-item" style="width:100%;text-align:left;background:transparent;border:none;margin-top:12px"><i class="lucide-log-out"></i> <span class="nav-label">Sair</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="page-title" id="page-title">Editar Perfil</h1>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notificações" onclick="window.location.href='notificacoes.html'"><i class="lucide-bell"></i><span class="dot" id="notif-dot" style="display:none"></span></button>
+        <a href="perfil.html" class="me">
+          <img id="top-avatar" src="https://ui-avatars.com/api/?name=User" alt="" />
+          <span id="top-name">Olá, Usuária</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="edit-profile-page page-content">
+      <div class="page-header">
+        <div>
+          <p style="color:var(--gray-500);font-size:14px;margin-top:4px">Personalize como as outras membras veem você na She.Tech</p>
+        </div>
+        <a href="perfil.html" class="btn btn-ghost"><i class="lucide-arrow-left"></i> Voltar ao perfil</a>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="edit-cover">
+          <img id="coverPreview" src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1600&q=80" alt="Capa" />
+          <div class="edit-cover-actions">
+            <label class="btn btn-ghost" style="background:rgba(255,255,255,.92);cursor:pointer"><i class="lucide-image"></i> Alterar capa
+              <input type="file" id="coverInput" accept="image/*" hidden />
+            </label>
+            <button type="button" class="btn btn-ghost" style="background:rgba(255,255,255,.92)" id="removeCoverBtn"><i class="lucide-trash-2"></i> Remover</button>
+          </div>
+        </div>
+
+        <div style="padding:24px">
+          <div class="edit-avatar-row">
+            <div class="edit-avatar-wrap">
+              <img id="avatarPreview" src="https://ui-avatars.com/api/?name=User" alt="Avatar" />
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:8px">
+              <label class="btn btn-primary" style="cursor:pointer"><i class="lucide-camera"></i> Alterar foto
+                <input type="file" id="avatarInput" accept="image/*" hidden />
+              </label>
+              <button type="button" class="btn btn-ghost" id="removeAvatarBtn"><i class="lucide-trash-2"></i> Remover foto</button>
+            </div>
+          </div>
+
+          <form id="edit-profile-form" style="margin-top:24px">
+            <div class="edit-form-grid">
+              <div class="form-group full">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" required />
+              </div>
+              <div class="form-group">
+                <label for="cargo">Cargo / Título</label>
+                <input type="text" id="cargo" placeholder="Ex: Desenvolvedora Front-end" />
+              </div>
+              <div class="form-group">
+                <label for="localizacao">Localização</label>
+                <input type="text" id="localizacao" placeholder="Ex: São Paulo, BR" />
+              </div>
+              <div class="form-group full">
+                <label for="linkedin">LinkedIn ou portfólio</label>
+                <input type="url" id="linkedin" placeholder="https://linkedin.com/in/seu-perfil" />
+              </div>
+              <div class="form-group full">
+                <label for="biografia">Biografia</label>
+                <textarea id="biografia" placeholder="Conte um pouco sobre você, sua jornada na tech..."></textarea>
+              </div>
+              <div class="form-group full">
+                <label for="cursos">Formação</label>
+                <textarea id="cursos" placeholder="Cursos, graduação, bootcamps..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="hobbies">Hobbies & Interesses</label>
+                <textarea id="hobbies" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="objetivos">Objetivos de Carreira</label>
+                <textarea id="objetivos" rows="3"></textarea>
+              </div>
+              <div class="form-group full">
+                <label for="idiomas">Idiomas</label>
+                <input type="text" id="idiomas" placeholder="Ex: Português (Nativo), Inglês (Avançado)" />
+              </div>
+              <div class="form-group full tech-editor">
+                <label>Linguagens & Tecnologias</label>
+                <div class="chips" id="techChips"></div>
+                <div class="lang-add" style="display:flex">
+                  <input type="text" id="techInput" placeholder="Adicionar tecnologia (Enter)" maxlength="30" />
+                  <button type="button" class="btn btn-primary" id="addTechBtn"><i class="lucide-plus"></i></button>
+                </div>
+                <div class="lang-bars" id="techBars" style="margin-top:14px"></div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <a href="perfil.html" class="btn btn-ghost">Cancelar</a>
+              <button type="submit" class="btn btn-primary"><i class="lucide-save"></i> Salvar alterações</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <div id="alert-dialog" class="alert-dialog-overlay">
+    <div class="alert-dialog-content">
+      <div class="alert-dialog-header">
+        <h2 class="alert-dialog-title" id="alert-title">Confirmar</h2>
+        <p class="alert-dialog-description" id="alert-desc"></p>
+      </div>
+      <div class="alert-dialog-footer">
+        <button class="btn btn-ghost" id="alert-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="alert-confirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    let user = Layout.init({ active: 'perfil', title: 'Editar Perfil' });
+    if (!user) throw new Error('auth');
+
+    let techList = [];
+    let techLevels = {};
+    let coverData = null;
+    let avatarData = undefined;
+
+    function openAlert(title, desc, onConfirm) {
+      const dialog = document.getElementById('alert-dialog');
+      document.getElementById('alert-title').innerText = title;
+      document.getElementById('alert-desc').innerText = desc;
+      dialog.classList.add('open');
+      document.getElementById('alert-confirm').onclick = () => { onConfirm(); dialog.classList.remove('open'); };
+      document.getElementById('alert-cancel').onclick = () => dialog.classList.remove('open');
+      dialog.onclick = (e) => { if (e.target === dialog) dialog.classList.remove('open'); };
+    }
+
+    function renderTech() {
+      const chips = document.getElementById('techChips');
+      const bars = document.getElementById('techBars');
+      if (!techList.length) {
+        chips.innerHTML = '<span class="chips-empty">Nenhuma tecnologia adicionada.</span>';
+        bars.innerHTML = '';
+        return;
+      }
+      chips.innerHTML = techList.map((tech, i) => `
+        <span class="chip">${tech}<span class="x" data-i="${i}">×</span></span>
+      `).join('');
+      chips.querySelectorAll('.x').forEach(btn => {
+        btn.onclick = () => {
+          const removed = techList[parseInt(btn.dataset.i, 10)];
+          techList.splice(parseInt(btn.dataset.i, 10), 1);
+          delete techLevels[removed];
+          renderTech();
+        };
+      });
+      bars.innerHTML = techList.map(tech => {
+        const level = techLevels[tech] || 70;
+        return `
+          <div class="tech-level-row">
+            <span>${tech}</span>
+            <input type="range" min="20" max="100" value="${level}" data-tech="${tech}" />
+            <span style="min-width:40px;text-align:right;font-size:13px;color:var(--gray-500)">${level}%</span>
+          </div>`;
+      }).join('');
+      bars.querySelectorAll('input[type=range]').forEach(range => {
+        range.oninput = () => {
+          techLevels[range.dataset.tech] = parseInt(range.value, 10);
+          range.nextElementSibling.innerText = range.value + '%';
+        };
+      });
+    }
+
+    function addTech() {
+      const input = document.getElementById('techInput');
+      const val = input.value.trim();
+      if (!val || techList.includes(val)) { input.value = ''; return; }
+      techList.push(val);
+      techLevels[val] = 70;
+      input.value = '';
+      renderTech();
+    }
+
+    function loadForm() {
+      user = State.getCurrentUser();
+      document.getElementById('nome').value = user.nome_completo || '';
+      document.getElementById('cargo').value = user.cargo || '';
+      document.getElementById('localizacao').value = user.localizacao || '';
+      document.getElementById('linkedin').value = user.linkedin || '';
+      document.getElementById('biografia').value = user.biografia || '';
+      document.getElementById('cursos').value = user.cursos || '';
+      document.getElementById('hobbies').value = user.hobbies || '';
+      document.getElementById('objetivos').value = user.objetivos || '';
+      document.getElementById('idiomas').value = user.idiomas || '';
+      techList = user.tecnologias ? [...user.tecnologias] : [];
+      techLevels = user.niveis_tecnologia ? { ...user.niveis_tecnologia } : {};
+      coverData = user.capa_perfil || null;
+      avatarData = undefined;
+
+      const avatarUrl = user.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo)}&background=ff3d8b&color=fff`;
+      document.getElementById('avatarPreview').src = avatarUrl;
+      document.getElementById('coverPreview').src = coverData || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1600&q=80';
+      renderTech();
+      Layout.initTopbar({ title: 'Editar Perfil' });
+    }
+
+    function readFile(input, callback) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => callback(e.target.result);
+      reader.readAsDataURL(file);
+      input.value = '';
+    }
+
+    document.getElementById('coverInput').addEventListener('change', (e) => {
+      readFile(e.target, (data) => {
+        coverData = data;
+        document.getElementById('coverPreview').src = data;
+      });
+    });
+
+    document.getElementById('avatarInput').addEventListener('change', (e) => {
+      readFile(e.target, (data) => {
+        avatarData = data;
+        document.getElementById('avatarPreview').src = data;
+      });
+    });
+
+    document.getElementById('removeCoverBtn').addEventListener('click', () => {
+      openAlert('Remover capa?', 'A capa padrão será restaurada.', () => {
+        coverData = null;
+        document.getElementById('coverPreview').src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1600&q=80';
+      });
+    });
+
+    document.getElementById('removeAvatarBtn').addEventListener('click', () => {
+      openAlert('Remover foto?', 'Seu avatar voltará para as iniciais padrão.', () => {
+        avatarData = null;
+        document.getElementById('avatarPreview').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo)}&background=ff3d8b&color=fff`;
+      });
+    });
+
+    document.getElementById('addTechBtn').addEventListener('click', addTech);
+    document.getElementById('techInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); addTech(); }
+    });
+
+    document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const updated = {
+        ...user,
+        nome_completo: document.getElementById('nome').value.trim(),
+        cargo: document.getElementById('cargo').value.trim(),
+        localizacao: document.getElementById('localizacao').value.trim(),
+        linkedin: document.getElementById('linkedin').value.trim(),
+        biografia: document.getElementById('biografia').value.trim(),
+        cursos: document.getElementById('cursos').value.trim(),
+        hobbies: document.getElementById('hobbies').value.trim(),
+        objetivos: document.getElementById('objetivos').value.trim(),
+        idiomas: document.getElementById('idiomas').value.trim(),
+        tecnologias: [...techList],
+        niveis_tecnologia: { ...techLevels },
+        capa_perfil: coverData
+      };
+      if (avatarData !== undefined) updated.foto_perfil = avatarData;
+      State.setCurrentUser(updated);
+      Layout.showToast('Perfil atualizado com sucesso!');
+      setTimeout(() => { window.location.href = 'perfil.html'; }, 800);
+    });
+
+    loadForm();
+  </script>
+</body>
+</html>
