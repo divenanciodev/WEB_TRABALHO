@@ -6,14 +6,48 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (authLinks) {
         if (user) {
+            const avatarUrl = user.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo)}&background=ff3d8b&color=fff`;
             authLinks.innerHTML = `
-                <span style="font-size:14px; color:var(--gray-700)">Olá, ${user.nome_completo.split(' ')[0]}</span>
-                <a href="dashboard.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Dashboard</a>
-                <button onclick="State.logout()" class="btn btn-ghost" style="padding: 8px 16px; font-size: 13px;">Sair</button>
+                <div class="user-dropdown" id="user-dropdown">
+                    <button class="dropdown-trigger" id="dropdown-trigger">
+                        <img src="${avatarUrl}" alt="Foto de Perfil" class="dropdown-avatar">
+                        <span class="dropdown-username">Olá, ${user.nome_completo.split(' ')[0]}</span>
+                        <i class="lucide-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="dashboard.html" class="dropdown-item">
+                            <i class="lucide-layout-dashboard"></i> Dashboard
+                        </a>
+                        <a href="https://discord.gg/hkc34REy9" target="_blank" class="dropdown-item">
+                            <i class="lucide-message-square"></i> Discord
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button onclick="State.logout()" class="dropdown-item logout-btn">
+                            <i class="lucide-log-out"></i> Sair
+                        </button>
+                    </div>
+                </div>
             `;
+
+            // Toggle dropdown behavior
+            const dropdown = document.getElementById('user-dropdown');
+            const trigger = document.getElementById('dropdown-trigger');
+
+            if (dropdown && trigger) {
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            }
         } else {
             authLinks.innerHTML = `
-                <a href="login.html" class="btn btn-ghost" style="padding: 8px 16px; font-size: 13px;">Entrar</a>
+                <a href="login.html" class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;">Entrar</a>
                 <a href="cadastro.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Cadastrar</a>
             `;
         }
