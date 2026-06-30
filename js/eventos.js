@@ -214,7 +214,7 @@
           </div>
           <div style="position:relative">
             <button class="event-card-menu-btn" aria-label="Opções" data-id="${ev.id}">
-              <i class="icon-more-vertical"></i>
+              <i class="icon-more-vertical">⋮</i>
             </button>
             <div class="card-dropdown" id="dd-${ev.id}">
               <button data-action="edit" data-id="${ev.id}"><i class="icon-pencil"></i> Editar</button>
