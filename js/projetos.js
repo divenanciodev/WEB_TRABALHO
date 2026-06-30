@@ -181,7 +181,7 @@
           </div>
           <div style="position:relative">
             <button class="project-card-menu-btn" aria-label="Opções">
-              <i class="icon-more-vertical"></i>
+              <i class="icon-more-vertical">⋮</i>
             </button>
             <div class="card-dropdown" id="dd-${p.id}">
               <button data-action="edit"><i class="icon-pencil"></i> Editar</button>
