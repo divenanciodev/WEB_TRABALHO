@@ -16,10 +16,15 @@ function updateDashboardStats() {
 /* ── BOAS-VINDAS ── */
 function renderWelcome() {
     const nameEl   = document.getElementById('welcome-name');
-    const streakEl = document.getElementById('chip-streak');
-    if (nameEl) nameEl.textContent = user.nome || user.name || 'Usuária';
+    if (nameEl) nameEl.textContent = user.nome_completo || user.nome || user.name || 'Usuária';
 
-    // Streak simples: dias desde o cadastro, máximo 30 para demo
+    // Chama lucide.createIcons para garantir que ícones injetados via JS também apareçam
+    if (window.lucide) lucide.createIcons();
+}
+
+// Removendo streak logic se não houver chip-streak no HTML
+function dummyStreak() {
+    const streakEl = document.getElementById('chip-streak');
     if (streakEl && user.createdAt) {
         const dias = Math.min(
             Math.floor((Date.now() - new Date(user.createdAt)) / 86400000),

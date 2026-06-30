@@ -11,82 +11,40 @@ const Layout = {
         this.highlightActiveNav(options.active || '');
         
         // Só exibe o card inferior se for a página de configurações
-        if (options.active === 'configuracoes') {
-            this.updateSidebarCard(user);
-        } else {
-            const sidebarFoot = document.querySelector('.sidebar-foot');
-            if (sidebarFoot) sidebarFoot.innerHTML = '';
-        }
+        const sidebarFoot = document.querySelector('.sidebar-foot');
+        if (sidebarFoot) sidebarFoot.innerHTML = '';
         
         return user;
     },
 
     bindSidebarCollapse() {
         const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        
-        // Desativa transições temporariamente para evitar o "tremido" no carregamento
-        document.body.style.transition = 'none';
-        
-        if (collapsed) {
-            document.body.classList.add('sidebar-collapsed');
-        } else {
-            document.body.classList.remove('sidebar-collapsed');
-        }
-        
-        // Força o reflow para aplicar a classe sem transição
-        document.body.offsetHeight;
-        
-        // Restaura a transição definida no CSS após um pequeno delay para garantir que o estado inicial foi aplicado
-        setTimeout(() => {
-            document.body.style.transition = '';
-        }, 50);
+        if (collapsed) document.body.classList.add('sidebar-collapsed');
 
-        let toggle = document.getElementById('sidebar-toggle');
-        if (!toggle) {
-            const sidebar = document.querySelector('.sidebar');
-            if (!sidebar) return;
+        const toggle = document.getElementById('sidebar-toggle');
+        if (!toggle) return;
 
-            toggle = document.createElement('button');
-            toggle.id = 'sidebar-toggle';
-            toggle.type = 'button';
-            toggle.className = 'sidebar-toggle';
-            toggle.title = collapsed ? 'Expandir menu' : 'Recolher menu';
-            // Usando o ícone correto da Lucide para recolher/expandir
-            toggle.innerHTML = `<i class="${collapsed ? 'icon-panel-left-open' : 'icon-panel-left'}"></i>`;
-            sidebar.insertBefore(toggle, sidebar.firstChild);
-        } else {
-            // Se o toggle já existe, atualiza o ícone e título baseado no estado inicial
+        const updateIcon = (isCollapsed) => {
             const icon = toggle.querySelector('i');
-            if (icon) icon.className = collapsed ? 'icon-panel-left-open' : 'icon-panel-left';
-            toggle.title = collapsed ? 'Expandir menu' : 'Recolher menu';
-        }
+            if (icon) {
+                icon.setAttribute('data-lucide', isCollapsed ? 'panel-left-open' : 'panel-left');
+                if (window.lucide) lucide.createIcons();
+            }
+        };
+
+        updateIcon(collapsed);
 
         toggle.onclick = () => {
             document.body.classList.toggle('sidebar-collapsed');
             const isCollapsed = document.body.classList.contains('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
-            
-            const icon = toggle.querySelector('i');
-            if (icon) icon.className = isCollapsed ? 'icon-panel-left-open' : 'icon-panel-left';
+            updateIcon(isCollapsed);
             toggle.title = isCollapsed ? 'Expandir menu' : 'Recolher menu';
         };
     },
 
     updateSidebarCard(user) {
-        if (!user) return;
-        const sidebarFoot = document.querySelector('.sidebar-foot');
-        if (sidebarFoot) {
-            const year = user.data_cadastro ? new Date(user.data_cadastro).getFullYear() : new Date().getFullYear();
-            sidebarFoot.innerHTML = `
-                <div class="mini-card">
-                    <div class="mini-title">Membro SheTech</div>
-                    <div class="mini-sub">Desde ${year} · @${user.nome_usuario || 'membra'}</div>
-                    <button onclick="State.logout()" class="nav-item" style="width:100%;text-align:left;background:rgba(255,61,139,0.1);border:none;margin-top:12px;padding:8px 12px;color:var(--pink)">
-                        <i class="icon-log-out"></i> <span class="nav-label">Sair</span>
-                    </button>
-                </div>
-            `;
-        }
+        // Card de membro e botão sair removidos conforme solicitação
     },
 
     initTopbar(options = {}) {
