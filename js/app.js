@@ -48,6 +48,7 @@ const State = {
     getEvents() { return this.getData('events'); },
     getPosts() { return this.getData('posts'); },
     getUsers() { return this.getData('users'); },
+    setUsers(users) { localStorage.setItem('users', JSON.stringify(users)); },
     getLinks(email) { 
         return this.getData('links').filter(l => l.proprietaria_id === email); 
     },

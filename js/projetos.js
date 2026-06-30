@@ -167,8 +167,8 @@
       (extraCount > 0 ? `<span class="tech-pill tech-pill--more">+${extraCount}</span>` : "");
 
     const linkBtns = [
-      p.repo ? `<a class="card-link-btn" href="${p.repo}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="lucide-github"></i> Repo</a>` : "",
-      p.demo ? `<a class="card-link-btn" href="${p.demo}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="lucide-external-link"></i> Demo</a>` : "",
+      p.repo ? `<a class="card-link-btn" href="${p.repo}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="icon-github"></i> Repo</a>` : "",
+      p.demo ? `<a class="card-link-btn" href="${p.demo}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="icon-external-link"></i> Demo</a>` : "",
     ].join("");
 
     card.innerHTML = `
@@ -181,11 +181,11 @@
           </div>
           <div style="position:relative">
             <button class="project-card-menu-btn" aria-label="Opções">
-              <i class="lucide-more-vertical"></i>
+              <i class="icon-more-vertical"></i>
             </button>
             <div class="card-dropdown" id="dd-${p.id}">
-              <button data-action="edit"><i class="lucide-pencil"></i> Editar</button>
-              <button data-action="delete" class="danger"><i class="lucide-trash-2"></i> Excluir</button>
+              <button data-action="edit"><i class="icon-pencil"></i> Editar</button>
+              <button data-action="delete" class="danger"><i class="icon-trash-2"></i> Excluir</button>
             </div>
           </div>
         </div>
@@ -385,7 +385,7 @@
     document.getElementById("detail-body").innerHTML = `
       <div class="detail-section">
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-tag"></i></div>
+          <div class="detail-row-icon"><i class="icon-tag"></i></div>
           <div class="detail-row-content">
             <strong>Categoria • Status</strong>
             <span>${p.categoria} &nbsp;·&nbsp; ${p.status}</span>
@@ -393,7 +393,7 @@
         </div>
 
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-bar-chart-2"></i></div>
+          <div class="detail-row-icon"><i class="icon-bar-chart-2"></i></div>
           <div class="detail-row-content" style="flex:1">
             <strong>Progresso</strong>
             <span>${p.progresso || 0}% concluído</span>
@@ -405,7 +405,7 @@
         </div>
 
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-cpu"></i></div>
+          <div class="detail-row-icon"><i class="icon-cpu"></i></div>
           <div class="detail-row-content">
             <strong>Tecnologias</strong>
             <div class="tech-pill-row" style="margin-top:4px">${techBadges}</div>
@@ -414,7 +414,7 @@
 
         ${p.repo || p.demo ? `
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-link"></i></div>
+          <div class="detail-row-icon"><i class="icon-link"></i></div>
           <div class="detail-row-content">
             <strong>Links</strong>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
@@ -426,7 +426,7 @@
 
         ${p.descricao ? `
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-align-left"></i></div>
+          <div class="detail-row-icon"><i class="icon-align-left"></i></div>
           <div class="detail-row-content">
             <strong>Descrição</strong>
             <div class="detail-descricao">${p.descricao}</div>
@@ -512,6 +512,9 @@
   }
 
   /* ── Init ────────────────────────────────────────────────────── */
+  if (typeof Layout !== 'undefined') {
+    Layout.init({ active: 'projetos' });
+  }
   updateStats();
   renderProjects();
 })();

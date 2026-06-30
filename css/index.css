@@ -381,6 +381,11 @@ footer {
     display: grid;
     grid-template-columns: 280px 1fr;
     min-height: 100vh;
+    transition: grid-template-columns 0.25s ease;
+}
+
+body.sidebar-collapsed .dashboard-layout {
+    grid-template-columns: 76px 1fr;
 }
 
 .sidebar {
@@ -390,6 +395,47 @@ footer {
     position: sticky;
     top: 0;
     height: 100vh;
+    overflow: hidden;
+    transition: width 0.25s ease, padding 0.25s ease;
+}
+
+body.sidebar-collapsed .sidebar {
+    padding: 2rem 0.5rem;
+}
+
+body.sidebar-collapsed .sidebar .logo,
+body.sidebar-collapsed .sidebar .nav-label,
+body.sidebar-collapsed .sidebar span,
+body.sidebar-collapsed .sidebar .sidebar-menu a::after {
+    display: none;
+}
+
+body.sidebar-collapsed .sidebar .sidebar-menu a {
+    padding: 12px 0;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+}
+
+/* Oculta texto dos botões e links na sidebar colapsada */
+body.sidebar-collapsed .sidebar .sidebar-menu li a {
+    font-size: 0;
+}
+
+body.sidebar-collapsed .sidebar .sidebar-menu li a::before {
+    content: '•'; /* Fallback icon if no real icons are present */
+    font-size: 1.5rem;
+    display: block;
+}
+
+body.sidebar-collapsed .sidebar .btn {
+    padding: 10px 0;
+    font-size: 0;
+}
+
+body.sidebar-collapsed .sidebar .btn::before {
+    content: '→';
+    font-size: 1.2rem;
 }
 
 .sidebar-menu li {

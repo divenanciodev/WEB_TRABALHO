@@ -59,7 +59,7 @@ function renderProfileProgress() {
     if (checklist) {
         checklist.innerHTML = campos.map((ok, i) => `
             <li class="check-item ${ok ? 'done' : 'pend'}">
-                <i class="lucide-${ok ? 'check-circle' : 'circle'}"></i>
+                <i class="icon-${ok ? 'check-circle' : 'circle'}"></i>
                 ${labels[i]}
             </li>
         `).join('');
@@ -82,7 +82,7 @@ function renderRecentActivity() {
     if (posts.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <i class="lucide-message-square-plus" style="font-size:28px;color:var(--pink);opacity:.6"></i>
+                <i class="icon-message-square-plus" style="font-size:28px;color:var(--pink);opacity:.6"></i>
                 <p>Nenhuma atividade ainda.</p>
                 <a href="comunidade.html" class="link">Ir para a comunidade →</a>
             </div>`;
@@ -115,7 +115,7 @@ function renderFeaturedProjects() {
     if (projects.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <i class="lucide-folder-plus" style="font-size:28px;color:var(--pink);opacity:.6"></i>
+                <i class="icon-folder-plus" style="font-size:28px;color:var(--pink);opacity:.6"></i>
                 <p>Ainda sem projetos criados.</p>
                 <a href="projetos.html" class="link">Criar primeiro projeto →</a>
             </div>`;
@@ -129,7 +129,7 @@ function renderFeaturedProjects() {
                 <span class="tag-pill">${p.categoria || 'Geral'}</span>
             </div>
             <a href="projetos.html" class="icon-btn" style="width:32px;height:32px" title="Ver projeto">
-                <i class="lucide-chevron-right"></i>
+                <i class="icon-chevron-right"></i>
             </a>
         </div>
     `).join('');

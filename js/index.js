@@ -12,18 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="dropdown-trigger" id="dropdown-trigger">
                         <img src="${avatarUrl}" alt="Foto de Perfil" class="dropdown-avatar">
                         <span class="dropdown-username">Olá, ${user.nome_completo.split(' ')[0]}</span>
-                        <i class="lucide-chevron-down"></i>
+                        <i class="icon-chevron-down"></i>
                     </button>
                     <div class="dropdown-menu" id="dropdown-menu">
                         <a href="dashboard.html" class="dropdown-item">
-                            <i class="lucide-layout-dashboard"></i> Dashboard
+                            <i class="icon-layout-dashboard"></i> Dashboard
                         </a>
                         <a href="https://discord.gg/hkc34REy9" target="_blank" class="dropdown-item">
-                            <i class="lucide-message-square"></i> Discord
+                            <i class="icon-message-square"></i> Discord
                         </a>
                         <div class="dropdown-divider"></div>
                         <button onclick="State.logout()" class="dropdown-item logout-btn">
-                            <i class="lucide-log-out"></i> Sair
+                            <i class="icon-log-out"></i> Sair
                         </button>
                     </div>
                 </div>

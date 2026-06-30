@@ -4,6 +4,10 @@
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Inicializa o layout compartilhado (sidebar, topbar, etc)
+  if (typeof Layout !== 'undefined') {
+    Layout.init({ active: 'perfil' });
+  }
 
   /* ─── TABS ───────────────────────────────── */
   const tabs     = document.querySelectorAll('.profile-tab');

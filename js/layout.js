@@ -9,13 +9,25 @@ const Layout = {
         this.bindSidebarCollapse();
         this.initTopbar(options);
         this.highlightActiveNav(options.active || '');
-        this.updateSidebarCard(user);
+        
+        // Só exibe o card inferior se for a página de configurações
+        if (options.active === 'configuracoes') {
+            this.updateSidebarCard(user);
+        } else {
+            const sidebarFoot = document.querySelector('.sidebar-foot');
+            if (sidebarFoot) sidebarFoot.innerHTML = '';
+        }
+        
         return user;
     },
 
     bindSidebarCollapse() {
         const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        if (collapsed) document.body.classList.add('sidebar-collapsed');
+        if (collapsed) {
+            document.body.classList.add('sidebar-collapsed');
+        } else {
+            document.body.classList.remove('sidebar-collapsed');
+        }
 
         let toggle = document.getElementById('sidebar-toggle');
         if (!toggle) {
@@ -26,17 +38,24 @@ const Layout = {
             toggle.id = 'sidebar-toggle';
             toggle.type = 'button';
             toggle.className = 'sidebar-toggle';
-            toggle.title = 'Recolher menu';
+            toggle.title = collapsed ? 'Expandir menu' : 'Recolher menu';
             // Usando o ícone correto da Lucide para recolher/expandir
-            toggle.innerHTML = `<i class="${collapsed ? 'lucide-panel-left-open' : 'lucide-panel-left'}"></i>`;
+            toggle.innerHTML = `<i class="${collapsed ? 'icon-panel-left-open' : 'icon-panel-left'}"></i>`;
             sidebar.insertBefore(toggle, sidebar.firstChild);
+        } else {
+            // Se o toggle já existe, atualiza o ícone e título baseado no estado inicial
+            const icon = toggle.querySelector('i');
+            if (icon) icon.className = collapsed ? 'icon-panel-left-open' : 'icon-panel-left';
+            toggle.title = collapsed ? 'Expandir menu' : 'Recolher menu';
         }
 
         toggle.onclick = () => {
             document.body.classList.toggle('sidebar-collapsed');
             const isCollapsed = document.body.classList.contains('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
-            toggle.querySelector('i').className = isCollapsed ? 'lucide-panel-left-open' : 'lucide-panel-left';
+            
+            const icon = toggle.querySelector('i');
+            if (icon) icon.className = isCollapsed ? 'icon-panel-left-open' : 'icon-panel-left';
             toggle.title = isCollapsed ? 'Expandir menu' : 'Recolher menu';
         };
     },
@@ -51,7 +70,7 @@ const Layout = {
                     <div class="mini-title">Membro SheTech</div>
                     <div class="mini-sub">Desde ${year} · @${user.nome_usuario || 'membra'}</div>
                     <button onclick="State.logout()" class="nav-item" style="width:100%;text-align:left;background:rgba(255,61,139,0.1);border:none;margin-top:12px;padding:8px 12px;color:var(--pink)">
-                        <i class="lucide-log-out"></i> <span class="nav-label">Sair</span>
+                        <i class="icon-log-out"></i> <span class="nav-label">Sair</span>
                     </button>
                 </div>
             `;
@@ -76,10 +95,13 @@ const Layout = {
 
         const avatar = document.getElementById('top-avatar');
         const name = document.getElementById('top-name');
+        const welcomeName = document.getElementById('welcome-name');
         const avatarUrl = user.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo)}&background=ff3d8b&color=fff`;
 
         if (avatar) avatar.src = avatarUrl;
-        if (name) name.innerText = `Olá, ${user.nome_completo.split(' ')[0]}`;
+        const firstName = user.nome_completo.split(' ')[0];
+        if (name) name.innerText = `Olá, ${firstName}`;
+        if (welcomeName) welcomeName.innerText = firstName;
 
         const notifs = State.getNotifications(user.email).filter(n => !n.lida);
         const dot = document.getElementById('notif-dot');

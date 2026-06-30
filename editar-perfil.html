@@ -7,20 +7,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icon-static@0.456.0/font/lucide.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/editar-perfil.css">
 </head>
 <body>
   <aside class="sidebar">
-    <div class="logo"><span class="logo-mark">◆</span><span class="logo-text">She<span class="accent">Tech</span></span></div>
+    <div class="logo"><span class="logo-text">She<span class="accent">Tech</span></span></div>
     <nav class="nav">
-      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
-      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
-      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
-      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
-      <a href="perfil.html" class="nav-item active" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
-      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="icon-home"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="icon-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="icon-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="icon-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item active" data-page="perfil"><i class="icon-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="icon-settings"></i> <span class="nav-label">Configurações</span></a>
     </nav>
     <div class="sidebar-foot" style="margin-top:auto"></div>
   </aside>
@@ -42,7 +42,7 @@
         <!-- SEÇÃO: IDENTIDADE -->
         <div class="card edit-section">
           <div class="edit-section-head">
-            <i class="lucide-user-circle"></i>
+            <i class="icon-user-circle"></i>
             <div>
               <h2>Identidade</h2>
               <p>Como você aparece para outras membros.</p>
@@ -53,7 +53,7 @@
             <div class="edit-avatar-wrap">
               <img id="edit-avatar-preview" src="" alt="Foto de perfil" />
               <label for="avatar-upload" class="avatar-cam-btn" title="Trocar foto">
-                <i class="lucide-camera"></i>
+                <i class="icon-camera"></i>
               </label>
               <input type="file" id="avatar-upload" hidden accept="image/*" />
             </div>
@@ -61,7 +61,7 @@
               <p class="avatar-hint-title">Foto de perfil</p>
               <p class="avatar-hint-sub">JPG, PNG ou GIF · Máx. 2 MB</p>
               <button type="button" class="btn-remove-avatar" id="btn-remove-avatar">
-                <i class="lucide-trash-2"></i> Remover foto
+                <i class="icon-trash-2"></i> Remover foto
               </button>
             </div>
           </div>
@@ -111,7 +111,7 @@
         <!-- SEÇÃO: HABILIDADES -->
         <div class="card edit-section">
           <div class="edit-section-head">
-            <i class="lucide-zap"></i>
+            <i class="icon-zap"></i>
             <div>
               <h2>Habilidades</h2>
               <p>Adicione suas principais tecnologias e competências.</p>
@@ -120,7 +120,7 @@
           <div class="skills-input-row">
             <input type="text" id="skill-input" placeholder="Ex: React, Python, Figma..." maxlength="30" />
             <button type="button" class="btn-add-skill" id="btn-add-skill">
-              <i class="lucide-plus"></i> Adicionar
+              <i class="icon-plus"></i> Adicionar
             </button>
           </div>
           <div class="skills-tags" id="skills-tags"></div>
@@ -130,7 +130,7 @@
         <!-- SEÇÃO: LINKS -->
         <div class="card edit-section">
           <div class="edit-section-head">
-            <i class="lucide-link"></i>
+            <i class="icon-link"></i>
             <div>
               <h2>Links e Redes Sociais</h2>
               <p>Compartilhe seu portfólio e presença online.</p>
@@ -139,25 +139,25 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="edit-linkedin">
-                <i class="lucide-linkedin"></i> LinkedIn
+                <i class="icon-linkedin"></i> LinkedIn
               </label>
               <input type="url" id="edit-linkedin" placeholder="https://linkedin.com/in/seuuser" />
             </div>
             <div class="form-group">
               <label for="edit-github">
-                <i class="lucide-github"></i> GitHub
+                <i class="icon-github"></i> GitHub
               </label>
               <input type="url" id="edit-github" placeholder="https://github.com/seuuser" />
             </div>
             <div class="form-group">
               <label for="edit-portfolio">
-                <i class="lucide-globe"></i> Portfólio / Site
+                <i class="icon-globe"></i> Portfólio / Site
               </label>
               <input type="url" id="edit-portfolio" placeholder="https://seusite.com" />
             </div>
             <div class="form-group">
               <label for="edit-instagram">
-                <i class="lucide-instagram"></i> Instagram
+                <i class="icon-instagram"></i> Instagram
               </label>
               <input type="text" id="edit-instagram" placeholder="@seuuser" />
             </div>
@@ -181,7 +181,7 @@
 
         <div class="edit-actions-sticky">
           <button type="submit" form="edit-profile-form" class="btn btn-primary btn-full">
-            <i class="lucide-check"></i> Salvar Alterações
+            <i class="icon-check"></i> Salvar Alterações
           </button>
           <a href="perfil.html" class="btn btn-ghost btn-full">Cancelar</a>
         </div>

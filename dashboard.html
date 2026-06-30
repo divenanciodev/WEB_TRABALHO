@@ -13,14 +13,14 @@
 </head>
 <body>
   <aside class="sidebar">
-    <div class="logo"><span class="logo-mark">◆</span><span class="logo-text">She<span class="accent">Tech</span></span></div>
+    <div class="logo"><span class="logo-text">She<span class="accent">Tech</span></span></div>
     <nav class="nav">
-      <a href="dashboard.html" class="nav-item active" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
-      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
-      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
-      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
-      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
-      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+      <a href="dashboard.html" class="nav-item active" data-page="dashboard"><i class="icon-house"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="icon-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="icon-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="icon-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="icon-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="icon-settings"></i> <span class="nav-label">Configurações</span></a>
     </nav>
     <div class="sidebar-foot" style="margin-top:auto"></div>
   </aside>
@@ -30,7 +30,7 @@
       <h1 class="page-title">Painel de Controle</h1>
       <div class="topbar-actions">
         <button class="icon-btn" title="Notificações" onclick="window.location.href='notificacoes.html'">
-          <i class="lucide-bell"></i><span class="dot" id="notif-dot" style="display:none"></span>
+          <i class="icon-bell"></i><span class="dot" id="notif-dot" style="display:none"></span>
         </button>
         <a href="perfil.html" class="me">
           <img id="top-avatar" src="" alt="" /><span id="top-name">Olá</span>
@@ -46,34 +46,31 @@
           <p class="welcome-sub">Bem-vinda de volta 👋</p>
           <h2 class="welcome-name" id="welcome-name">Carregando...</h2>
         </div>
-        <div class="welcome-chips">
-          <span class="chip chip-streak" id="chip-streak">🔥 &mdash; dias seguidos</span>
-          <span class="chip chip-member">✦ Membro SheTech</span>
-        </div>
+
       </div>
 
       <!-- CARDS DE MÉTRICAS -->
       <div class="dashboard-grid">
         <div class="card stat-card">
-          <h3><i class="lucide-folder-kanban"></i> Projetos Ativos</h3>
+          <h3><i class="icon-folder-kanban"></i> Projetos Ativos</h3>
           <div class="stat-num" id="dash-projects-count">0</div>
           <p class="stat-sub">Trabalhando em novas ideias</p>
           <a href="projetos.html" class="stat-link">Ver projetos →</a>
         </div>
         <div class="card stat-card">
-          <h3><i class="lucide-calendar-days"></i> Próximos Eventos</h3>
+          <h3><i class="icon-calendar-days"></i> Próximos Eventos</h3>
           <div class="stat-num" id="dash-events-count">0</div>
           <p class="stat-sub">Não perca nenhuma data</p>
           <a href="eventos.html" class="stat-link">Ver eventos →</a>
         </div>
         <div class="card stat-card">
-          <h3><i class="lucide-users"></i> Conexões</h3>
+          <h3><i class="icon-users"></i> Conexões</h3>
           <div class="stat-num" id="dash-members-count">0</div>
           <p class="stat-sub">Membros na comunidade</p>
           <a href="comunidade.html" class="stat-link">Ver comunidade →</a>
         </div>
         <div class="card stat-card stat-card-perfil">
-          <h3><i class="lucide-badge-check"></i> Perfil</h3>
+          <h3><i class="icon-badge-check"></i> Perfil</h3>
           <div class="stat-num" id="dash-profile-pct">—</div>
           <div class="mini-bar-wrap"><div class="mini-bar" id="mini-bar"></div></div>
           <a href="perfil.html" class="stat-link">Completar perfil →</a>
@@ -85,7 +82,7 @@
         <div class="col">
           <div class="card">
             <div class="card-head">
-              <h3><i class="lucide-activity"></i> Atividades Recentes</h3>
+              <h3><i class="icon-activity"></i> Atividades Recentes</h3>
               <a href="comunidade.html" class="link">Ver Feed</a>
             </div>
             <div id="recent-activity-list" style="display:flex;flex-direction:column;gap:12px">
@@ -96,7 +93,7 @@
         <div class="col">
           <div class="card">
             <div class="card-head">
-              <h3><i class="lucide-star"></i> Projetos em Destaque</h3>
+              <h3><i class="icon-star"></i> Projetos em Destaque</h3>
               <a href="projetos.html" class="link">Ver Todos</a>
             </div>
             <div id="featured-projects-list" style="display:flex;flex-direction:column;gap:12px">
@@ -112,7 +109,7 @@
         <!-- AVISOS DA PLATAFORMA -->
         <div class="card avisos-card">
           <div class="card-head">
-            <h3><i class="lucide-megaphone"></i> Avisos da Plataforma</h3>
+            <h3><i class="icon-megaphone"></i> Avisos da Plataforma</h3>
           </div>
           <div class="avisos-lista" id="avisos-lista">
             <div class="aviso-item aviso-destaque">
@@ -145,18 +142,18 @@
         <!-- PROGRESSO DO PERFIL -->
         <div class="card progresso-card">
           <div class="card-head">
-            <h3><i class="lucide-sparkles"></i> Complete seu Perfil</h3>
+            <h3><i class="icon-sparkles"></i> Complete seu Perfil</h3>
             <span class="pct-badge" id="pct-badge">—</span>
           </div>
           <div class="progresso-bar-wrap">
             <div class="progresso-bar" id="progresso-bar" style="width:0%"></div>
           </div>
           <ul class="checklist" id="checklist">
-            <li class="check-item done"><i class="lucide-check-circle"></i> Foto de perfil adicionada</li>
-            <li class="check-item done"><i class="lucide-check-circle"></i> Habilidades preenchidas</li>
-            <li class="check-item done"><i class="lucide-check-circle"></i> Experiência adicionada</li>
-            <li class="check-item pend"><i class="lucide-circle"></i> Adicione um link do LinkedIn</li>
-            <li class="check-item pend"><i class="lucide-circle"></i> Escreva uma bio de apresentação</li>
+            <li class="check-item done"><i class="icon-check-circle"></i> Foto de perfil adicionada</li>
+            <li class="check-item done"><i class="icon-check-circle"></i> Habilidades preenchidas</li>
+            <li class="check-item done"><i class="icon-check-circle"></i> Experiência adicionada</li>
+            <li class="check-item pend"><i class="icon-circle"></i> Adicione um link do LinkedIn</li>
+            <li class="check-item pend"><i class="icon-circle"></i> Escreva uma bio de apresentação</li>
           </ul>
           <a href="perfil.html" class="btn-completar">Completar agora</a>
         </div>

@@ -8,7 +8,12 @@ document.getElementById('register-form').addEventListener('submit', (e) => {
         nome_completo: document.getElementById('nome_completo').value,
         nome_usuario: document.getElementById('nome_usuario').value,
         email: document.getElementById('email').value,
-        data_cadastro: new Date().toISOString()
+        senha: document.getElementById('senha').value,
+        data_cadastro: new Date().toISOString(),
+        foto_perfil: '',
+        bio: '',
+        habilidades: [],
+        experiencia: []
       };
       const users = State.getUsers();
       if (users.find(u => u.email === newUser.email || u.nome_usuario === newUser.nome_usuario)) {

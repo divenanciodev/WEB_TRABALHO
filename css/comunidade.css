@@ -70,7 +70,37 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 100;
-  transition: transform var(--trans);
+  transition: transform var(--trans), width var(--trans);
+}
+
+body.sidebar-collapsed .sidebar {
+  width: 76px;
+}
+
+body.sidebar-collapsed .sidebar .logo-text,
+body.sidebar-collapsed .sidebar .nav-label,
+body.sidebar-collapsed .sidebar .user-info,
+body.sidebar-collapsed .sidebar .nav-badge {
+  display: none;
+}
+
+body.sidebar-collapsed .sidebar .logo {
+  justify-content: center;
+  padding: 4px 0;
+}
+
+body.sidebar-collapsed .sidebar .nav-item {
+  justify-content: center;
+  padding: 11px;
+}
+
+body.sidebar-collapsed .sidebar .sidebar-user {
+  justify-content: center;
+  padding: 16px 10px 20px;
+}
+
+body.sidebar-collapsed .main {
+  margin-left: 76px;
 }
 
 .sidebar-top { padding: 20px 20px 8px; }
@@ -182,6 +212,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  transition: margin-left var(--trans);
 }
 
 /* ─── TOPBAR ──────────────────────────────── */

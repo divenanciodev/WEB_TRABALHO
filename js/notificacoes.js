@@ -5,7 +5,7 @@ const user = Layout.init({ active: '', title: 'Notificações' });
       const container = document.getElementById('notif-container');
       const notifs = State.getNotifications(user.email);
       if (!notifs.length) {
-        container.innerHTML = '<p style="padding:40px;text-align:center;color:var(--gray-500)"><i class="lucide-bell-off" style="font-size:24px;display:block;margin-bottom:8px"></i>Você não tem notificações.</p>';
+        container.innerHTML = '<p style="padding:40px;text-align:center;color:var(--gray-500)"><i class="icon-bell-off" style="font-size:24px;display:block;margin-bottom:8px"></i>Você não tem notificações.</p>';
         return;
       }
       container.innerHTML = notifs.map(n => `

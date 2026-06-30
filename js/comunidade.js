@@ -102,11 +102,32 @@ let nextPostId    = MOCK_POSTS.length + 1;
 /* ─── INIT ────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Persistência da sidebar
+  const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+  if (collapsed) {
+    document.body.classList.add('sidebar-collapsed');
+  }
+
+  // Personalização da saudação e limpeza da sidebar inferior
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    const user = JSON.parse(storedUser);
+    const firstName = user.nome_completo.split(' ')[0];
+    const topName = document.getElementById('top-name');
+    const welcomeName = document.getElementById('welcome-name');
+    const sidebarUser = document.querySelector('.sidebar-user');
+    
+    if (topName) topName.innerText = `Olá, ${firstName}`;
+    if (welcomeName) welcomeName.innerText = firstName;
+    if (sidebarUser) sidebarUser.innerHTML = ''; // Remove Analuiza Desenvolvedora
+  }
+
   renderFeed();
   renderLinks();
   renderMembers();
   initSearch();
-  document.getElementById('notif-dot').style.display = 'block';
+  const notifDot = document.getElementById('notif-dot');
+  if (notifDot) notifDot.style.display = 'block';
 });
 
 /* ─── TABS ────────────────────────────────── */
@@ -509,10 +530,18 @@ function markAllRead() {
   showToast('Todas marcadas como lidas.', 'success');
 }
 
-/* ─── SIDEBAR MOBILE ──────────────────────── */
+/* ─── SIDEBAR ─────────────────────────────── */
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  // Se estiver em mobile (resolução baixa), o toggle controla a visibilidade (abrir/fechar)
+  if (window.innerWidth <= 820) {
+    document.getElementById('sidebar').classList.toggle('open');
+  } else {
+    // Em desktop, o toggle controla o estado encolhido (sidebar-collapsed)
+    document.body.classList.toggle('sidebar-collapsed');
+    const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
+  }
 }
 
 /* ─── POST OPTIONS ────────────────────────── */

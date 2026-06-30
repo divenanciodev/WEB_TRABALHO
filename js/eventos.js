@@ -200,7 +200,7 @@
 
     const horarioStr = ev.horario ? ` às ${ev.horario}` : "";
     const locLabel = isOnline ? platformLabel(ev.link) : ev.endereco;
-    const locIcon = isOnline ? "lucide-video" : "lucide-map-pin";
+    const locIcon = isOnline ? "icon-video" : "icon-map-pin";
 
     card.innerHTML = `
       <div class="event-card-stripe ${isOnline ? "" : "event-card-stripe--presencial"}"></div>
@@ -214,11 +214,11 @@
           </div>
           <div style="position:relative">
             <button class="event-card-menu-btn" aria-label="Opções" data-id="${ev.id}">
-              <i class="lucide-more-vertical"></i>
+              <i class="icon-more-vertical"></i>
             </button>
             <div class="card-dropdown" id="dd-${ev.id}">
-              <button data-action="edit" data-id="${ev.id}"><i class="lucide-pencil"></i> Editar</button>
-              <button data-action="delete" data-id="${ev.id}" class="danger"><i class="lucide-trash-2"></i> Excluir</button>
+              <button data-action="edit" data-id="${ev.id}"><i class="icon-pencil"></i> Editar</button>
+              <button data-action="delete" data-id="${ev.id}" class="danger"><i class="icon-trash-2"></i> Excluir</button>
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@
 
         <div class="event-card-meta">
           <div class="meta-row">
-            <i class="lucide-calendar"></i>
+            <i class="icon-calendar"></i>
             <span>${formatDate(ev.data)}${horarioStr}</span>
           </div>
           <div class="meta-row">
@@ -241,7 +241,7 @@
         </div>
 
         <span class="date-pill ${cls}">
-          <i class="lucide-clock-4"></i> ${label}
+          <i class="icon-clock-4"></i> ${label}
         </span>
       </div>
     `;
@@ -384,7 +384,7 @@
     document.getElementById("detail-title").textContent = ev.titulo;
 
     const isOnline = ev.tipo === "online";
-    const locIcon = isOnline ? "lucide-video" : "lucide-map-pin";
+    const locIcon = isOnline ? "icon-video" : "icon-map-pin";
     const locLabel = isOnline ? "Link da reunião" : "Endereço";
     const locValue = isOnline
       ? `<a href="${ev.link}" target="_blank" rel="noopener">${ev.link}</a>`
@@ -393,7 +393,7 @@
     document.getElementById("detail-body").innerHTML = `
       <div class="detail-section">
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-calendar"></i></div>
+          <div class="detail-row-icon"><i class="icon-calendar"></i></div>
           <div class="detail-row-content">
             <strong>Data e Horário</strong>
             <span>${formatDate(ev.data)}${ev.horario ? " às " + ev.horario : ""}</span>
@@ -409,7 +409,7 @@
           </div>
         </div>
         <div class="detail-row">
-          <div class="detail-row-icon"><i class="lucide-tag"></i></div>
+          <div class="detail-row-icon"><i class="icon-tag"></i></div>
           <div class="detail-row-content">
             <strong>Categoria</strong>
             <span>${ev.categoria} • ${isOnline ? "Online" : "Presencial"}</span>
@@ -418,7 +418,7 @@
         ${
           ev.descricao
             ? `<div class="detail-row">
-                <div class="detail-row-icon"><i class="lucide-align-left"></i></div>
+                <div class="detail-row-icon"><i class="icon-align-left"></i></div>
                 <div class="detail-row-content">
                   <strong>Descrição</strong>
                   <div class="detail-descricao">${ev.descricao}</div>
@@ -515,6 +515,9 @@
   }
 
   /* ── Init ────────────────────────────────────────────────────── */
+  if (typeof Layout !== 'undefined') {
+    Layout.init({ active: 'eventos' });
+  }
   updateStats();
   renderEvents();
 })();

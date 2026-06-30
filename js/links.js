@@ -79,4 +79,10 @@ const user = State.getCurrentUser();
             renderLinks();
         }
 
-        document.addEventListener('DOMContentLoaded', renderLinks);
+        document.addEventListener('DOMContentLoaded', () => {
+    // Inicializa o layout compartilhado
+    if (typeof Layout !== 'undefined') {
+        Layout.init({ active: 'links', requireAuth: true });
+    }
+    renderLinks();
+});

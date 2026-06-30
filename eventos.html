@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icon-static@0.456.0/font/lucide.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/eventos.css">
 </head>
@@ -16,16 +16,15 @@
   <!-- ===== SIDEBAR ===== -->
   <aside class="sidebar">
     <div class="logo">
-      <span class="logo-mark">◆</span>
       <span class="logo-text">SheTech</span>
     </div>
     <nav class="nav">
-      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="lucide-home"></i> <span class="nav-label">Início</span></a>
-      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="lucide-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
-      <a href="eventos.html" class="nav-item active" data-page="eventos"><i class="lucide-calendar-days"></i> <span class="nav-label">Eventos</span></a>
-      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="lucide-users"></i> <span class="nav-label">Comunidade</span></a>
-      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="lucide-user"></i> <span class="nav-label">Perfil</span></a>
-      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="lucide-settings"></i> <span class="nav-label">Configurações</span></a>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="icon-home"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="icon-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item active" data-page="eventos"><i class="icon-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="icon-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="icon-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="icon-settings"></i> <span class="nav-label">Configurações</span></a>
     </nav>
   </aside>
 
@@ -37,7 +36,7 @@
       <h1 class="page-title">Eventos</h1>
       <div class="topbar-actions">
         <button class="btn btn-primary" id="btn-novo-evento">
-          <i class="lucide-plus"></i> Novo Evento
+          <i class="icon-plus"></i> Novo Evento
         </button>
         <a href="perfil.html" class="me">
           <img id="top-avatar" src="https://i.pravatar.cc/80?img=47" alt="Avatar" />
@@ -49,28 +48,28 @@
     <!-- Stats rápidas -->
     <div class="stats-row">
       <div class="stat-mini">
-        <span class="stat-icon stat-icon--pink"><i class="lucide-calendar-days"></i></span>
+        <span class="stat-icon stat-icon--pink"><i class="icon-calendar-days"></i></span>
         <div>
           <div class="stat-mini-num" id="stat-total">0</div>
           <div class="stat-mini-label">Total</div>
         </div>
       </div>
       <div class="stat-mini">
-        <span class="stat-icon stat-icon--blue"><i class="lucide-video"></i></span>
+        <span class="stat-icon stat-icon--blue"><i class="icon-video"></i></span>
         <div>
           <div class="stat-mini-num" id="stat-online">0</div>
           <div class="stat-mini-label">Online</div>
         </div>
       </div>
       <div class="stat-mini">
-        <span class="stat-icon stat-icon--green"><i class="lucide-map-pin"></i></span>
+        <span class="stat-icon stat-icon--green"><i class="icon-map-pin"></i></span>
         <div>
           <div class="stat-mini-num" id="stat-presencial">0</div>
           <div class="stat-mini-label">Presencial</div>
         </div>
       </div>
       <div class="stat-mini">
-        <span class="stat-icon stat-icon--orange"><i class="lucide-clock"></i></span>
+        <span class="stat-icon stat-icon--orange"><i class="icon-clock"></i></span>
         <div>
           <div class="stat-mini-num" id="stat-proximos">0</div>
           <div class="stat-mini-label">Próximos 7 dias</div>
@@ -81,7 +80,7 @@
     <!-- Filtros -->
     <div class="filters-bar">
       <div class="search-box">
-        <i class="lucide-search"></i>
+        <i class="icon-search"></i>
         <input type="text" id="search-input" placeholder="Buscar evento..." />
       </div>
       <div class="filter-chips">
@@ -93,8 +92,8 @@
         <button class="chip" data-filter="palestra">Palestra</button>
       </div>
       <div class="view-toggle">
-        <button class="view-btn view-btn--active" id="view-grid" title="Grade"><i class="lucide-layout-grid"></i></button>
-        <button class="view-btn" id="view-list" title="Lista"><i class="lucide-layout-list"></i></button>
+        <button class="view-btn view-btn--active" id="view-grid" title="Grade"><i class="icon-layout-grid"></i></button>
+        <button class="view-btn" id="view-list" title="Lista"><i class="icon-layout-list"></i></button>
       </div>
     </div>
 
@@ -105,11 +104,11 @@
 
     <!-- Empty state -->
     <div id="empty-state" class="empty-state" style="display:none">
-      <div class="empty-icon"><i class="lucide-calendar-x"></i></div>
+      <div class="empty-icon"><i class="icon-calendar-x"></i></div>
       <h3>Nenhum evento encontrado</h3>
       <p>Crie seu primeiro evento ou ajuste os filtros.</p>
       <button class="btn btn-primary" id="btn-empty-novo">
-        <i class="lucide-plus"></i> Criar evento
+        <i class="icon-plus"></i> Criar evento
       </button>
     </div>
 
@@ -121,7 +120,7 @@
 
       <div class="modal-header">
         <h2 id="modal-title">Novo Evento</h2>
-        <button class="modal-close" id="modal-close-btn" aria-label="Fechar"><i class="lucide-x"></i></button>
+        <button class="modal-close" id="modal-close-btn" aria-label="Fechar"><i class="icon-x"></i></button>
       </div>
 
       <form id="event-form" novalidate>
@@ -138,10 +137,10 @@
           <label>Tipo de Evento <span class="req">*</span></label>
           <div class="tipo-toggle">
             <button type="button" class="tipo-btn tipo-btn--active" data-tipo="online">
-              <i class="lucide-video"></i> Online
+              <i class="icon-video"></i> Online
             </button>
             <button type="button" class="tipo-btn" data-tipo="presencial">
-              <i class="lucide-map-pin"></i> Presencial
+              <i class="icon-map-pin"></i> Presencial
             </button>
           </div>
           <input type="hidden" id="event-tipo" value="online" />
@@ -151,7 +150,7 @@
         <div class="form-group" id="campo-online">
           <label for="event-link">Link da Reunião <span class="req">*</span></label>
           <div class="input-icon-wrap">
-            <i class="lucide-link"></i>
+            <i class="icon-link"></i>
             <input type="url" id="event-link" placeholder="https://meet.google.com/..." />
           </div>
           <div class="plataformas-hint">
@@ -165,7 +164,7 @@
         <div class="form-group" id="campo-presencial" style="display:none">
           <label for="event-endereco">Endereço <span class="req">*</span></label>
           <div class="input-icon-wrap">
-            <i class="lucide-map-pin"></i>
+            <i class="icon-map-pin"></i>
             <input type="text" id="event-endereco" placeholder="Rua, número, cidade..." />
           </div>
         </div>
@@ -175,14 +174,14 @@
           <div class="form-group">
             <label for="event-data">Data <span class="req">*</span></label>
             <div class="input-icon-wrap">
-              <i class="lucide-calendar"></i>
+              <i class="icon-calendar"></i>
               <input type="date" id="event-data" required />
             </div>
           </div>
           <div class="form-group">
             <label for="event-horario">Horário</label>
             <div class="input-icon-wrap">
-              <i class="lucide-clock"></i>
+              <i class="icon-clock"></i>
               <input type="time" id="event-horario" />
             </div>
           </div>
@@ -210,7 +209,7 @@
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" id="modal-cancel-btn">Cancelar</button>
           <button type="submit" class="btn btn-primary" id="modal-submit-btn">
-            <i class="lucide-check"></i> Salvar Evento
+            <i class="icon-check"></i> Salvar Evento
           </button>
         </div>
       </form>
@@ -222,12 +221,12 @@
     <div class="modal-content modal-content--detail">
       <div class="modal-header">
         <h2 id="detail-title">—</h2>
-        <button class="modal-close" id="detail-close-btn" aria-label="Fechar"><i class="lucide-x"></i></button>
+        <button class="modal-close" id="detail-close-btn" aria-label="Fechar"><i class="icon-x"></i></button>
       </div>
       <div id="detail-body"></div>
       <div class="form-actions" style="margin-top:24px">
-        <button class="btn btn-ghost" id="detail-edit-btn"><i class="lucide-pencil"></i> Editar</button>
-        <button class="btn btn-danger" id="detail-delete-btn"><i class="lucide-trash-2"></i> Excluir</button>
+        <button class="btn btn-ghost" id="detail-edit-btn"><i class="icon-pencil"></i> Editar</button>
+        <button class="btn btn-danger" id="detail-delete-btn"><i class="icon-trash-2"></i> Excluir</button>
       </div>
     </div>
   </div>
