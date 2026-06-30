@@ -3,49 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Links - Mulheres na Tech</title>
-    <link rel="stylesheet" href="css/index.css">
-    <style>
-        .link-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .link-info h4 { margin-bottom: 0.2rem; color: var(--primary-color); }
-        .link-info p { font-size: 0.9rem; color: var(--gray); }
-        .link-actions { display: flex; gap: 10px; }
-    </style>
+    <title>Links • SheTech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/links.css">
 </head>
 <body>
-    <div class="dashboard-layout">
         <aside class="sidebar">
-            <div class="logo" style="margin-bottom: 2rem;">SheTech</div>
-            <ul class="sidebar-menu">
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="projetos.html">Projetos</a></li>
-                <li><a href="eventos.html">Eventos</a></li>
-                <li><a href="comunidade.html">Comunidade</a></li>
-                <li><a href="links.html" class="active">Meus Links</a></li>
-                <li><a href="perfil.html">Perfil</a></li>
+    <div class="logo"><span class="logo-text">She<span class="accent">Tech</span></span></div>
+    <nav class="nav">
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i class="icon-house"></i> <span class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i class="icon-folder-kanban"></i> <span class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i class="icon-calendar-days"></i> <span class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i class="icon-users"></i> <span class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item" data-page="perfil"><i class="icon-user"></i> <span class="nav-label">Perfil</span></a>
+      <a href="links.html" class="nav-item" data-page="links"><i class="icon-link"></i> <span class="nav-label">Links</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i class="icon-settings"></i> <span class="nav-label">Configurações</span></a>
+    </nav>
+    <div class="sidebar-foot" style="margin-top:auto"></div>
+  </aside>
 
-                <li><a href="configuracoes.html">Configurações</a></li>
-                <li style="margin-top: 2rem;"><button onclick="State.logout()" class="btn btn-outline" style="width: 100%;">Sair</button></li>
-            </ul>
-        </aside>
+  <main class="main">
+    <header class="topbar">
+      <h1 class="page-title">Meus Links</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="icon-plus"></i> Adicionar Link
+        </button>
+        <a href="perfil.html" class="me">
+          <img id="top-avatar" src="" alt="" />
+          <span id="top-name">Olá</span>
+        </a>
+      </div>
+    </header>
 
-        <main class="main-content">
-            <header style="background: transparent; box-shadow: none; padding: 0; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
-                <h1>Meus Links</h1>
-                <button class="btn btn-primary" onclick="openAddModal()">+ Adicionar Link</button>
-            </header>
-
-            <div id="links-container">
-                <!-- Links here -->
-            </div>
-        </main>
+    <div class="page-content">
+      <div id="links-container" class="content-grid">
+          <!-- Links here -->
+      </div>
     </div>
+  </main>
 
     <!-- Modal for Add/Edit Link -->
     <div id="link-modal" class="modal">

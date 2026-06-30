@@ -23,11 +23,23 @@ const Layout = {
 
     bindSidebarCollapse() {
         const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        // Desativa transições temporariamente para evitar o "tremido" no carregamento
+        document.body.style.transition = 'none';
+        
         if (collapsed) {
             document.body.classList.add('sidebar-collapsed');
         } else {
             document.body.classList.remove('sidebar-collapsed');
         }
+        
+        // Força o reflow para aplicar a classe sem transição
+        document.body.offsetHeight;
+        
+        // Restaura a transição definida no CSS após um pequeno delay para garantir que o estado inicial foi aplicado
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 50);
 
         let toggle = document.getElementById('sidebar-toggle');
         if (!toggle) {

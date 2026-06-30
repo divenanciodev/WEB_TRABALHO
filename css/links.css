@@ -1,0 +1,32 @@
+.link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.link-info h4 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    color: var(--ink);
+}
+
+.link-info p {
+    font-size: 14px;
+    color: var(--gray-500);
+}
+
+.link-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.link-category {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pink);
+    background: var(--pink-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    align-self: flex-start;
+}

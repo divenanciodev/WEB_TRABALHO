@@ -102,24 +102,21 @@ let nextPostId    = MOCK_POSTS.length + 1;
 /* ─── INIT ────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Persistência da sidebar
-  const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-  if (collapsed) {
-    document.body.classList.add('sidebar-collapsed');
-  }
+  // Inicializa o layout compartilhado
+  if (typeof Layout !== 'undefined') {
+    Layout.init({ active: 'comunidade' });
+  } else {
+    // Fallback caso Layout não esteja disponível
+    const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (collapsed) document.body.classList.add('sidebar-collapsed');
 
-  // Personalização da saudação e limpeza da sidebar inferior
-  const storedUser = localStorage.getItem('currentUser');
-  if (storedUser) {
-    const user = JSON.parse(storedUser);
-    const firstName = user.nome_completo.split(' ')[0];
-    const topName = document.getElementById('top-name');
-    const welcomeName = document.getElementById('welcome-name');
-    const sidebarUser = document.querySelector('.sidebar-user');
-    
-    if (topName) topName.innerText = `Olá, ${firstName}`;
-    if (welcomeName) welcomeName.innerText = firstName;
-    if (sidebarUser) sidebarUser.innerHTML = ''; // Remove Analuiza Desenvolvedora
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const firstName = user.nome_completo.split(' ')[0];
+        const topName = document.getElementById('top-name');
+        if (topName) topName.innerText = `Olá, ${firstName}`;
+    }
   }
 
   renderFeed();
@@ -531,18 +528,9 @@ function markAllRead() {
 }
 
 /* ─── SIDEBAR ─────────────────────────────── */
-
-function toggleSidebar() {
-  // Se estiver em mobile (resolução baixa), o toggle controla a visibilidade (abrir/fechar)
-  if (window.innerWidth <= 820) {
-    document.getElementById('sidebar').classList.toggle('open');
-  } else {
-    // Em desktop, o toggle controla o estado encolhido (sidebar-collapsed)
-    document.body.classList.toggle('sidebar-collapsed');
-    const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
-  }
-}
+// A funcionalidade de sidebar agora é gerenciada pelo Layout.js compartilhado.
+// O botão de toggle na topbar chama a função global toggleSidebar se necessário,
+// mas o padrão do sistema é usar o botão dentro da sidebar injetado pelo Layout.js.
 
 /* ─── POST OPTIONS ────────────────────────── */
 
@@ -571,13 +559,16 @@ function sharePost(id) {
 
 /* ─── TOAST ───────────────────────────────── */
 
-let toastTimer;
 function showToast(msg, type) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (type ? ' ' + type : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+  if (typeof Layout !== 'undefined' && Layout.showToast) {
+    Layout.showToast(msg);
+  } else {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'toast show' + (type ? ' ' + type : '');
+    setTimeout(() => el.classList.remove('show'), 3200);
+  }
 }
 
 /* ─── UTILS ───────────────────────────────── */

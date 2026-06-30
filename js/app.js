@@ -56,6 +56,13 @@ const State = {
     deleteLink(id) { this.deleteData('links', id); },
     getNotifications(email) {
         return this.getData('notifications').filter(n => n.destinataria_id === email);
+    },
+    markAllAsRead(email) {
+        const notifs = this.getData('notifications');
+        notifs.forEach(n => {
+            if (n.destinataria_id === email) n.lida = true;
+        });
+        localStorage.setItem('notifications', JSON.stringify(notifs));
     }
 };
 

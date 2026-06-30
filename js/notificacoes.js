@@ -1,4 +1,4 @@
-const user = Layout.init({ active: '', title: 'Notificações' });
+const user = Layout.init({ active: 'dashboard', title: 'Notificações' });
     if (!user) throw new Error('auth');
 
     function renderNotifs() {
