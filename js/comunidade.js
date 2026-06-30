@@ -8,7 +8,7 @@ const CURRENT_USER = {
   id: 0,
   name: 'Ana Luiza',
   role: 'Desenvolvedora Front-end',
-  avatar: 'https://i.pravatar.cc/44?img=47'
+  avatar: 'assets/avatars/avatar.svg'
 };
 
 const MOCK_POSTS = [
@@ -16,7 +16,7 @@ const MOCK_POSTS = [
     id: 1,
     author: 'Carla Mendes',
     role: 'Full Stack Dev',
-    avatar: 'https://i.pravatar.cc/44?img=5',
+    avatar: 'assets/avatars/avatar.svg',
     time: '5 minutos atrás',
     text: 'Acabei de lançar meu primeiro projeto open source! 🚀 Um template de autenticação com Next.js e Prisma. Se quiserem colaborar, o PR é bem-vindo! #opensource #nextjs #carreira',
     tags: ['#opensource', '#nextjs'],
@@ -29,7 +29,7 @@ const MOCK_POSTS = [
     id: 2,
     author: 'Bia Torres',
     role: 'UX Designer',
-    avatar: 'https://i.pravatar.cc/44?img=9',
+    avatar: 'assets/avatars/avatar.svg',
     time: '32 minutos atrás',
     text: 'Dica rápida de acessibilidade: sempre use aria-label em ícones sem texto visível. Parece pequeno, mas faz uma diferença enorme para usuárias de leitores de tela. A gente faz código para todas. 💜 #uxdesign #acessibilidade',
     tags: ['#uxdesign', '#acessibilidade'],
@@ -42,7 +42,7 @@ const MOCK_POSTS = [
     id: 3,
     author: 'Julia Costa',
     role: 'Data Scientist',
-    avatar: 'https://i.pravatar.cc/44?img=16',
+    avatar: 'assets/avatars/avatar.svg',
     time: '1 hora atrás',
     text: 'Compartilhando um recurso incrível que encontrei esta semana. O curso da fast.ai para ML prático é gratuito e absolutamente fenomenal. Recomendo para todas que estão entrando em IA/ML. #datascience #machinelearning',
     tags: ['#datascience', '#machinelearning'],
@@ -55,7 +55,7 @@ const MOCK_POSTS = [
     id: 4,
     author: 'Mariana Lima',
     role: 'Product Manager',
-    avatar: 'https://i.pravatar.cc/44?img=21',
+    avatar: 'assets/avatars/avatar.svg',
     time: '3 horas atrás',
     text: 'Reflexão do dia: produto sem diversidade nas equipes é produto com pontos cegos. Precisamos de mais mulheres tomando decisões sobre o que construímos. Nossa perspectiva não é diferencial — é necessidade. #mulhereslíderes #product',
     tags: ['#mulhereslíderes', '#product'],
@@ -75,18 +75,18 @@ const MOCK_LINKS = [
 ];
 
 const MOCK_MEMBERS = [
-  { id: 1,  name: 'Carla Mendes',   role: 'Full Stack Dev',      avatar: 'https://i.pravatar.cc/60?img=5',  online: true,  skills: ['React', 'Node.js'] },
-  { id: 2,  name: 'Bia Torres',     role: 'UX Designer',         avatar: 'https://i.pravatar.cc/60?img=9',  online: true,  skills: ['Figma', 'UX'] },
-  { id: 3,  name: 'Julia Costa',    role: 'Data Scientist',       avatar: 'https://i.pravatar.cc/60?img=16', online: true,  skills: ['Python', 'ML'] },
-  { id: 4,  name: 'Mariana Lima',   role: 'Product Manager',      avatar: 'https://i.pravatar.cc/60?img=21', online: false, skills: ['Product', 'Scrum'] },
-  { id: 5,  name: 'Sofia Andrade',  role: 'DevOps Engineer',      avatar: 'https://i.pravatar.cc/60?img=25', online: false, skills: ['Docker', 'AWS'] },
-  { id: 6,  name: 'Letícia Rocha',  role: 'Desenvolvedora iOS',   avatar: 'https://i.pravatar.cc/60?img=32', online: true,  skills: ['Swift', 'iOS'] },
-  { id: 7,  name: 'Fernanda Cruz',  role: 'Back-end Developer',   avatar: 'https://i.pravatar.cc/60?img=44', online: false, skills: ['Java', 'Spring'] },
-  { id: 8,  name: 'Priya Sharma',   role: 'Data Analyst',         avatar: 'https://i.pravatar.cc/60?img=48', online: true,  skills: ['SQL', 'Power BI'] },
-  { id: 9,  name: 'Amanda Souza',   role: 'Desenvolvedora',       avatar: 'https://i.pravatar.cc/60?img=51', online: false, skills: ['Vue.js', 'Firebase'] },
-  { id: 10, name: 'Tatiana Alves',  role: 'Designer de Produto',  avatar: 'https://i.pravatar.cc/60?img=56', online: false, skills: ['Figma', 'Motion'] },
-  { id: 11, name: 'Renata Faria',   role: 'Full Stack Dev',       avatar: 'https://i.pravatar.cc/60?img=60', online: true,  skills: ['React', 'GraphQL'] },
-  { id: 12, name: 'Camila Duarte',  role: 'Product Manager',      avatar: 'https://i.pravatar.cc/60?img=63', online: false, skills: ['Product', 'OKRs'] }
+  { id: 1,  name: 'Carla Mendes',   role: 'Full Stack Dev',      avatar: 'assets/avatars/avatar.svg',  online: true,  skills: ['React', 'Node.js'] },
+  { id: 2,  name: 'Bia Torres',     role: 'UX Designer',         avatar: 'assets/avatars/avatar.svg',  online: true,  skills: ['Figma', 'UX'] },
+  { id: 3,  name: 'Julia Costa',    role: 'Data Scientist',       avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['Python', 'ML'] },
+  { id: 4,  name: 'Mariana Lima',   role: 'Product Manager',      avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Product', 'Scrum'] },
+  { id: 5,  name: 'Sofia Andrade',  role: 'DevOps Engineer',      avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Docker', 'AWS'] },
+  { id: 6,  name: 'Letícia Rocha',  role: 'Desenvolvedora iOS',   avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['Swift', 'iOS'] },
+  { id: 7,  name: 'Fernanda Cruz',  role: 'Back-end Developer',   avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Java', 'Spring'] },
+  { id: 8,  name: 'Priya Sharma',   role: 'Data Analyst',         avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['SQL', 'Power BI'] },
+  { id: 9,  name: 'Amanda Souza',   role: 'Desenvolvedora',       avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Vue.js', 'Firebase'] },
+  { id: 10, name: 'Tatiana Alves',  role: 'Designer de Produto',  avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Figma', 'Motion'] },
+  { id: 11, name: 'Renata Faria',   role: 'Full Stack Dev',       avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['React', 'GraphQL'] },
+  { id: 12, name: 'Camila Duarte',  role: 'Product Manager',      avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Product', 'OKRs'] }
 ];
 
 /* ─── ESTADO ──────────────────────────────── */
@@ -279,11 +279,11 @@ function addEmoji() {
 
 const MOCK_COMMENTS = {
   1: [
-    { id: 1, author: 'Bia Torres', avatar: 'https://i.pravatar.cc/32?img=9', text: 'Uau! Parabéns, Carla! Vou dar uma olhada no repositório.', time: '3min' },
-    { id: 2, author: 'Julia Costa', avatar: 'https://i.pravatar.cc/32?img=16', text: 'Que orgulho! Open source é a melhor escola 🚀', time: '7min' }
+    { id: 1, author: 'Bia Torres', avatar: 'assets/avatars/avatar.svg', text: 'Uau! Parabéns, Carla! Vou dar uma olhada no repositório.', time: '3min' },
+    { id: 2, author: 'Julia Costa', avatar: 'assets/avatars/avatar.svg', text: 'Que orgulho! Open source é a melhor escola 🚀', time: '7min' }
   ],
   2: [
-    { id: 1, author: 'Carla Mendes', avatar: 'https://i.pravatar.cc/32?img=5', text: 'Tão importante essa dica! Já apliquei no meu projeto hoje.', time: '20min' }
+    { id: 1, author: 'Carla Mendes', avatar: 'assets/avatars/avatar.svg', text: 'Tão importante essa dica! Já apliquei no meu projeto hoje.', time: '20min' }
   ],
   3: [],
   4: []

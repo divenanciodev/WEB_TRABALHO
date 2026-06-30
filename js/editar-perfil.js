@@ -6,7 +6,7 @@ let skills = Array.isArray(user.habilidades) ? [...user.habilidades] : [];
 
 /* ─── CARREGAR CAMPOS ─────────────────────────────────── */
 function loadFields() {
-    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo || 'U')}&background=ff3d8b&color=fff`;
+    const fallbackAvatar = `assets/avatars/avatar.svg`;
 
     setVal('edit-name',      user.nome_completo || '');
     setVal('edit-username',  user.nome_usuario  || '');
@@ -54,7 +54,7 @@ document.getElementById('avatar-upload').addEventListener('change', (e) => {
 
 document.getElementById('btn-remove-avatar')?.addEventListener('click', () => {
     currentAvatar = '';
-    const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo || 'U')}&background=ff3d8b&color=fff`;
+    const fallback = `assets/avatars/avatar.svg`;
     setImg('edit-avatar-preview', fallback);
     setImg('preview-avatar-img',  fallback);
     document.getElementById('avatar-upload').value = '';

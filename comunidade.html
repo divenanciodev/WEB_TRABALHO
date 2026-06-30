@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Comunidade • SheTech</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.456.0/font/lucide.css">
+    <link rel="stylesheet" href="vendor/fonts/fonts.css">
+    <link rel="stylesheet" href="vendor/lucide/lucide.css">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/comunidade.css">
 </head>
@@ -71,7 +69,7 @@
         </div>
 
         <a href="perfil.html" class="topbar-user">
-          <img id="top-avatar" src="https://i.pravatar.cc/36?img=47" alt="Usuária" />
+          <img id="top-avatar" src="assets/avatars/avatar.svg" alt="Usuária" />
           <span id="top-name">Ana Luiza</span>
         </a>
       </div>
@@ -130,7 +128,7 @@
             <!-- Composer -->
             <div class="composer card">
               <div class="composer-top">
-                <img src="https://i.pravatar.cc/44?img=47" alt="Você" class="composer-avatar" />
+                <img src="assets/avatars/avatar.svg" alt="Você" class="composer-avatar" />
                 <div class="composer-field" id="composer-field" onclick="expandComposer()" contenteditable="true" data-placeholder="Compartilhe algo com a comunidade..."></div>
               </div>
               <div id="media-preview" class="media-preview" style="display:none">
@@ -220,7 +218,7 @@
               <div class="active-members">
                 <div class="active-member" onclick="viewProfile(1)">
                   <div class="member-thumb-wrap">
-                    <img src="https://i.pravatar.cc/36?img=5" alt="Carla">
+                    <img src="assets/avatars/avatar.svg" alt="Carla">
                     <span class="online-indicator"></span>
                   </div>
                   <div>
@@ -231,7 +229,7 @@
                 </div>
                 <div class="active-member" onclick="viewProfile(2)">
                   <div class="member-thumb-wrap">
-                    <img src="https://i.pravatar.cc/36?img=9" alt="Bia">
+                    <img src="assets/avatars/avatar.svg" alt="Bia">
                     <span class="online-indicator"></span>
                   </div>
                   <div>
@@ -242,7 +240,7 @@
                 </div>
                 <div class="active-member" onclick="viewProfile(3)">
                   <div class="member-thumb-wrap">
-                    <img src="https://i.pravatar.cc/36?img=16" alt="Julia">
+                    <img src="assets/avatars/avatar.svg" alt="Julia">
                     <span class="online-indicator"></span>
                   </div>
                   <div>
@@ -253,7 +251,7 @@
                 </div>
                 <div class="active-member" onclick="viewProfile(4)">
                   <div class="member-thumb-wrap">
-                    <img src="https://i.pravatar.cc/36?img=21" alt="Mariana">
+                    <img src="assets/avatars/avatar.svg" alt="Mariana">
                   </div>
                   <div>
                     <span class="active-name">Mariana Lima</span>
@@ -369,7 +367,7 @@
       </div>
       <div id="comments-list" class="comments-list"></div>
       <div class="comment-input-wrap">
-        <img src="https://i.pravatar.cc/32?img=47" alt="Você" class="comment-avatar" />
+        <img src="assets/avatars/avatar.svg" alt="Você" class="comment-avatar" />
         <input type="text" id="comment-input" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter') submitComment()" />
         <button class="comment-send" onclick="submitComment()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>

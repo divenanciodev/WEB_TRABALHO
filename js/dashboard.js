@@ -97,7 +97,7 @@ function renderRecentActivity() {
     container.innerHTML = posts.map(p => `
         <div class="activity-row">
             <img
-                src="${p.autor_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.autor_nome)}&background=ff3d8b&color=fff`}"
+                src="${p.autor_avatar || `assets/avatars/avatar.svg`}"
                 class="activity-av"
                 alt="${p.autor_nome}"
             >

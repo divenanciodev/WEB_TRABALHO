@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (authLinks) {
         if (user) {
-            const avatarUrl = user.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome_completo)}&background=ff3d8b&color=fff`;
+            const avatarUrl = user.foto_perfil || `assets/avatars/avatar.svg`;
             authLinks.innerHTML = `
                 <div class="user-dropdown" id="user-dropdown">
                     <button class="dropdown-trigger" id="dropdown-trigger">
