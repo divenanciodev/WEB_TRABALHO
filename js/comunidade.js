@@ -2,102 +2,26 @@
    SheTech — Comunidade JS
    ============================================ */
 
-/* ─── DADOS MOCK ──────────────────────────── */
+/* ─── CONTEÚDO INICIAL ───────────────────── */
 
 const CURRENT_USER = {
   id: 0,
-  name: 'Ana Luiza',
-  role: 'Desenvolvedora Front-end',
+  name: 'Você',
+  role: 'Membro SheTech',
   avatar: 'assets/avatars/avatar.svg'
 };
 
-const MOCK_POSTS = [
-  {
-    id: 1,
-    author: 'Carla Mendes',
-    role: 'Full Stack Dev',
-    avatar: 'assets/avatars/avatar.svg',
-    time: '5 minutos atrás',
-    text: 'Acabei de lançar meu primeiro projeto open source! 🚀 Um template de autenticação com Next.js e Prisma. Se quiserem colaborar, o PR é bem-vindo! #opensource #nextjs #carreira',
-    tags: ['#opensource', '#nextjs'],
-    likes: 42,
-    comments: 8,
-    liked: false,
-    link: { title: 'she-auth — GitHub', url: 'github.com/carla/she-auth' }
-  },
-  {
-    id: 2,
-    author: 'Bia Torres',
-    role: 'UX Designer',
-    avatar: 'assets/avatars/avatar.svg',
-    time: '32 minutos atrás',
-    text: 'Dica rápida de acessibilidade: sempre use aria-label em ícones sem texto visível. Parece pequeno, mas faz uma diferença enorme para usuárias de leitores de tela. A gente faz código para todas. 💜 #uxdesign #acessibilidade',
-    tags: ['#uxdesign', '#acessibilidade'],
-    likes: 87,
-    comments: 14,
-    liked: true,
-    image: null
-  },
-  {
-    id: 3,
-    author: 'Julia Costa',
-    role: 'Data Scientist',
-    avatar: 'assets/avatars/avatar.svg',
-    time: '1 hora atrás',
-    text: 'Compartilhando um recurso incrível que encontrei esta semana. O curso da fast.ai para ML prático é gratuito e absolutamente fenomenal. Recomendo para todas que estão entrando em IA/ML. #datascience #machinelearning',
-    tags: ['#datascience', '#machinelearning'],
-    likes: 134,
-    comments: 21,
-    liked: false,
-    link: { title: 'Practical Deep Learning — fast.ai', url: 'course.fast.ai' }
-  },
-  {
-    id: 4,
-    author: 'Mariana Lima',
-    role: 'Product Manager',
-    avatar: 'assets/avatars/avatar.svg',
-    time: '3 horas atrás',
-    text: 'Reflexão do dia: produto sem diversidade nas equipes é produto com pontos cegos. Precisamos de mais mulheres tomando decisões sobre o que construímos. Nossa perspectiva não é diferencial — é necessidade. #mulhereslíderes #product',
-    tags: ['#mulhereslíderes', '#product'],
-    likes: 203,
-    comments: 37,
-    liked: false
-  }
-];
-
-const MOCK_LINKS = [
-  { id: 1, title: 'Roadmap Desenvolvedor Full Stack 2024', url: 'https://roadmap.sh', desc: 'Guia visual com todas as habilidades necessárias para se tornar full stack.', categoria: 'Referência' },
-  { id: 2, title: 'CSS Grid — Guia Completo', url: 'https://css-tricks.com/snippets/css/complete-guide-grid/', desc: 'O recurso mais completo sobre CSS Grid que você vai encontrar online.', categoria: 'Tutorial' },
-  { id: 3, title: 'Figma — Design colaborativo', url: 'https://figma.com', desc: 'Ferramenta essencial para design de interfaces, gratuita para estudantes.', categoria: 'Ferramenta' },
-  { id: 4, title: 'Women Who Code', url: 'https://womenwhocode.com', desc: 'Comunidade global que apoia mulheres em carreiras de tecnologia.', categoria: 'Referência' },
-  { id: 5, title: 'JavaScript.info', url: 'https://javascript.info', desc: 'Tutorial moderno de JavaScript do zero ao avançado, em português.', categoria: 'Tutorial' },
-  { id: 6, title: 'Vercel — Deploy instantâneo', url: 'https://vercel.com', desc: 'Plataforma de hospedagem gratuita para projetos front-end.', categoria: 'Ferramenta' }
-];
-
-const MOCK_MEMBERS = [
-  { id: 1,  name: 'Carla Mendes',   role: 'Full Stack Dev',      avatar: 'assets/avatars/avatar.svg',  online: true,  skills: ['React', 'Node.js'] },
-  { id: 2,  name: 'Bia Torres',     role: 'UX Designer',         avatar: 'assets/avatars/avatar.svg',  online: true,  skills: ['Figma', 'UX'] },
-  { id: 3,  name: 'Julia Costa',    role: 'Data Scientist',       avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['Python', 'ML'] },
-  { id: 4,  name: 'Mariana Lima',   role: 'Product Manager',      avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Product', 'Scrum'] },
-  { id: 5,  name: 'Sofia Andrade',  role: 'DevOps Engineer',      avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Docker', 'AWS'] },
-  { id: 6,  name: 'Letícia Rocha',  role: 'Desenvolvedora iOS',   avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['Swift', 'iOS'] },
-  { id: 7,  name: 'Fernanda Cruz',  role: 'Back-end Developer',   avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Java', 'Spring'] },
-  { id: 8,  name: 'Priya Sharma',   role: 'Data Analyst',         avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['SQL', 'Power BI'] },
-  { id: 9,  name: 'Amanda Souza',   role: 'Desenvolvedora',       avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Vue.js', 'Firebase'] },
-  { id: 10, name: 'Tatiana Alves',  role: 'Designer de Produto',  avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Figma', 'Motion'] },
-  { id: 11, name: 'Renata Faria',   role: 'Full Stack Dev',       avatar: 'assets/avatars/avatar.svg', online: true,  skills: ['React', 'GraphQL'] },
-  { id: 12, name: 'Camila Duarte',  role: 'Product Manager',      avatar: 'assets/avatars/avatar.svg', online: false, skills: ['Product', 'OKRs'] }
-];
+const commentsByPost = {};
 
 /* ─── ESTADO ──────────────────────────────── */
 
 let currentTab    = 'feed';
-let allLinks      = [...MOCK_LINKS];
-let allMembers    = [...MOCK_MEMBERS];
-let allPosts      = [...MOCK_POSTS];
+let allLinks      = [];
+let allMembers    = [];
+let allPosts      = [];
 let activePostId  = null;
-let nextLinkId    = MOCK_LINKS.length + 1;
-let nextPostId    = MOCK_POSTS.length + 1;
+let nextLinkId    = 1;
+let nextPostId    = 1;
 
 /* ─── INIT ────────────────────────────────── */
 
@@ -123,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLinks();
   renderMembers();
   initSearch();
+  document.querySelectorAll('.tabs .tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const nextTab = btn.id.replace('tab-', '');
+      switchTab(nextTab);
+    });
+  });
+  switchTab('feed');
   const notifDot = document.getElementById('notif-dot');
   if (notifDot) notifDot.style.display = 'block';
 });
@@ -134,8 +65,13 @@ function switchTab(tab) {
   ['feed', 'links', 'members'].forEach(t => {
     const el = document.getElementById(`section-${t}`);
     const btn = document.getElementById(`tab-${t}`);
-    el.style.display = t === tab ? '' : 'none';
-    btn.classList.toggle('active', t === tab);
+    const isActive = t === tab;
+
+    if (el) el.style.display = isActive ? 'block' : 'none';
+    if (btn) {
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', String(isActive));
+    }
   });
 }
 
@@ -170,14 +106,18 @@ function postHTML(post) {
     ${post.image ? `<img src="${post.image}" class="post-image" alt="imagem do post" />` : ''}
     
     ${post.link ? `
-    <div class="post-link-preview-wrap">
-      <a href="https://${post.link.url}" target="_blank" class="post-link-preview">
+    <div class="post-link-preview-wrap ${post.link.destaque ? 'post-link-preview-wrap--featured' : ''}">
+      <a href="${post.link.url.startsWith('http') ? post.link.url : `https://${post.link.url}`}" target="_blank" class="post-link-preview ${post.link.destaque ? 'post-link-preview--featured' : ''}">
         <div class="post-link-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         </div>
-        <div>
-          <div class="post-link-title">${post.link.title}</div>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+            <div class="post-link-title">${post.link.title}</div>
+            ${post.link.destaque ? '<span class="post-link-feature-badge">Destaque</span>' : ''}
+          </div>
           <div class="post-link-url">${post.link.url}</div>
+          ${post.link.desc ? `<div class="post-link-desc">${escapeHTML(post.link.desc)}</div>` : ''}
         </div>
       </a>
       <button class="post-link-save-btn" onclick="savePostLinkToMyLinks('${post.link.title}', '${post.link.url}', event)" title="Salvar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
@@ -266,10 +206,22 @@ function expandComposer() {
 }
 
 function addLink() {
-  // Para uma experiência sem prompts nativos, abrimos o modal de criação de post com foco no campo
   const field = document.getElementById('composer-field');
-  field.focus();
-  Layout.showToast('Cole o link diretamente no campo de texto 🔗');
+  const text = (field?.innerText || '').trim();
+  const urlMatch = text.match(/https?:\/\/[^\s]+/i);
+
+  const titleInput = document.getElementById('link-titulo');
+  const urlInput = document.getElementById('link-url');
+  const descInput = document.getElementById('link-desc');
+  const destaqueInput = document.getElementById('link-destaque');
+
+  if (titleInput) titleInput.value = text.replace(/^https?:\/\/[^\s]+/i, '').trim().slice(0, 60) || 'Recurso compartilhado';
+  if (urlInput) urlInput.value = urlMatch ? urlMatch[0] : '';
+  if (descInput) descInput.value = '';
+  if (destaqueInput) destaqueInput.checked = true;
+
+  openModal('link-modal');
+  field?.focus();
 }
 
 function addEmoji() {
@@ -318,31 +270,41 @@ function savePostLinkToMyLinks(title, url, event) {
         return;
     }
 
+    const existing = document.getElementById('save-link-modal');
+    if (existing) { existing.remove(); return; }
+
     const folders = State.getFolders(user.email);
+    const btn = event.currentTarget;
+    const rect = btn?.getBoundingClientRect();
+    const top = rect ? `${rect.top - 220}px` : '50%';
+    const left = rect ? `${rect.left - 100}px` : '50%';
     
     const modalHtml = `
-        <div id="save-link-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10000;">
-            <div class="modal-content" style="max-width: 400px; height: auto;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>Salvar nos Meus Links</h2>
-                    <button onclick="document.getElementById('save-link-modal').remove()" style="font-size: 24px; background: none; border: none; cursor: pointer;">&times;</button>
+        <div id="save-link-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10002; background: transparent;">
+            <div class="modal-content" style="max-width: 320px; height: auto; position: fixed; top: ${top}; left: ${left}; padding: 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); background: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h2 style="font-size: 15px; margin: 0;">Salvar nos Meus Links</h2>
+                    <button onclick="document.getElementById('save-link-modal').remove()" style="font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
                 </div>
-                <p style="margin-bottom: 15px; font-size: 14px; color: var(--gray-700);">Escolha uma pasta para salvar: <strong>${title}</strong></p>
-                <div class="form-group">
-                    <label>Pasta</label>
-                    <select id="save-folder-select" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                <p style="margin-bottom: 10px; font-size: 13px; color: var(--gray-700);">Escolha uma pasta para salvar: <strong>${title}</strong></p>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 12px;">Pasta</label>
+                    <select id="save-folder-select" class="form-control" style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--gray-300); font-size: 13px;">
                         <option value="">Nenhuma pasta (Geral)</option>
                         ${folders.map(f => `<option value="${f.id}">${f.nome}</option>`).join('')}
                     </select>
                 </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button onclick="confirmSavePostLink('${title}', '${url}')" class="btn btn-primary" style="flex: 1;">Salvar</button>
-                    <button onclick="document.getElementById('save-link-modal').remove()" class="btn btn-outline" style="flex: 1;">Cancelar</button>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button onclick="confirmSavePostLink('${title}', '${url}')" class="btn btn-primary" style="flex: 1; padding: 8px 10px; font-size: 12px;">Salvar</button>
+                    <button onclick="document.getElementById('save-link-modal').remove()" class="btn btn-outline" style="flex: 1; padding: 8px 10px; font-size: 12px;">Cancelar</button>
                 </div>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.getElementById('save-link-modal').onclick = (e) => {
+        if (e.target.id === 'save-link-modal') e.target.remove();
+    };
 }
 
 function confirmSavePostLink(title, url) {
@@ -366,22 +328,10 @@ function confirmSavePostLink(title, url) {
 
 /* ─── COMMENTS MODAL ──────────────────────── */
 
-const MOCK_COMMENTS = {
-  1: [
-    { id: 1, author: 'Bia Torres', avatar: 'assets/avatars/avatar.svg', text: 'Uau! Parabéns, Carla! Vou dar uma olhada no repositório.', time: '3min' },
-    { id: 2, author: 'Julia Costa', avatar: 'assets/avatars/avatar.svg', text: 'Que orgulho! Open source é a melhor escola 🚀', time: '7min' }
-  ],
-  2: [
-    { id: 1, author: 'Carla Mendes', avatar: 'assets/avatars/avatar.svg', text: 'Tão importante essa dica! Já apliquei no meu projeto hoje.', time: '20min' }
-  ],
-  3: [],
-  4: []
-};
-
 function openComments(postId) {
   activePostId = postId;
   const list = document.getElementById('comments-list');
-  const comments = MOCK_COMMENTS[postId] || [];
+  const comments = commentsByPost[postId] || [];
   list.innerHTML = comments.length
     ? comments.map(c => commentHTML(c)).join('')
     : '<p style="color:var(--text-3); font-size:13px; text-align:center; padding:24px 0;">Nenhum comentário ainda. Seja a primeira! 💬</p>';
@@ -405,8 +355,8 @@ function submitComment() {
   const text = input.value.trim();
   if (!text) return;
   const comment = { id: Date.now(), author: CURRENT_USER.name, avatar: CURRENT_USER.avatar, text, time: 'Agora' };
-  if (!MOCK_COMMENTS[activePostId]) MOCK_COMMENTS[activePostId] = [];
-  MOCK_COMMENTS[activePostId].push(comment);
+  if (!commentsByPost[activePostId]) commentsByPost[activePostId] = [];
+  commentsByPost[activePostId].push(comment);
   const list = document.getElementById('comments-list');
   const p = list.querySelector('p');
   if (p) p.remove();
@@ -439,17 +389,21 @@ function renderLinks(filter) {
   const data = filter && filter !== 'todos'
     ? allLinks.filter(l => l.categoria === filter)
     : allLinks;
-  grid.innerHTML = data.map(l => linkCardHTML(l)).join('');
+  const sorted = [...data].sort((a, b) => Number(b.destaque) - Number(a.destaque));
+  grid.innerHTML = sorted.map(l => linkCardHTML(l)).join('');
 }
 
 function linkCardHTML(link) {
   return `
-  <div class="link-card" data-cat="${link.categoria}" id="link-${link.id}">
+  <div class="link-card ${link.destaque ? 'link-card--featured' : ''}" data-cat="${link.categoria}" id="link-${link.id}">
     <div class="link-card-top">
       <div class="link-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       </div>
-      <span class="link-cat-badge">${link.categoria}</span>
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+        ${link.destaque ? '<span class="link-feature-badge">Destaque</span>' : ''}
+        <span class="link-cat-badge">${link.categoria}</span>
+      </div>
     </div>
     <div class="link-card-title">${escapeHTML(link.title)}</div>
     ${link.desc ? `<div class="link-card-desc">${escapeHTML(link.desc)}</div>` : ''}
@@ -482,13 +436,49 @@ function saveLink(e) {
     const url   = document.getElementById('link-url').value.trim();
     const desc  = document.getElementById('link-desc').value.trim();
     const cat   = document.getElementById('link-categoria').value;
+    const destaque = document.getElementById('link-destaque')?.checked || false;
+    const composerField = document.getElementById('composer-field');
+    const composerText = (composerField?.innerText || '').trim();
     if (!title || !url) return;
 
-    allLinks.unshift({ id: nextLinkId++, title, url, desc, categoria: cat });
+    const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
+
+    allLinks.unshift({
+      id: nextLinkId++,
+      title,
+      url: normalizedUrl,
+      desc,
+      categoria: cat,
+      destaque,
+      criadoPor: CURRENT_USER.name
+    });
+
+    allPosts.unshift({
+      id: nextPostId++,
+      author: CURRENT_USER.name,
+      role: CURRENT_USER.role,
+      avatar: CURRENT_USER.avatar,
+      time: 'Agora mesmo',
+      text: composerText || `Compartilhei um recurso útil para a comunidade: ${title}`,
+      tags: [],
+      likes: 0,
+      comments: 0,
+      liked: false,
+      link: {
+        title,
+        url: normalizedUrl,
+        desc,
+        destaque,
+        categoria: cat
+      }
+    });
+
+    if (composerField) composerField.innerText = '';
+    renderFeed();
     renderLinks(currentLinkFilter === 'todos' ? null : currentLinkFilter);
     closeModal('link-modal');
     document.getElementById('link-form').reset();
-    showToast('Link postado na comunidade! 🔗', 'success');
+    showToast(destaque ? 'Link destacado e compartilhado na comunidade! ✨' : 'Link postado na comunidade! 🔗', 'success');
 }
 
 function saveToMyLinks(id) {
@@ -741,6 +731,49 @@ function postMenu(id) {
   }, 0);
 }
 
+function previewEditedImage(input) {
+  const preview = document.getElementById('edit-post-image-preview');
+  const removeFlag = document.getElementById('edit-post-image-remove');
+  const file = input?.files?.[0];
+  if (!preview) return;
+
+  if (!file) {
+    preview.style.display = 'none';
+    preview.src = '';
+    if (removeFlag) removeFlag.value = 'true';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    preview.src = event.target.result;
+    preview.style.display = 'block';
+    if (removeFlag) removeFlag.value = 'false';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearEditedImage() {
+  const preview = document.getElementById('edit-post-image-preview');
+  const input = document.getElementById('edit-post-image-input');
+  const removeFlag = document.getElementById('edit-post-image-remove');
+  if (preview) {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+  if (input) input.value = '';
+  if (removeFlag) removeFlag.value = 'true';
+}
+
+function clearEditedLink() {
+  const removeFlag = document.getElementById('edit-post-link-remove');
+  if (removeFlag) removeFlag.value = 'true';
+  document.getElementById('edit-post-link-title').value = '';
+  document.getElementById('edit-post-link-url').value = '';
+  document.getElementById('edit-post-link-desc').value = '';
+  document.getElementById('edit-post-link-destaque').checked = false;
+}
+
 function editPost(id) {
   document.querySelectorAll('.post-dropdown-menu').forEach(m => m.remove());
   const post = allPosts.find(p => p.id === id);
@@ -751,7 +784,7 @@ function editPost(id) {
 
   const modalHtml = `
     <div id="edit-post-modal" class="modal-overlay" onclick="closeOnOverlay(event,'edit-post-modal')">
-      <div class="modal-box">
+      <div class="modal-box" style="max-width: 600px;">
         <div class="modal-header">
           <h2>Editar Post</h2>
           <button class="modal-close" onclick="closeModal('edit-post-modal')">
@@ -760,8 +793,30 @@ function editPost(id) {
         </div>
         <div class="form-group" style="margin-top:16px">
           <label>Texto do post</label>
-          <textarea id="edit-post-text" rows="5" style="width:100%;padding:12px;border:1px solid var(--gray-200);border-radius:12px;font-family:inherit;font-size:14px;resize:vertical;">${post.text}</textarea>
+          <textarea id="edit-post-text" rows="5" style="width:100%;padding:12px;border:1px solid var(--gray-200);border-radius:12px;font-family:inherit;font-size:14px;resize:vertical;">${escapeHTML(post.text || '')}</textarea>
         </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label>Mídia</label>
+          <img id="edit-post-image-preview" src="${post.image || ''}" alt="Pré-visualização" style="display:${post.image ? 'block' : 'none'}; width:100%; max-height:220px; object-fit:cover; border-radius:12px; margin-bottom:8px;" />
+          <input type="file" id="edit-post-image-input" accept="image/*" onchange="previewEditedImage(this)" />
+          <input type="hidden" id="edit-post-image-remove" value="false" />
+          <button type="button" class="btn-ghost" onclick="clearEditedImage()" style="margin-top:8px">Remover imagem</button>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label>Link compartilhado</label>
+          <input id="edit-post-link-title" type="text" value="${escapeHTML(post.link?.title || '')}" placeholder="Título do link" style="width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;" />
+          <input id="edit-post-link-url" type="text" value="${escapeHTML(post.link?.url || '')}" placeholder="https://exemplo.com" style="width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;" />
+          <textarea id="edit-post-link-desc" rows="3" placeholder="Descrição do link" style="width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:10px;resize:vertical;">${escapeHTML(post.link?.desc || '')}</textarea>
+          <label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-weight:600;">
+            <input type="checkbox" id="edit-post-link-destaque" ${post.link?.destaque ? 'checked' : ''} style="width:auto; margin:0;" />
+            <span>Destacar este link</span>
+          </label>
+          <input type="hidden" id="edit-post-link-remove" value="false" />
+          <button type="button" class="btn-ghost" onclick="clearEditedLink()" style="margin-top:8px">Remover link</button>
+        </div>
+
         <div class="modal-footer" style="margin-top:16px">
           <button type="button" class="btn-ghost" onclick="closeModal('edit-post-modal')">Cancelar</button>
           <button type="button" class="btn-primary" onclick="saveEditedPost(${id})">Salvar</button>
@@ -773,12 +828,52 @@ function editPost(id) {
   openModal('edit-post-modal');
 }
 
-function saveEditedPost(id) {
+async function saveEditedPost(id) {
   const text = document.getElementById('edit-post-text').value.trim();
-  if (!text) return;
   const post = allPosts.find(p => p.id === id);
+  if (!post) return;
+
+  const imageInput = document.getElementById('edit-post-image-input');
+  const imageRemove = document.getElementById('edit-post-image-remove')?.value === 'true';
+  const linkTitle = document.getElementById('edit-post-link-title')?.value.trim() || '';
+  const linkUrl = document.getElementById('edit-post-link-url')?.value.trim() || '';
+  const linkDesc = document.getElementById('edit-post-link-desc')?.value.trim() || '';
+  const linkDestaque = document.getElementById('edit-post-link-destaque')?.checked || false;
+  const linkRemove = document.getElementById('edit-post-link-remove')?.value === 'true';
+
+  if (!text && !post.image && !post.link && !imageInput?.files?.[0] && !linkTitle && !linkUrl && !linkDesc) {
+    closeModal('edit-post-modal');
+    document.getElementById('edit-post-modal')?.remove();
+    return;
+  }
+
   if (post) {
-    post.text = text;
+    post.text = text || '';
+
+    if (imageRemove) {
+      post.image = null;
+    } else if (imageInput?.files?.[0]) {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+      const result = await new Promise((resolve) => {
+        reader.onload = (event) => resolve(event.target.result);
+        reader.readAsDataURL(file);
+      });
+      post.image = result;
+    }
+
+    if (linkRemove || (!linkTitle && !linkUrl && !linkDesc && !linkDestaque)) {
+      post.link = null;
+    } else if (linkTitle || linkUrl || linkDesc || linkDestaque) {
+      post.link = {
+        title: linkTitle || 'Recurso compartilhado',
+        url: normalizeLinkUrl(linkUrl),
+        desc: linkDesc,
+        destaque: linkDestaque,
+        categoria: post.link?.categoria || 'Comunidade'
+      };
+    }
+
     renderFeed();
     showToast('Post atualizado! ✏️', 'success');
   }
@@ -787,49 +882,78 @@ function saveEditedPost(id) {
 }
 
 function deletePost(id) {
-  if (!confirm('Tem certeza que deseja excluir este post?')) return;
+  const existing = document.getElementById('delete-post-modal');
+  if (existing) { existing.remove(); }
+
+  const modalHtml = `
+    <div id="delete-post-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10003; background: transparent; align-items: center; justify-content: center;">
+      <div class="modal-content" style="max-width: 360px; width: min(90vw, 360px); height: auto; padding: 18px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); background: white;">
+        <h2 style="font-size: 18px; margin: 0 0 8px;">Excluir post?</h2>
+        <p style="margin: 0 0 16px; color: var(--gray-700); font-size: 14px;">Essa ação não pode ser desfeita.</p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn-ghost" onclick="document.getElementById('delete-post-modal').remove()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="confirmDeletePost(${id})">Excluir</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  document.getElementById('delete-post-modal').onclick = (e) => {
+    if (e.target.id === 'delete-post-modal') e.target.remove();
+  };
+}
+
+function confirmDeletePost(id) {
   allPosts = allPosts.filter(p => p.id !== id);
   renderFeed();
   showToast('Post excluído.', 'success');
+  document.getElementById('delete-post-modal')?.remove();
 }
 
 function sharePost(id) {
     const post = allPosts.find(p => p.id === id);
     if (!post) return;
-    
-    const url = encodeURIComponent(window.location.href + '#post-' + id);
-    const text = encodeURIComponent(`Confira este post de ${post.author} na comunidade SheTech!`);
-    
+
+    const existing = document.getElementById('share-modal');
+    if (existing) { existing.remove(); return; }
+
+    const url = window.location.href + '#post-' + id;
+    const text = `Confira este post de ${post.author} na comunidade SheTech!`;
+    const btn = document.querySelector(`#post-${id} .post-share`);
+    const rect = btn?.getBoundingClientRect();
+    const top = rect ? `${rect.top - 220}px` : '50%';
+    const left = rect ? `${rect.left - 120}px` : '50%';
+
     const modalHtml = `
-        <div id="share-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 9999;">
-            <div class="modal-content" style="max-width: 400px; height: auto;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>Compartilhar Post</h2>
-                    <button onclick="document.getElementById('share-modal').remove()" style="font-size: 24px;">&times;</button>
+        <div id="share-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10001; background: transparent;">
+            <div class="modal-content" style="max-width: 320px; height: auto; position: fixed; top: ${top}; left: ${left}; padding: 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); background: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h2 style="font-size: 15px; margin: 0;">Compartilhar</h2>
+                    <button onclick="document.getElementById('share-modal').remove()" style="font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                    <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="btn btn-outline" style="flex-direction: column; gap: 5px; padding: 15px; font-size: 12px;">
-                        <i class="icon-message-circle" style="font-size: 20px; color: #25D366;"></i>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                    <button type="button" onclick="shareToNetwork('whatsapp', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
+                        <i class="icon-message-circle" style="font-size: 18px; color: #25D366;"></i>
                         <span>WhatsApp</span>
-                    </a>
-                    <a href="https://t.me/share/url?url=${url}&text=${text}" target="_blank" class="btn btn-outline" style="flex-direction: column; gap: 5px; padding: 15px; font-size: 12px;">
-                        <i class="icon-send" style="font-size: 20px; color: #0088cc;"></i>
+                    </button>
+                    <button type="button" onclick="shareToNetwork('telegram', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
+                        <i class="icon-send" style="font-size: 18px; color: #0088cc;"></i>
                         <span>Telegram</span>
-                    </a>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="btn btn-outline" style="flex-direction: column; gap: 5px; padding: 15px; font-size: 12px;">
-                        <i class="icon-facebook" style="font-size: 20px; color: #1877F2;"></i>
+                    </button>
+                    <button type="button" onclick="shareToNetwork('facebook', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
+                        <i class="icon-facebook" style="font-size: 18px; color: #1877F2;"></i>
                         <span>Facebook</span>
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank" class="btn btn-outline" style="flex-direction: column; gap: 5px; padding: 15px; font-size: 12px;">
-                        <i class="icon-instagram" style="font-size: 20px; color: #E4405F;"></i>
+                    </button>
+                    <button type="button" onclick="shareToNetwork('instagram', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
+                        <i class="icon-instagram" style="font-size: 18px; color: #E4405F;"></i>
                         <span>Instagram</span>
-                    </a>
-                    <a href="https://discord.com/channels/@me" target="_blank" class="btn btn-outline" style="flex-direction: column; gap: 5px; padding: 15px; font-size: 12px;">
-                        <i class="icon-message-square" style="font-size: 20px; color: #5865F2;"></i>
+                    </button>
+                    <button type="button" onclick="shareToNetwork('discord', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
+                        <i class="icon-message-square" style="font-size: 18px; color: #5865F2;"></i>
                         <span>Discord</span>
-                    </a>
-                    <button onclick="copyPostLink('${window.location.href + '#post-' + id}')" class="btn btn-outline" style="flex-direction: column; gap: 5px; padding: 15px; font-size: 12px;">
-                        <i class="icon-copy" style="font-size: 20px; color: var(--pink);"></i>
+                    </button>
+                    <button type="button" onclick="copyPostLink('${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
+                        <i class="icon-copy" style="font-size: 18px; color: var(--pink);"></i>
                         <span>Copiar</span>
                     </button>
                 </div>
@@ -837,6 +961,30 @@ function sharePost(id) {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.getElementById('share-modal').onclick = (e) => {
+        if (e.target.id === 'share-modal') e.target.remove();
+    };
+}
+
+function shareToNetwork(network, text, url) {
+    const shareText = `${text} ${url}`;
+    const shareData = { title: 'SheTech', text: shareText, url };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {
+            navigator.clipboard.writeText(shareText).then(() => {
+                showToast('Link preparado para compartilhar!', 'success');
+                document.getElementById('share-modal')?.remove();
+            });
+        });
+    } else {
+        navigator.clipboard.writeText(shareText).then(() => {
+            showToast('Link preparado para compartilhar!', 'success');
+            document.getElementById('share-modal')?.remove();
+        });
+    }
+
+    document.getElementById('share-modal')?.remove();
 }
 
 function copyPostLink(url) {
@@ -861,6 +1009,11 @@ function showToast(msg, type) {
 }
 
 /* ─── UTILS ───────────────────────────────── */
+
+function normalizeLinkUrl(url) {
+  if (!url) return '';
+  return url.startsWith('http') ? url : `https://${url}`;
+}
 
 function escapeHTML(str) {
   return str

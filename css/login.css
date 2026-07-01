@@ -2,8 +2,9 @@
 body.auth-page{display:flex;flex-direction:column;background:var(--bg);min-height:100vh}
 .auth-header-top{background:#1a1a1a;padding:16px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1);position:sticky;top:0;z-index:1000}
 .auth-header-container{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center}
-.auth-logo{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;color:#fff;font-weight:bold;font-size:18px;transition:opacity 0.3s}
-.auth-logo-img{width:40px;height:40px;object-fit:contain}
+.auth-logo{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;color:var(--pink);font-weight:800;font-size:1.5rem;transition:opacity 0.3s}
+.auth-logo-img{width:60px;height:60px;object-fit:contain;transform:scale(5)}
+.auth-logo span{color:var(--pink);font-size:1.5rem;font-weight:800;font-family:'Sora',sans-serif}
 .auth-logo:hover{opacity:0.8}
 .checkbox-label{display:flex;align-items:center;gap:8px;font-weight:400;cursor:pointer}
 .checkbox-label input[type="checkbox"]{width:auto;margin:0}

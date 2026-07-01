@@ -29,68 +29,9 @@
   let isListView = false;
   let editingId = null;
 
-  /* ── Dados de exemplo (apenas na 1ª visita) ───────────────── */
+  /* ── Conteúdo inicial vazio ───────────────────────────────── */
   if (events.length === 0) {
-    const hoje = new Date();
-    const fmt = (d) => d.toISOString().slice(0, 10);
-    const addDays = (n) => {
-      const d = new Date(hoje);
-      d.setDate(d.getDate() + n);
-      return d;
-    };
-
-    events = [
-      {
-        id: uid(),
-        titulo: "Meetup de UX Research",
-        tipo: "online",
-        link: "https://meet.google.com/abc-defg-hij",
-        endereco: "",
-        data: fmt(addDays(5)),
-        horario: "19:00",
-        categoria: "Meetup",
-        descricao:
-          "Vamos conversar sobre as melhores práticas de pesquisa com usuários e como aplicar no dia a dia de produto.",
-        inscritos: ["Ana Luiza", "Carla Mendes", "Bia Torres", "Julia Costa"],
-      },
-      {
-        id: uid(),
-        titulo: "Workshop de Figma Avançado",
-        tipo: "online",
-        link: "https://zoom.us/j/123456789",
-        endereco: "",
-        data: fmt(addDays(12)),
-        horario: "14:00",
-        categoria: "Workshop",
-        descricao: "Componentes, auto layout e prototipagem de alta fidelidade.",
-        inscritos: ["Bia Torres", "Mariana Lima"],
-      },
-      {
-        id: uid(),
-        titulo: "Hackathon SheTech 2025",
-        tipo: "presencial",
-        link: "",
-        endereco: "Av. Paulista, 1374 – São Paulo, SP",
-        data: fmt(addDays(20)),
-        horario: "09:00",
-        categoria: "Hackathon",
-        descricao: "48 horas de inovação focadas em tecnologia para causas sociais.",
-        inscritos: ["Ana Luiza", "Julia Costa", "Sofia Andrade", "Leticia Rocha", "Fernanda Cruz"],
-      },
-      {
-        id: uid(),
-        titulo: "Palestra: Mulheres no Open Source",
-        tipo: "online",
-        link: "https://teams.microsoft.com/l/meetup-join/xpto",
-        endereco: "",
-        data: fmt(addDays(-3)),
-        horario: "18:30",
-        categoria: "Palestra",
-        descricao: "Como contribuir com projetos open source e construir reputação na comunidade.",
-        inscritos: ["Carla Mendes", "Renata Faria"],
-      },
-    ];
-    saveEvents(events);
+    saveEvents([]);
   }
 
   /* ── Helpers ────────────────────────────────────────────────── */
@@ -157,11 +98,20 @@
 
   /* ── Renderização ────────────────────────────────────────────── */
   function filteredEvents() {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const in7 = new Date(hoje);
+    in7.setDate(in7.getDate() + 7);
+
     return events.filter((e) => {
-      const matchFilter =
-        filterActive === "todos" ||
-        filterActive === e.tipo ||
-        filterActive === e.categoria.toLowerCase();
+      let matchFilter = filterActive === "todos";
+      if (filterActive === "online" || filterActive === "presencial") {
+        matchFilter = e.tipo === filterActive;
+      } else if (filterActive === "proximos") {
+        const d = new Date(e.data + "T00:00:00");
+        matchFilter = d >= hoje && d <= in7;
+      }
+
       const matchSearch =
         !searchQuery ||
         e.titulo.toLowerCase().includes(searchQuery) ||
@@ -386,6 +336,7 @@
     if (!ev) return;
 
     detailModal.classList.add("modal-detail-overlay");
+    document.body.style.overflow = 'hidden'; // Prevenir scroll no fundo
     document.getElementById("detail-title").textContent = ev.titulo;
 
     const isOnline = ev.tipo === "online";
@@ -395,56 +346,92 @@
       ? `<a href="${ev.link}" target="_blank" rel="noopener">${ev.link}</a>`
       : `<span>${ev.endereco}</span>`;
 
-    const inscritos = ev.inscritos || [];
-    const inscritosHTML = inscritos.length > 0
-      ? `<div class="detail-row">
-          <div class="detail-row-icon"><i class="icon-users"></i></div>
-          <div class="detail-row-content">
-            <strong>Inscritos (${inscritos.length})</strong>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
-              ${inscritos.map(m => `<span style="background:var(--pink-soft);color:var(--pink);padding:4px 12px;border-radius:12px;font-size:13px">${m}</span>`).join('')}
-            </div>
+    const membros = ev.membros || [];
+    const membrosHTML = membros.length > 0
+      ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <div class="detail-row-icon"><i class="icon-users"></i></div>
+            <strong>Membros Participantes (${membros.length})</strong>
           </div>
+          <div class="members-list" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+            ${membros.map(m => `
+              <div class="member-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px;">
+                <div style="font-weight: 600; color: var(--pink);">${m.nome}</div>
+                <div style="font-size: 12px; color: var(--gray-600);">${m.papel}</div>
+                <div style="font-size: 11px; color: var(--gray-500); margin-top: 4px;">Status: ${m.status}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`
+      : '';
+
+    const googleMapsHTML = !isOnline && ev.endereco
+      ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <div class="detail-row-icon"><i class="icon-map"></i></div>
+            <strong>Localização no Mapa</strong>
+          </div>
+          <iframe 
+            width="100%" 
+            height="250" 
+            style="border:0; border-radius: 12px;" 
+            loading="lazy" 
+            allowfullscreen 
+            src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(ev.endereco)}">
+          </iframe>
         </div>`
       : '';
 
     document.getElementById("detail-body").innerHTML = `
       <div class="detail-section">
-        <div class="detail-row">
-          <div class="detail-row-icon"><i class="icon-calendar"></i></div>
-          <div class="detail-row-content">
-            <strong>Data e Horário</strong>
-            <span>${formatDate(ev.data)}${ev.horario ? " às " + ev.horario : ""}</span>
+        ${ev.imagemLocal ? `
+          <div class="detail-image-wrap" style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
+            <img src="${ev.imagemLocal}" alt="Local do evento" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-row-icon" style="${isOnline ? "" : "background:#d4f7e8;color:#16a34a"}">
-            <i class="${locIcon}"></i>
+        ` : ''}
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+          <div>
+            <div class="detail-row">
+              <div class="detail-row-icon"><i class="icon-calendar"></i></div>
+              <div class="detail-row-content">
+                <strong>Data e Horário</strong>
+                <span>${formatDate(ev.data)}${ev.horario ? " às " + ev.horario : ""}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-row-icon" style="${isOnline ? "" : "background:#d4f7e8;color:#16a34a"}">
+                <i class="${locIcon}"></i>
+              </div>
+              <div class="detail-row-content">
+                <strong>${locLabel}</strong>
+                ${locValue}
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-row-icon"><i class="icon-tag"></i></div>
+              <div class="detail-row-content">
+                <strong>Categoria</strong>
+                <span>${ev.categoria} • ${isOnline ? "Online" : "Presencial"}</span>
+              </div>
+            </div>
           </div>
-          <div class="detail-row-content">
-            <strong>${locLabel}</strong>
-            ${locValue}
-          </div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-row-icon"><i class="icon-tag"></i></div>
-          <div class="detail-row-content">
-            <strong>Categoria</strong>
-            <span>${ev.categoria} • ${isOnline ? "Online" : "Presencial"}</span>
-          </div>
-        </div>
-        ${inscritosHTML}
-        ${
-          ev.descricao
-            ? `<div class="detail-row">
+          
+          <div>
+            ${ev.descricao ? `
+              <div class="detail-row">
                 <div class="detail-row-icon"><i class="icon-align-left"></i></div>
                 <div class="detail-row-content">
                   <strong>Descrição</strong>
                   <div class="detail-descricao">${ev.descricao}</div>
                 </div>
-              </div>`
-            : ""
-        }
+              </div>
+            ` : ""}
+          </div>
+        </div>
+
+        ${googleMapsHTML}
+        ${membrosHTML}
       </div>
     `;
 
@@ -464,6 +451,7 @@
   function closeDetail() {
     detailModal.classList.remove("open");
     detailModal.classList.remove("modal-detail-overlay");
+    document.body.style.overflow = ''; // Restaurar scroll
   }
 
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);

@@ -27,59 +27,9 @@
   let editingId = null;
   let techTags = []; // tags temporárias no form
 
-  /* ── Dados de exemplo (1ª visita) ─────────────────────────── */
+  /* ── Conteúdo inicial vazio ───────────────────────────────── */
   if (projects.length === 0) {
-    projects = [
-      {
-        id: uid(),
-        titulo: "App de Gestão Financeira",
-        categoria: "Mobile",
-        status: "Em Desenvolvimento",
-        progresso: 60,
-        repo: "https://github.com/shetech/finance-app",
-        demo: "",
-        tecnologias: ["React Native", "Firebase", "Figma"],
-        descricao: "Aplicativo para controle de gastos pessoais com gráficos e metas mensais. Foco em usuárias iniciantes em finanças.",
-        membros: ["Ana Luiza", "Carla Mendes", "Bia Torres"],
-      },
-      {
-        id: uid(),
-        titulo: "Dashboard de Dados de Saúde",
-        categoria: "Dados",
-        status: "Em Planejamento",
-        progresso: 15,
-        repo: "",
-        demo: "",
-        tecnologias: ["Python", "Pandas", "Streamlit"],
-        descricao: "Painel interativo para visualização de indicadores de saúde pública com foco em gênero.",
-        membros: ["Julia Costa"],
-      },
-      {
-        id: uid(),
-        titulo: "Portfólio Pessoal",
-        categoria: "Web",
-        status: "Concluído",
-        progresso: 100,
-        repo: "https://github.com/shetech/portfolio",
-        demo: "https://anadev.vercel.app",
-        tecnologias: ["Next.js", "Tailwind CSS"],
-        descricao: "Site portfólio responsivo com projetos, blog e formulário de contato.",
-        membros: ["Ana Luiza", "Mariana Lima"],
-      },
-      {
-        id: uid(),
-        titulo: "Design System SheTech",
-        categoria: "Design",
-        status: "Em Desenvolvimento",
-        progresso: 45,
-        repo: "",
-        demo: "https://www.figma.com/file/exemplo",
-        tecnologias: ["Figma", "Tokens Studio"],
-        descricao: "Sistema de componentes visual e de marca para toda a plataforma SheTech.",
-        membros: ["Bia Torres", "Tatiana Alves"],
-      },
-    ];
-    saveProjects(projects);
+    saveProjects([]);
   }
 
   /* ── Helpers ─────────────────────────────────────────────────── */
@@ -128,7 +78,7 @@
     return projects.filter((p) => {
       const matchFilter =
         filterActive === "todos" ||
-        catKey(p.categoria) === filterActive;
+        p.status === filterActive;
       const matchSearch =
         !searchQuery ||
         p.titulo.toLowerCase().includes(searchQuery) ||
@@ -379,6 +329,7 @@
     if (!p) return;
 
     detailModal.classList.add("modal-detail-overlay");
+    document.body.style.overflow = 'hidden'; // Prevenir scroll no fundo
     document.getElementById("detail-title").textContent = p.titulo;
 
     const isConcluido = p.status === "Concluído";
@@ -389,13 +340,19 @@
 
     const membros = p.membros || [];
     const membrosHTML = membros.length > 0
-      ? `<div class="detail-row">
-          <div class="detail-row-icon"><i class="icon-users"></i></div>
-          <div class="detail-row-content">
+      ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <div class="detail-row-icon"><i class="icon-users"></i></div>
             <strong>Membros (${membros.length})</strong>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
-              ${membros.map(m => `<span style="background:var(--pink-soft);color:var(--pink);padding:4px 12px;border-radius:12px;font-size:13px">${m}</span>`).join('')}
-            </div>
+          </div>
+          <div class="members-list" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+            ${membros.map(m => `
+              <div class="member-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px;">
+                <div style="font-weight: 600; color: var(--pink);">${m.nome || m}</div>
+                ${m.funcao ? `<div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">${m.funcao}</div>` : ''}
+                ${m.descricao ? `<div style="font-size: 13px; color: var(--gray-700); line-height: 1.4;">${m.descricao}</div>` : ''}
+              </div>
+            `).join('')}
           </div>
         </div>`
       : '';
@@ -464,6 +421,7 @@
     function closeDetail() {
     detailModal.classList.remove("open");
     detailModal.classList.remove("modal-detail-overlay");
+    document.body.style.overflow = ''; // Restaurar scroll
   }
 
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);

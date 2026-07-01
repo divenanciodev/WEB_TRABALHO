@@ -55,8 +55,9 @@ nav {
 }
 
 .logo {
+    font-family: 'Sora', sans-serif;
     font-size: 1.5rem;
-    font-weight: bold;
+    font-weight: 800;
     color: var(--primary-color);
 }
 

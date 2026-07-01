@@ -137,7 +137,24 @@ i[class^="lucide-"]{font-size:1.1em;line-height:1;vertical-align:-2px}
 }
 .modal-content form { max-width: 800px; margin: 0 auto; width: 100%; }
 .modal-detail-overlay{background:rgba(14,14,16,.55);backdrop-filter:blur(4px)}
-.modal-detail-overlay .modal-content { max-width: 600px; height: auto; max-height: 90vh; border-radius: 20px; margin: 20px; padding: 32px; box-shadow: var(--shadow); }
+.modal-detail-overlay .modal-content { 
+  max-width: 100%; 
+  width: 100%; 
+  height: 100vh; 
+  max-height: 100vh; 
+  border-radius: 0; 
+  margin: 0; 
+  padding: 40px; 
+  box-shadow: none; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4000;
+}
+.modal-detail-overlay {
+  background: var(--bg);
+  backdrop-filter: none;
+}
 .modal-detail-overlay .modal-content form { max-width: 100%; }
 
 @keyframes modal-in {

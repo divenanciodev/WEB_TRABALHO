@@ -58,9 +58,9 @@
           <div class="profile-info">
             <div class="profile-info-top">
               <div>
-                <h2 id="profile-name" class="profile-display-name">Ana Beatriz Silva</h2>
-                <p id="profile-user" class="profile-username">@anabeatriz</p>
-                <p id="profile-bio" class="profile-bio">Desenvolvedora Full Stack apaixonada por tecnologia e impacto social. Construindo pontes entre código e comunidade. 🚀</p>
+                <h2 id="profile-name" class="profile-display-name">Seu nome</h2>
+                <p id="profile-user" class="profile-username">@seuusuario</p>
+                <p id="profile-bio" class="profile-bio">Adicione uma biografia para compartilhar sua história com a comunidade.</p>
               </div>
               <div class="profile-actions">
                 <a href="editar-perfil.html" class="btn btn-primary"><i class="icon-pencil"></i> Editar</a>
@@ -70,24 +70,21 @@
               </div>
             </div>
 
-            <!-- Stats rápidas -->
             <div class="profile-quick-stats">
               <div class="quick-stat">
-                <span class="quick-stat-num" id="stat-projetos">12</span>
+                <span class="quick-stat-num" id="stat-projetos">0</span>
                 <span class="quick-stat-label">Projetos</span>
               </div>
               <div class="quick-stat-divider"></div>
               <div class="quick-stat">
-                <span class="quick-stat-num" id="stat-eventos">8</span>
+                <span class="quick-stat-num" id="stat-eventos">0</span>
                 <span class="quick-stat-label">Eventos</span>
               </div>
               <div class="quick-stat-divider"></div>
               <div class="quick-stat">
-                <span class="quick-stat-num" id="stat-conexoes">234</span>
+                <span class="quick-stat-num" id="stat-conexoes">0</span>
                 <span class="quick-stat-label">Conexões</span>
               </div>
-              <div class="quick-stat-divider"></div>
-
             </div>
           </div>
         </div>
@@ -109,15 +106,15 @@
             <ul class="info-list">
               <li class="info-item">
                 <i class="icon-mail"></i>
-                <span id="profile-email">ana@shetech.com.br</span>
+                <span id="profile-email">seuemail@shetech.com.br</span>
               </li>
               <li class="info-item">
                 <i class="icon-briefcase"></i>
-                <span id="profile-role-info">Desenvolvedora Full Stack</span>
+                <span id="profile-role-info">Membro SheTech</span>
               </li>
               <li class="info-item">
                 <i class="icon-calendar"></i>
-                <span>Membro desde <strong id="profile-date">jan. 2024</strong></span>
+                <span>Membro desde <strong id="profile-date">hoje</strong></span>
               </li>
             </ul>
 
@@ -179,290 +176,33 @@
 
             <!-- Timeline -->
             <div class="timeline" id="timeline-list">
-
-              <!-- Item: Projeto em andamento -->
-              <div class="tl-item" data-type="projeto">
-                <div class="tl-dot tl-dot--projeto">
-                  <i class="icon-folder-kanban"></i>
-                </div>
-                <div class="tl-content card">
-                  <div class="tl-meta">
-                    <span class="tl-badge tl-badge--projeto">Projeto</span>
-                    <span class="tl-badge tl-badge--status tl-badge--ativo">Em andamento</span>
-                    <span class="tl-date"><i class="icon-clock"></i> jun. 2025 – presente</span>
-                  </div>
-                  <h4 class="tl-title">EducaTech — Plataforma de Aprendizado Inclusivo</h4>
-                  <p class="tl-desc">Desenvolvimento do front-end de uma plataforma de ensino acessível para mulheres em situação de vulnerabilidade social, com suporte a leitores de tela e modo offline.</p>
-                  <div class="tl-tags">
-                    <span class="tl-tag">React</span>
-                    <span class="tl-tag">Acessibilidade</span>
-                    <span class="tl-tag">Node.js</span>
-                  </div>
-                  <div class="tl-footer">
-                    <div class="tl-avatars" title="5 participantes">
-                      <img src="assets/avatars/avatar.svg" alt="" />
-                      <img src="assets/avatars/avatar.svg" alt="" />
-                      <img src="assets/avatars/avatar.svg" alt="" />
-                      <span class="tl-avatars-more">+2</span>
-                    </div>
-                    <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i> Ver projeto</a>
-                  </div>
-                </div>
+              <div class="card" style="padding: 24px; text-align: center; color: var(--gray-600);">
+                <i class="icon-clock" style="font-size: 28px; color: var(--pink); margin-bottom: 10px; display: inline-block;"></i>
+                <h4 style="margin: 0 0 8px; color: var(--ink);">Sua linha do tempo aparecerá aqui</h4>
+                <p style="margin: 0;">Adicione projetos, eventos e conquistas para construir seu histórico profissional na plataforma.</p>
               </div>
-
-              <!-- Item: Evento -->
-              <div class="tl-item" data-type="evento">
-                <div class="tl-dot tl-dot--evento">
-                  <i class="icon-calendar-check"></i>
-                </div>
-                <div class="tl-content card">
-                  <div class="tl-meta">
-                    <span class="tl-badge tl-badge--evento">Evento</span>
-                    <span class="tl-badge tl-badge--status tl-badge--concluido">Concluído</span>
-                    <span class="tl-date"><i class="icon-clock"></i> mai. 2025</span>
-                  </div>
-                  <h4 class="tl-title">SheTech Summit 2025 — Palestrante</h4>
-                  <p class="tl-desc">Apresentou a palestra "De Dev Jr. a Tech Lead: como as comunidades me transformaram" para uma audiência de 300+ pessoas.</p>
-                  <div class="tl-tags">
-                    <span class="tl-tag">Palestra</span>
-                    <span class="tl-tag">Liderança</span>
-                    <span class="tl-tag">Presencial</span>
-                  </div>
-                  <div class="tl-footer">
-                    <span class="tl-role-pill"><i class="icon-mic"></i> Speaker</span>
-                    <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i> Ver evento</a>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Item: Conquista -->
-              <div class="tl-item" data-type="conquista">
-                <div class="tl-dot tl-dot--conquista">
-                  <i class="icon-award"></i>
-                </div>
-                <div class="tl-content card">
-                  <div class="tl-meta">
-                    <span class="tl-badge tl-badge--conquista">Conquista</span>
-                    <span class="tl-date"><i class="icon-clock"></i> abr. 2025</span>
-                  </div>
-                  <h4 class="tl-title">🏆 Vencedora do Hackathon ImpactoTech</h4>
-                  <p class="tl-desc">1º lugar na trilha de Impacto Social com o projeto WaterMap — sistema de mapeamento comunitário de acesso à água potável.</p>
-                  <div class="tl-tags">
-                    <span class="tl-tag">Hackathon</span>
-                    <span class="tl-tag">1º lugar</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Item: Projeto concluído -->
-              <div class="tl-item" data-type="projeto">
-                <div class="tl-dot tl-dot--projeto">
-                  <i class="icon-folder-kanban"></i>
-                </div>
-                <div class="tl-content card">
-                  <div class="tl-meta">
-                    <span class="tl-badge tl-badge--projeto">Projeto</span>
-                    <span class="tl-badge tl-badge--status tl-badge--concluido">Concluído</span>
-                    <span class="tl-date"><i class="icon-clock"></i> jan. – mar. 2025</span>
-                  </div>
-                  <h4 class="tl-title">API de Mentoria — SheTech Mentorship</h4>
-                  <p class="tl-desc">Arquitetura e desenvolvimento da API REST para o sistema de matching entre mentoras e mentoradas da comunidade.</p>
-                  <div class="tl-tags">
-                    <span class="tl-tag">Node.js</span>
-                    <span class="tl-tag">PostgreSQL</span>
-                    <span class="tl-tag">REST API</span>
-                  </div>
-                  <div class="tl-footer">
-                    <div class="tl-avatars" title="3 participantes">
-                      <img src="assets/avatars/avatar.svg" alt="" />
-                      <img src="assets/avatars/avatar.svg" alt="" />
-                      <img src="assets/avatars/avatar.svg" alt="" />
-                    </div>
-                    <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i> Ver projeto</a>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Item: Evento -->
-              <div class="tl-item" data-type="evento">
-                <div class="tl-dot tl-dot--evento">
-                  <i class="icon-calendar-check"></i>
-                </div>
-                <div class="tl-content card">
-                  <div class="tl-meta">
-                    <span class="tl-badge tl-badge--evento">Evento</span>
-                    <span class="tl-badge tl-badge--status tl-badge--concluido">Concluído</span>
-                    <span class="tl-date"><i class="icon-clock"></i> nov. 2024</span>
-                  </div>
-                  <h4 class="tl-title">Workshop: Introdução ao TypeScript</h4>
-                  <p class="tl-desc">Ministrou workshop online de 4 horas sobre TypeScript para iniciantes, com 45 participantes.</p>
-                  <div class="tl-tags">
-                    <span class="tl-tag">Workshop</span>
-                    <span class="tl-tag">TypeScript</span>
-                    <span class="tl-tag">Online</span>
-                  </div>
-                  <div class="tl-footer">
-                    <span class="tl-role-pill"><i class="icon-graduation-cap"></i> Instrutora</span>
-                    <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i> Ver evento</a>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Item: Conquista entrada -->
-              <div class="tl-item" data-type="conquista">
-                <div class="tl-dot tl-dot--conquista">
-                  <i class="icon-star"></i>
-                </div>
-                <div class="tl-content card">
-                  <div class="tl-meta">
-                    <span class="tl-badge tl-badge--conquista">Conquista</span>
-                    <span class="tl-date"><i class="icon-clock"></i> jan. 2024</span>
-                  </div>
-                  <h4 class="tl-title">🚀 Entrou para a SheTech como Pioneira</h4>
-                  <p class="tl-desc">Uma das primeiras 100 membras da plataforma. Bem-vinda à comunidade!</p>
-                </div>
-              </div>
-
             </div>
           </div>
 
           <!-- TAB: PROJETOS -->
           <div class="tab-panel" id="tab-projetos">
             <div class="projects-grid" id="projects-grid">
-
-              <div class="project-card card">
-                <div class="project-card-header">
-                  <div class="project-icon">📱</div>
-                  <span class="project-status project-status--ativo">Em andamento</span>
-                </div>
-                <h4 class="project-name">EducaTech</h4>
-                <p class="project-desc">Plataforma de aprendizado inclusivo para mulheres em vulnerabilidade social.</p>
-                <div class="project-tags">
-                  <span class="tl-tag">React</span>
-                  <span class="tl-tag">Node.js</span>
-                </div>
-                <div class="project-footer">
-                  <div class="project-progress-wrap">
-                    <div class="project-progress-bar">
-                      <div class="project-progress-fill" style="width:65%"></div>
-                    </div>
-                    <span class="project-progress-label">65%</span>
-                  </div>
-                  <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i></a>
-                </div>
+              <div class="card" style="padding: 24px; text-align: center; color: var(--gray-600); grid-column: 1 / -1;">
+                <i class="icon-folder-kanban" style="font-size: 28px; color: var(--pink); margin-bottom: 10px; display: inline-block;"></i>
+                <h4 style="margin: 0 0 8px; color: var(--ink);">Nenhum projeto por enquanto</h4>
+                <p style="margin: 0;">Crie seu primeiro projeto e ele aparecerá aqui.</p>
               </div>
-
-              <div class="project-card card">
-                <div class="project-card-header">
-                  <div class="project-icon">🌊</div>
-                  <span class="project-status project-status--concluido">Concluído</span>
-                </div>
-                <h4 class="project-name">WaterMap</h4>
-                <p class="project-desc">Mapeamento comunitário de acesso à água potável. Vencedor do ImpactoTech.</p>
-                <div class="project-tags">
-                  <span class="tl-tag">Python</span>
-                  <span class="tl-tag">Maps API</span>
-                </div>
-                <div class="project-footer">
-                  <div class="project-progress-wrap">
-                    <div class="project-progress-bar">
-                      <div class="project-progress-fill" style="width:100%"></div>
-                    </div>
-                    <span class="project-progress-label">100%</span>
-                  </div>
-                  <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i></a>
-                </div>
-              </div>
-
-              <div class="project-card card">
-                <div class="project-card-header">
-                  <div class="project-icon">🤝</div>
-                  <span class="project-status project-status--concluido">Concluído</span>
-                </div>
-                <h4 class="project-name">API de Mentoria</h4>
-                <p class="project-desc">Sistema de matching entre mentoras e mentoradas da comunidade SheTech.</p>
-                <div class="project-tags">
-                  <span class="tl-tag">Node.js</span>
-                  <span class="tl-tag">PostgreSQL</span>
-                </div>
-                <div class="project-footer">
-                  <div class="project-progress-wrap">
-                    <div class="project-progress-bar">
-                      <div class="project-progress-fill" style="width:100%"></div>
-                    </div>
-                    <span class="project-progress-label">100%</span>
-                  </div>
-                  <a href="#" class="tl-link"><i class="icon-arrow-up-right"></i></a>
-                </div>
-              </div>
-
             </div>
           </div>
 
           <!-- TAB: EVENTOS -->
           <div class="tab-panel" id="tab-eventos">
             <div class="events-list" id="events-list">
-
-              <div class="event-row card">
-                <div class="event-date-block">
-                  <span class="event-month">MAI</span>
-                  <span class="event-day">14</span>
-                  <span class="event-year">2025</span>
-                </div>
-                <div class="event-info">
-                  <div class="event-header-row">
-                    <h4 class="event-title">SheTech Summit 2025</h4>
-                    <span class="event-role-pill event-role--speaker"><i class="icon-mic"></i> Speaker</span>
-                  </div>
-                  <p class="event-desc">Palestra sobre trajetória de carreira e impacto das comunidades tech.</p>
-                  <div class="event-meta-row">
-                    <span class="event-meta"><i class="icon-map-pin"></i> São Paulo, SP</span>
-                    <span class="event-meta"><i class="icon-users"></i> 300+ participantes</span>
-                    <span class="event-badge event-badge--presencial">Presencial</span>
-                  </div>
-                </div>
+              <div class="card" style="padding: 24px; text-align: center; color: var(--gray-600);">
+                <i class="icon-calendar-days" style="font-size: 28px; color: var(--pink); margin-bottom: 10px; display: inline-block;"></i>
+                <h4 style="margin: 0 0 8px; color: var(--ink);">Nenhum evento cadastrado</h4>
+                <p style="margin: 0;">Quando você criar eventos, eles aparecerão aqui.</p>
               </div>
-
-              <div class="event-row card">
-                <div class="event-date-block">
-                  <span class="event-month">NOV</span>
-                  <span class="event-day">08</span>
-                  <span class="event-year">2024</span>
-                </div>
-                <div class="event-info">
-                  <div class="event-header-row">
-                    <h4 class="event-title">Workshop: Intro ao TypeScript</h4>
-                    <span class="event-role-pill event-role--instrutora"><i class="icon-graduation-cap"></i> Instrutora</span>
-                  </div>
-                  <p class="event-desc">Workshop online de 4 horas sobre TypeScript para iniciantes.</p>
-                  <div class="event-meta-row">
-                    <span class="event-meta"><i class="icon-monitor"></i> Online</span>
-                    <span class="event-meta"><i class="icon-users"></i> 45 participantes</span>
-                    <span class="event-badge event-badge--online">Online</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="event-row card">
-                <div class="event-date-block">
-                  <span class="event-month">ABR</span>
-                  <span class="event-day">20</span>
-                  <span class="event-year">2024</span>
-                </div>
-                <div class="event-info">
-                  <div class="event-header-row">
-                    <h4 class="event-title">Hackathon ImpactoTech</h4>
-                    <span class="event-role-pill event-role--participante"><i class="icon-code-2"></i> Participante</span>
-                  </div>
-                  <p class="event-desc">48 horas de hackathon focado em tecnologia e impacto social.</p>
-                  <div class="event-meta-row">
-                    <span class="event-meta"><i class="icon-map-pin"></i> Recife, PE</span>
-                    <span class="event-meta"><i class="icon-trophy"></i> 1º lugar</span>
-                    <span class="event-badge event-badge--presencial">Presencial</span>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
 

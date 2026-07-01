@@ -96,6 +96,26 @@ body {
   flex-wrap: wrap;
 }
 
+.community-topbar {
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.community-topbar .page-title {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.page-header {
+  margin-top: -4px;
+  margin-bottom: 16px;
+}
+
+.page-header-left .page-subtitle {
+  margin-top: 2px;
+}
+
 .menu-toggle {
   display: none;
   background: none;
@@ -573,6 +593,9 @@ body {
   position: relative;
   margin-bottom: 12px;
 }
+.post-link-preview-wrap--featured {
+  margin-bottom: 14px;
+}
 
 .post-link-preview {
   display: flex;
@@ -583,9 +606,31 @@ body {
   padding: 12px;
   text-decoration: none;
   background: var(--bg);
-  transition: background var(--trans);
+  transition: background var(--trans), transform var(--trans), border-color var(--trans);
 }
 .post-link-preview:hover { background: var(--brand-light); }
+.post-link-preview--featured {
+  border-color: rgba(255,61,139,.3);
+  background: linear-gradient(135deg, #fff 0%, #fff7fb 100%);
+  box-shadow: 0 10px 20px -16px rgba(255,61,139,.35);
+}
+.post-link-feature-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--grad);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.post-link-desc {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 4px;
+  line-height: 1.45;
+}
 .post-link-icon {
   width: 36px; height: 36px;
   border-radius: 8px;
@@ -861,6 +906,23 @@ body {
   transition: box-shadow var(--trans), transform var(--trans);
 }
 .link-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.link-card--featured {
+  border-color: rgba(255,61,139,.35);
+  background: linear-gradient(135deg, #fff 0%, #fff7fb 100%);
+  box-shadow: 0 12px 24px -14px rgba(255,61,139,.35);
+}
+.link-feature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--grad);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
 
 .link-card-top {
   display: flex;

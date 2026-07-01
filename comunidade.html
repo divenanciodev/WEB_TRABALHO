@@ -33,11 +33,11 @@
   <main class="main" id="main">
 
     <!-- Topbar -->
-    <header class="topbar">
+    <header class="topbar community-topbar">
+      <h1 class="page-title">Comunidade</h1>
       <div class="search-bar">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="community-search" placeholder="Buscar posts, links ou membros..." />
-        <!-- kbd removido -->
       </div>
       <div class="topbar-right">
         <button class="icon-btn notif-btn" id="notif-btn" onclick="toggleNotifications()" title="Notificações">
@@ -54,28 +54,20 @@
           <div class="notif-list">
             <div class="notif-item unread">
               <div class="notif-avatar" style="background:#f0d0e8">💜</div>
-              <div class="notif-body"><strong>Carla Mendes</strong> curtiu sua postagem<span class="notif-time">2min</span></div>
+              <div class="notif-body"><strong>Nova interação</strong> apareceu na sua comunidade<span class="notif-time">agora</span></div>
             </div>
             <div class="notif-item unread">
               <div class="notif-avatar" style="background:#d0e8f0">🔗</div>
-              <div class="notif-body"><strong>Bia Torres</strong> adicionou um novo link<span class="notif-time">14min</span></div>
+              <div class="notif-body"><strong>Seu conteúdo</strong> pode ganhar mais visibilidade<span class="notif-time">hoje</span></div>
             </div>
             <div class="notif-item">
               <div class="notif-avatar" style="background:#e8f0d0">🎉</div>
-              <div class="notif-body"><strong>Novo evento</strong>: Workshop de React avançado<span class="notif-time">1h</span></div>
-            </div>
-            <div class="notif-item">
-              <div class="notif-avatar" style="background:#f0e8d0">💬</div>
-              <div class="notif-body"><strong>Julia Costa</strong> comentou no seu post<span class="notif-time">3h</span></div>
+              <div class="notif-body"><strong>Novos eventos</strong> aparecerão aqui quando forem criados<span class="notif-time">em breve</span></div>
             </div>
           </div>
           <a href="notificacoes.html" class="notif-all-link">Ver todas as notificações</a>
         </div>
 
-        <a href="perfil.html" class="topbar-user">
-          <img id="top-avatar" src="assets/avatars/avatar.svg" alt="Usuária" />
-          <span id="top-name">Ana Luiza</span>
-        </a>
       </div>
     </header>
 
@@ -85,10 +77,8 @@
       <!-- Page header -->
       <div class="page-header">
         <div class="page-header-left">
-          <h1 class="page-title">Comunidade</h1>
           <p class="page-subtitle">Conecte-se, compartilhe e inspire outras mulheres na tech</p>
         </div>
-<!-- Contadores removidos conforme solicitação -->
       </div>
 
       <!-- Tabs -->
@@ -164,43 +154,9 @@
           <aside class="feed-sidebar">
             <div class="widget card">
               <h3 class="widget-title">Trending na SheTech</h3>
-              <ul class="trending-list">
-                <li class="trending-item">
-                  <span class="trending-rank">01</span>
-                  <div>
-                    <span class="trending-tag">#carreira</span>
-                    <span class="trending-count">284 posts</span>
-                  </div>
-                </li>
-                <li class="trending-item">
-                  <span class="trending-rank">02</span>
-                  <div>
-                    <span class="trending-tag">#mentorias</span>
-                    <span class="trending-count">197 posts</span>
-                  </div>
-                </li>
-                <li class="trending-item">
-                  <span class="trending-rank">03</span>
-                  <div>
-                    <span class="trending-tag">#uxdesign</span>
-                    <span class="trending-count">156 posts</span>
-                  </div>
-                </li>
-                <li class="trending-item">
-                  <span class="trending-rank">04</span>
-                  <div>
-                    <span class="trending-tag">#codingtips</span>
-                    <span class="trending-count">112 posts</span>
-                  </div>
-                </li>
-                <li class="trending-item">
-                  <span class="trending-rank">05</span>
-                  <div>
-                    <span class="trending-tag">#mulhereslíderes</span>
-                    <span class="trending-count">98 posts</span>
-                  </div>
-                </li>
-              </ul>
+              <div style="padding: 8px 0; color: var(--gray-600); font-size: 14px;">
+                Nenhuma tendência registrada ainda.
+              </div>
             </div>
 
             <div class="widget card">
@@ -208,44 +164,12 @@
               <div class="active-members">
                 <div class="active-member" onclick="viewProfile(1)">
                   <div class="member-thumb-wrap">
-                    <img src="assets/avatars/avatar.svg" alt="Carla">
+                    <img src="assets/avatars/avatar.svg" alt="Membro">
                     <span class="online-indicator"></span>
                   </div>
                   <div>
-                    <span class="active-name">Carla Mendes</span>
-                    <span class="active-role">Full Stack Dev</span>
-                  </div>
-                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
-                </div>
-                <div class="active-member" onclick="viewProfile(2)">
-                  <div class="member-thumb-wrap">
-                    <img src="assets/avatars/avatar.svg" alt="Bia">
-                    <span class="online-indicator"></span>
-                  </div>
-                  <div>
-                    <span class="active-name">Bia Torres</span>
-                    <span class="active-role">UX Designer</span>
-                  </div>
-                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
-                </div>
-                <div class="active-member" onclick="viewProfile(3)">
-                  <div class="member-thumb-wrap">
-                    <img src="assets/avatars/avatar.svg" alt="Julia">
-                    <span class="online-indicator"></span>
-                  </div>
-                  <div>
-                    <span class="active-name">Julia Costa</span>
-                    <span class="active-role">Data Scientist</span>
-                  </div>
-                  <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
-                </div>
-                <div class="active-member" onclick="viewProfile(4)">
-                  <div class="member-thumb-wrap">
-                    <img src="assets/avatars/avatar.svg" alt="Mariana">
-                  </div>
-                  <div>
-                    <span class="active-name">Mariana Lima</span>
-                    <span class="active-role">Product Manager</span>
+                    <span class="active-name">Sua rede</span>
+                    <span class="active-role">Em construção</span>
                   </div>
                   <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
                 </div>
@@ -337,6 +261,13 @@
             <option value="Artigo">Artigo</option>
             <option value="Outro">Outro</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
+            <input type="checkbox" id="link-destaque" style="width:auto; margin:0;" />
+            <span>Destacar para a comunidade</span>
+          </label>
+          <p style="margin-top:6px; font-size:12px; color:var(--gray-500);">Links destacados ficam mais visíveis para outros membros salvarem depois.</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-ghost" onclick="closeModal('link-modal')">Cancelar</button>

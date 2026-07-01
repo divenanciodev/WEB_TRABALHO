@@ -1,3 +1,65 @@
+const DEMO_PROJECT_TITLES = [
+    'App de Gestão Financeira',
+    'Dashboard de Dados de Saúde',
+    'Portfólio Pessoal',
+    'Design System SheTech',
+    'EducaTech',
+    'WaterMap',
+    'API de Mentoria'
+];
+
+const DEMO_EVENT_TITLES = [
+    'Meetup de UX Research',
+    'Workshop de Figma Avançado',
+    'Hackathon SheTech 2025',
+    'Palestra: Mulheres no Open Source',
+    'SheTech Summit 2025',
+    'Workshop: Introdução ao TypeScript',
+    'Hackathon ImpactoTech'
+];
+
+function clearSeededDemoData() {
+    const cleanup = (key, sampleTitles) => {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return;
+
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return;
+
+            const isSeeded = parsed.some((item) => {
+                const haystack = [
+                    item.titulo,
+                    item.title,
+                    item.nome,
+                    item.name,
+                    item.descricao,
+                    item.descricao || item.text,
+                    item.conteudo,
+                    item.text,
+                    item.titulo || item.nome
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                return sampleTitles.some((title) => haystack.includes(title.toLowerCase()));
+            });
+
+            if (isSeeded) {
+                localStorage.setItem(key, JSON.stringify([]));
+            }
+        } catch (error) {
+            console.warn('Não foi possível limpar dados mockados de', key, error);
+        }
+    };
+
+    cleanup('projects', DEMO_PROJECT_TITLES);
+    cleanup('events', DEMO_EVENT_TITLES);
+    cleanup('posts', DEMO_EVENT_TITLES);
+    cleanup('shetech_projetos', DEMO_PROJECT_TITLES);
+    cleanup('shetech_eventos', DEMO_EVENT_TITLES);
+}
+
+clearSeededDemoData();
+
 const State = {
     getData(key) {
         const data = localStorage.getItem(key);

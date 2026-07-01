@@ -22,10 +22,10 @@ if (userId) {
 
 function loadUserData() {
     // Identidade
-    setText('profile-name', user.nome_completo);
-    setText('profile-user', `@${user.nome_usuario}`);
-    setText('profile-bio',  user.biografia || 'Sem biografia definida.');
-    setText('profile-email', user.email);
+    setText('profile-name', user.nome_completo || 'Seu nome');
+    setText('profile-user', user.nome_usuario ? `@${user.nome_usuario}` : '@seuusuario');
+    setText('profile-bio', user.biografia || 'Adicione uma biografia para compartilhar sua história com a comunidade.');
+    setText('profile-email', user.email || 'seuemail@shetech.com.br');
     setText('profile-role-info', user.cargo || user.area || 'Membro SheTech');
     
     const avatar = document.getElementById('profile-avatar');
@@ -40,7 +40,7 @@ function loadUserData() {
     // Sobre
     const aboutText = document.getElementById('profile-about-text');
     if (aboutText) {
-        aboutText.textContent = user.sobre || 'Nenhuma informação detalhada fornecida.';
+        aboutText.textContent = user.sobre || 'Complete seu perfil para compartilhar mais detalhes sobre você.';
     }
 
     // Skills
@@ -61,8 +61,23 @@ function loadUserData() {
     }
 
     // Stats (do State)
-    setText('stat-projetos', State.getProjects().filter(p => p.proprietaria_id === user.email).length);
-    setText('stat-eventos', State.getEvents().length);
+    const isOwnedByUser = (item) => [item?.proprietaria_id, item?.organizador_id, item?.criador_id].includes(user.email);
+    const projetos = State.getProjects().filter(isOwnedByUser);
+    const eventos = State.getEvents().filter(isOwnedByUser);
+
+    setText('stat-projetos', projetos.length);
+    setText('stat-eventos', eventos.length);
+    setText('stat-conexoes', 0);
+    setText('profile-date', formatMemberSince(user.createdAt || user.created_at || user.criado_em));
+}
+
+function formatMemberSince(value) {
+    if (!value) return 'hoje';
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'hoje';
+
+    return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }).replace('.', '').replace(' 202', ' 202');
 }
 
 function setText(id, val) {
