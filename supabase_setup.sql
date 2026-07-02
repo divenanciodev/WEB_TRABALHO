@@ -1,9 +1,10 @@
 -- ============================================================
--- SheTech — Configuração da tabela 'users' no Supabase
+-- SheTech — Configuração da tabela 'users' no Supabase (VERSÃO CORRIGIDA)
 -- Execute este script no SQL Editor do seu projeto Supabase
 -- ============================================================
 
--- 1. Cria a tabela 'users' caso ainda não exista
+-- 1. Garante que a tabela 'users' exista com os tipos corretos
+-- Se a tabela já existir, este comando não fará nada.
 CREATE TABLE IF NOT EXISTS public.users (
     id          UUID PRIMARY KEY,
     email       TEXT UNIQUE NOT NULL,
@@ -30,14 +31,13 @@ CREATE TABLE IF NOT EXISTS public.users (
 -- 2. Habilita Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
--- 3. Remove políticas antigas (caso existam) para evitar conflitos
+-- 3. Remove políticas antigas para evitar conflitos
 DROP POLICY IF EXISTS "Qualquer usuário autenticado pode ler todos os perfis" ON public.users;
 DROP POLICY IF EXISTS "Usuário pode inserir o próprio perfil" ON public.users;
 DROP POLICY IF EXISTS "Usuário pode atualizar o próprio perfil" ON public.users;
 DROP POLICY IF EXISTS "Leitura pública de perfis" ON public.users;
 
 -- 4. Política: QUALQUER PESSOA AUTENTICADA pode ler TODOS os perfis
---    (necessário para que membros apareçam na aba Comunidade)
 CREATE POLICY "Qualquer usuário autenticado pode ler todos os perfis"
     ON public.users
     FOR SELECT
@@ -45,21 +45,23 @@ CREATE POLICY "Qualquer usuário autenticado pode ler todos os perfis"
     USING (true);
 
 -- 5. Política: Usuário autenticado pode inserir o próprio perfil
+-- Corrigido: Usando cast (::uuid) para evitar erro de tipo caso a coluna id seja texto
 CREATE POLICY "Usuário pode inserir o próprio perfil"
     ON public.users
     FOR INSERT
     TO authenticated
-    WITH CHECK (auth.uid() = id);
+    WITH CHECK (auth.uid() = id::uuid);
 
 -- 6. Política: Usuário autenticado pode atualizar o próprio perfil
+-- Corrigido: Usando cast (::uuid) para evitar erro de tipo
 CREATE POLICY "Usuário pode atualizar o próprio perfil"
     ON public.users
     FOR UPDATE
     TO authenticated
-    USING (auth.uid() = id)
-    WITH CHECK (auth.uid() = id);
+    USING (auth.uid() = id::uuid)
+    WITH CHECK (auth.uid() = id::uuid);
 
--- 7. (Opcional) Garante que o campo 'updatedAt' seja atualizado automaticamente
+-- 7. Gatilho para atualizar o campo 'updatedAt' automaticamente
 CREATE OR REPLACE FUNCTION public.set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -75,9 +77,8 @@ CREATE TRIGGER set_users_updated_at
     EXECUTE FUNCTION public.set_updated_at();
 
 -- ============================================================
--- IMPORTANTE: Verifique também nas configurações do Supabase:
---   Authentication > Settings > "Confirm email"
---   Se estiver ATIVADO, o usuário precisa confirmar o e-mail
---   antes de conseguir fazer login. Para testes, você pode
---   DESATIVAR temporariamente essa opção.
+-- DICA DE OURO: Se o erro persistir, significa que sua tabela 
+-- 'users' foi criada com o ID como TEXTO em vez de UUID.
+-- Você pode tentar rodar este comando extra para converter a coluna:
+-- ALTER TABLE public.users ALTER COLUMN id TYPE UUID USING id::uuid;
 -- ============================================================
