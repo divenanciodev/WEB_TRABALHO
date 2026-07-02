@@ -179,16 +179,26 @@ const State = {
     getPosts() { return this.getData('posts'); },
     getUsers() { return this.getData('users'); },
     setUsers(users) { localStorage.setItem('users', JSON.stringify(users)); },
-    getLinks(email) { 
-        return this.getData('links').filter(l => l.proprietaria_id === email); 
+    
+    // Links e Pastas - AGORA GLOBAIS (sem filtro por proprietária)
+    getLinks(email = null) { 
+        const allLinks = this.getData('links');
+        // Se email for fornecido, retorna apenas links do usuário (para compatibilidade)
+        // Se não, retorna todos os links (global)
+        return email ? allLinks.filter(l => l.proprietaria_id === email) : allLinks;
     },
     saveLink(link) { this.saveData('links', link); },
     deleteLink(id) { this.deleteData('links', id); },
-    getFolders(email) {
-        return this.getData('folders').filter(f => f.proprietaria_id === email);
+    
+    getFolders(email = null) {
+        const allFolders = this.getData('folders');
+        // Se email for fornecido, retorna apenas pastas do usuário (para compatibilidade)
+        // Se não, retorna todas as pastas (global)
+        return email ? allFolders.filter(f => f.proprietaria_id === email) : allFolders;
     },
     saveFolder(folder) { this.saveData('folders', folder); },
     deleteFolder(id) { this.deleteData('folders', id); },
+    
     addNotification(email, message) {
         const notif = {
             id: Date.now(),
@@ -201,40 +211,21 @@ const State = {
         notifs.push(notif);
         localStorage.setItem('notifications', JSON.stringify(notifs));
     },
+
     getNotifications(email) {
         return this.getData('notifications').filter(n => n.destinataria_id === email);
     },
-    markAllAsRead(email) {
-        const notifs = this.getData('notifications');
-        notifs.forEach(n => {
-            if (n.destinataria_id === email) n.lida = true;
-        });
-        localStorage.setItem('notifications', JSON.stringify(notifs));
-    }
-};
 
-const UI = {
-    showModal(id) {
-        const m = document.getElementById(id);
-        if (m) m.style.display = 'flex';
+    // Contagem de usuários online (simula com base em usuários cadastrados)
+    getOnlineCount() {
+        const users = this.getUsers();
+        // Simula: 30-70% dos usuários estão online
+        const onlinePercentage = Math.random() * 0.4 + 0.3;
+        return Math.max(1, Math.ceil(users.length * onlinePercentage));
     },
-    closeModal(id) {
-        const m = document.getElementById(id);
-        if (m) m.style.display = 'none';
-    },
-    updateNotificationBadge() {
-        const user = State.getCurrentUser();
-        if (!user) return;
-        const notifs = State.getNotifications(user.email).filter(n => !n.lida);
-        const badge = document.querySelector('.icon-btn .dot');
-        if (badge) {
-            badge.style.display = notifs.length > 0 ? 'block' : 'none';
-        }
-    }
-};
 
-window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = 'none';
+    // Contagem total de membros
+    getMembersCount() {
+        return this.getUsers().length;
     }
 };

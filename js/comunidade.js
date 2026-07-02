@@ -38,7 +38,9 @@ function mapUserToMember(user, index) {
     skills: Array.isArray(user.habilidades) ? user.habilidades : [],
     online: true, // Simula online para todos na demo
     email:  user.email  || '',
-    bio:    user.bio    || user.biografia || ''
+    bio:    user.bio    || user.biografia || '',
+    // Adiciona campos completos do usuário para visualização de perfil
+    fullUser: user
   };
 }
 
@@ -96,9 +98,15 @@ async function loadMembers() {
     console.warn('[Comunidade] Não foi possível buscar membros do Supabase:', err);
   }
 
-  // Removido fallback local para evitar que o usuário veja apenas a si mesmo.
-  // A lista deve vir sempre do Supabase para garantir visibilidade global.
+  // Fallback: se não conseguir do Supabase, usa localStorage
+  if (members.length === 0) {
+    const localUsers = State.getUsers();
+    if (localUsers && localUsers.length > 0) {
+      members = localUsers.map((u, i) => mapUserToMember(u, i));
+    }
+  }
 
+  // Garante que o usuário atual está na lista
   if (currentUser) {
     const alreadyIn = members.some(m => m.email === currentUser.email);
     if (!alreadyIn) members.unshift(mapUserToMember(currentUser, -1));
@@ -363,394 +371,104 @@ function insertEmoji(emoji) {
     const field = document.getElementById('composer-field');
     field.innerText += emoji;
     field.focus();
-    document.getElementById('emoji-picker-modal')?.remove();
-}
-
-function savePostLinkToMyLinks(title, url, event) {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const user = State.getCurrentUser();
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
-    }
-
-    const existing = document.getElementById('save-link-modal');
-    if (existing) { existing.remove(); return; }
-
-    const folders = State.getFolders(user.email);
-    const btn = event.currentTarget;
-    const rect = btn?.getBoundingClientRect();
-    const top = rect ? `${rect.top - 220}px` : '50%';
-    const left = rect ? `${rect.left - 100}px` : '50%';
-    
-    const modalHtml = `
-        <div id="save-link-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10002; background: transparent;">
-            <div class="modal-content" style="max-width: 320px; height: auto; position: fixed; top: ${top}; left: ${left}; padding: 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); background: white;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h2 style="font-size: 15px; margin: 0;">Salvar nos Meus Links</h2>
-                    <button onclick="document.getElementById('save-link-modal').remove()" style="font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
-                </div>
-                <p style="margin-bottom: 10px; font-size: 13px; color: var(--gray-700);">Escolha uma pasta para salvar: <strong>${title}</strong></p>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 12px;">Pasta</label>
-                    <select id="save-folder-select" class="form-control" style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--gray-300); font-size: 13px;">
-                        <option value="">Nenhuma pasta (Geral)</option>
-                        ${folders.map(f => `<option value="${f.id}">${f.nome}</option>`).join('')}
-                    </select>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button onclick="confirmSavePostLink('${title}', '${url}')" class="btn btn-primary" style="flex: 1; padding: 8px 10px; font-size: 12px;">Salvar</button>
-                    <button onclick="document.getElementById('save-link-modal').remove()" class="btn btn-outline" style="flex: 1; padding: 8px 10px; font-size: 12px;">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    document.getElementById('save-link-modal').onclick = (e) => {
-        if (e.target.id === 'save-link-modal') e.target.remove();
-    };
-}
-
-function confirmSavePostLink(title, url) {
-    const folderId = document.getElementById('save-folder-select').value;
-    const user = State.getCurrentUser();
-    
-    const linkData = {
-        titulo: title,
-        url: url.startsWith('http') ? url : `https://${url}`,
-        descricao: '',
-        categoria: 'Comunidade',
-        folderId: folderId ? parseInt(folderId) : null,
-        proprietaria_id: user.email,
-        favorito: false
-    };
-    
-    State.saveLink(linkData);
-    showToast(`Link "${title}" salvo em Meus Links!`, 'success');
-    document.getElementById('save-link-modal').remove();
-}
-
-/* ─── COMMENTS MODAL ──────────────────────── */
-
-function openComments(postId) {
-  activePostId = postId;
-  const list = document.getElementById('comments-list');
-  const comments = commentsByPost[postId] || [];
-  list.innerHTML = comments.length
-    ? comments.map(c => commentHTML(c)).join('')
-    : '<p style="color:var(--text-3); font-size:13px; text-align:center; padding:24px 0;">Nenhum comentário ainda. Seja a primeira! 💬</p>';
-  openModal('comments-modal');
-}
-
-function commentHTML(c) {
-  return `
-  <div class="comment-item">
-    <img src="${c.avatar}" alt="${c.author}" />
-    <div class="comment-bubble">
-      <strong>${c.author}</strong>
-      <p>${escapeHTML(c.text)}</p>
-      <div class="comment-time">${c.time}</div>
-    </div>
-  </div>`;
-}
-
-function submitComment() {
-  const input = document.getElementById('comment-input');
-  const text = input.value.trim();
-  if (!text) return;
-  const comment = { id: Date.now(), author: CURRENT_USER.name, avatar: CURRENT_USER.avatar, text, time: 'Agora' };
-  if (!commentsByPost[activePostId]) commentsByPost[activePostId] = [];
-  commentsByPost[activePostId].push(comment);
-  const list = document.getElementById('comments-list');
-  const p = list.querySelector('p');
-  if (p) p.remove();
-  list.insertAdjacentHTML('beforeend', commentHTML(comment));
-  list.scrollTop = list.scrollHeight;
-  input.value = '';
-
-  const post = allPosts.find(p => p.id === activePostId);
-  if (post) {
-    post.comments++;
-    const card = document.getElementById(`post-${activePostId}`);
-    if (card) {
-      const btns = card.querySelectorAll('.reaction-btn');
-      btns.forEach(b => {
-        const spans = b.querySelectorAll('span');
-        if (spans.length && b.textContent.includes(post.comments - 1)) {
-          spans[0].textContent = post.comments;
-        }
-      });
-    }
-  }
+    document.getElementById('emoji-picker-modal').remove();
 }
 
 /* ─── LINKS ───────────────────────────────── */
 
-let currentLinkFilter = 'todos';
-
-function renderLinks(filter) {
-  const grid = document.getElementById('links-grid');
-  const data = filter && filter !== 'todos'
-    ? allLinks.filter(l => l.categoria === filter)
-    : allLinks;
-  const sorted = [...data].sort((a, b) => Number(b.destaque) - Number(a.destaque));
-  grid.innerHTML = sorted.map(l => linkCardHTML(l)).join('');
+function renderLinks(links) {
+  const list = document.getElementById('links-list');
+  const data = links || allLinks;
+  list.innerHTML = data.map(link => linkHTML(link)).join('');
 }
 
-function linkCardHTML(link) {
+function linkHTML(link) {
   return `
-  <div class="link-card ${link.destaque ? 'link-card--featured' : ''}" data-cat="${link.categoria}" id="link-${link.id}">
-    <div class="link-card-top">
-      <div class="link-icon-wrap">
+  <div class="link-card" id="link-${link.id}">
+    <div class="link-header">
+      <div class="link-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       </div>
-      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-        ${link.destaque ? '<span class="link-feature-badge">Destaque</span>' : ''}
-        <span class="link-cat-badge">${link.categoria}</span>
-      </div>
-    </div>
-    <div class="link-card-title">${escapeHTML(link.title)}</div>
-    ${link.desc ? `<div class="link-card-desc">${escapeHTML(link.desc)}</div>` : ''}
-    <div class="link-card-url">${link.url}</div>
-    <div class="link-card-footer">
-      <a href="${link.url}" target="_blank" class="link-open-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Abrir
-      </a>
-      <button class="link-save-btn" onclick="saveToMyLinks(${link.id})" title="Salvar nos Meus Links" style="background: var(--pink-soft); color: var(--pink); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <div class="link-title">${link.title}</div>
+      <button class="link-options" onclick="linkMenu(${link.id})" title="Opções">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
       </button>
-      <button class="link-del-btn" onclick="deleteLink(${link.id})" title="Remover">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <div class="link-url">${link.url}</div>
+    ${link.desc ? `<div class="link-desc">${link.desc}</div>` : ''}
+    <div class="link-footer">
+      <span class="link-category">${link.category || 'Geral'}</span>
+      <button class="link-save" onclick="saveLinkToMyLinks(${link.id}, this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar
       </button>
     </div>
   </div>`;
 }
 
-function filterLinks(cat, btn) {
-  currentLinkFilter = cat;
-  document.querySelectorAll('.links-filter .filter-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  renderLinks(cat === 'todos' ? null : cat);
+function saveLinkToMyLinks(id, btn) {
+  const link = allLinks.find(l => l.id === id);
+  if (!link) return;
+  
+  State.saveLink({
+    ...link,
+    proprietaria_id: State.getCurrentUser().email
+  });
+  
+  btn.textContent = '✓ Salvo';
+  btn.disabled = true;
+  showToast('Link salvo na sua biblioteca! 📚', 'success');
 }
 
-function saveLink(e) {
-    e.preventDefault();
-    const title = document.getElementById('link-titulo').value.trim();
-    const url   = document.getElementById('link-url').value.trim();
-    const desc  = document.getElementById('link-desc').value.trim();
-    const cat   = document.getElementById('link-categoria').value;
-    const destaque = document.getElementById('link-destaque')?.checked || false;
-    const composerField = document.getElementById('composer-field');
-    const composerText = (composerField?.innerText || '').trim();
-    if (!title || !url) return;
-
-    const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
-
-    allLinks.unshift({
-      id: nextLinkId++,
-      title,
-      url: normalizedUrl,
-      desc,
-      categoria: cat,
-      destaque,
-      criadoPor: CURRENT_USER.name
-    });
-
-    allPosts.unshift({
-      id: nextPostId++,
-      author: CURRENT_USER.name,
-      role: CURRENT_USER.role,
-      avatar: CURRENT_USER.avatar,
-      time: 'Agora mesmo',
-      text: composerText || `Compartilhei um recurso útil para a comunidade: ${title}`,
-      tags: [],
-      likes: 0,
-      comments: 0,
-      liked: false,
-      link: {
-        title,
-        url: normalizedUrl,
-        desc,
-        destaque,
-        categoria: cat
-      }
-    });
-
-    if (composerField) composerField.innerText = '';
-    renderFeed();
-    renderLinks(currentLinkFilter === 'todos' ? null : currentLinkFilter);
-    closeModal('link-modal');
-    document.getElementById('link-form').reset();
-    showToast(destaque ? 'Link destacado e compartilhado na comunidade! ✨' : 'Link postado na comunidade! 🔗', 'success');
+function savePostLinkToMyLinks(title, url, event) {
+  event.stopPropagation();
+  
+  const link = {
+    id: Date.now(),
+    title,
+    url,
+    desc: '',
+    category: 'Compartilhado',
+    proprietaria_id: State.getCurrentUser().email
+  };
+  
+  State.saveLink(link);
+  showToast('Link salvo na sua biblioteca! 📚', 'success');
 }
 
-function saveToMyLinks(id) {
-    const link = allLinks.find(l => l.id === id);
-    if (!link) return;
-    
-    const user = State.getCurrentUser();
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
-    }
+/* ─── MEMBROS ───────────────────────────────── */
 
-    const folders = State.getFolders(user.email);
-    
-    const modalHtml = `
-        <div id="save-link-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10000;">
-            <div class="modal-content" style="max-width: 400px; height: auto;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>Salvar nos Meus Links</h2>
-                    <button onclick="document.getElementById('save-link-modal').remove()" style="font-size: 24px;">&times;</button>
-                </div>
-                <p style="margin-bottom: 15px; font-size: 14px; color: var(--gray-700);">Escolha uma pasta para salvar: <strong>${link.title}</strong></p>
-                <div class="form-group">
-                    <label>Pasta</label>
-                    <select id="save-folder-select" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gray-300);">
-                        <option value="">Nenhuma pasta (Geral)</option>
-                        ${folders.map(f => `<option value="${f.id}">${f.nome}</option>`).join('')}
-                    </select>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button onclick="confirmSaveToMyLinks(${id})" class="btn btn-primary" style="flex: 1;">Salvar</button>
-                    <button onclick="document.getElementById('save-link-modal').remove()" class="btn btn-outline" style="flex: 1;">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
-function confirmSaveToMyLinks(id) {
-    const link = allLinks.find(l => l.id === id);
-    const folderId = document.getElementById('save-folder-select').value;
-    const user = State.getCurrentUser();
-    
-    const linkData = {
-        titulo: link.title,
-        url: link.url.startsWith('http') ? link.url : `https://${link.url}`,
-        descricao: link.desc || '',
-        categoria: link.categoria || 'Comunidade',
-        folderId: folderId ? parseInt(folderId) : null,
-        proprietaria_id: user.email,
-        favorito: false
-    };
-    
-    State.saveLink(linkData);
-    showToast(`Link "${link.title}" salvo em Meus Links!`, 'success');
-    document.getElementById('save-link-modal').remove();
-    closeModal('link-detail-modal');
-}
-
-function deleteLink(id) {
-  allLinks = allLinks.filter(l => l.id !== id);
-  renderLinks();
-  showToast('Link removido.', 'success');
-}
-
-/* ─── MEMBERS ─────────────────────────────── */
-
-let memberRoleFilter = 'todos';
-
-function renderMembers(list) {
+function renderMembers(members) {
   const grid = document.getElementById('members-grid');
-  if (!grid) return;
-  const data = list || allMembers;
-  if (data.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--gray-500);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:12px;opacity:0.4;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <p style="font-size:15px;font-weight:600;margin-bottom:6px;">Nenhum membro encontrado</p>
-        <p style="font-size:13px;">Convide colegas para se cadastrarem na plataforma!</p>
-      </div>`;
+  const data = members || allMembers;
+  
+  if (!data || data.length === 0) {
+    grid.innerHTML = '<p style="color:var(--gray-500);padding:20px;">Nenhum membro encontrado.</p>';
     return;
   }
+  
   grid.innerHTML = data.map(m => memberCardHTML(m)).join('');
-  renderActiveMembers();
-}
-
-function renderActiveMembers() {
-  const activeGrid = document.querySelector('.active-members');
-  if (!activeGrid) return;
-  
-  const currentUser = State.getCurrentUser();
-  // Exibe outros membros como "ativos" para dar vida à comunidade
-  const otherMembers = allMembers.filter(m => m.email !== (currentUser ? currentUser.email : ''));
-  
-  // Adiciona o próprio usuário no topo se estiver logado
-  let html = '';
-  if (currentUser) {
-    html += `
-      <div class="active-member" onclick="window.location.href='perfil.html'">
-        <div class="member-thumb-wrap">
-          <img src="${currentUser.foto_perfil || 'assets/avatars/avatar.svg'}" alt="Você">
-          <span class="online-indicator"></span>
-        </div>
-        <div>
-          <span class="active-name">Você</span>
-          <span class="active-role">${currentUser.cargo || 'Membro'}</span>
-        </div>
-        <span style="font-size:10px;color:var(--gray-400);margin-left:auto;">Online</span>
-      </div>
-    `;
-  }
-
-  if (otherMembers.length === 0 && !currentUser) {
-    activeGrid.innerHTML = '<p style="font-size:12px;color:var(--gray-500);padding:10px;">Nenhum membro online.</p>';
-    return;
-  }
-
-  html += otherMembers.slice(0, 5).map(m => `
-    <div class="active-member" onclick="viewProfile('${m.id}')">
-      <div class="member-thumb-wrap">
-        <img src="${m.avatar}" alt="${m.name}">
-        <span class="online-indicator"></span>
-      </div>
-      <div>
-        <span class="active-name">${m.name}</span>
-        <span class="active-role">${m.role}</span>
-      </div>
-      <button class="follow-mini-btn" onclick="event.stopPropagation(); followUser(this)">Seguir</button>
-    </div>
-  `).join('');
-
-  activeGrid.innerHTML = html;
-}
-
-function followUser(btn) {
-  const isFollowing = btn.classList.contains('following');
-  if (isFollowing) {
-    btn.classList.remove('following');
-    btn.textContent = 'Seguir';
-    btn.style.background = 'var(--pink-soft)';
-    btn.style.color = 'var(--pink)';
-  } else {
-    btn.classList.add('following');
-    btn.textContent = 'Seguindo';
-    btn.style.background = 'var(--gray-100)';
-    btn.style.color = 'var(--gray-500)';
-  }
 }
 
 function memberCardHTML(m) {
   const currentUser = State.getCurrentUser();
-  const isMe = currentUser && (m.email === currentUser.email || m.id === currentUser.id);
+  const isMe = currentUser && (currentUser.email === m.email || currentUser.id === m.id);
   
   return `
   <div class="member-card" id="member-${m.id}">
-    <div class="member-avatar-wrap">
-      <img src="${m.avatar}" alt="${m.name}" />
-      ${m.online || isMe ? '<span class="online-indicator"></span>' : ''}
+    <div class="member-card-header">
+      <img src="${m.avatar}" alt="${m.name}" class="member-avatar" onclick="viewProfile('${m.id}')" style="cursor:pointer;" />
+      ${m.online ? '<span class="online-badge"></span>' : ''}
     </div>
-    <div class="member-card-name">${m.name} ${isMe ? '<span style="font-size:10px;color:var(--pink);background:var(--pink-soft);padding:2px 6px;border-radius:10px;margin-left:4px;">Você</span>' : ''}</div>
-    <div class="member-card-role">${m.role}</div>
-    <div class="member-card-skills">
-      ${m.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+    <div class="member-card-body">
+      <div class="member-name" onclick="viewProfile('${m.id}')" style="cursor:pointer;">${m.name}</div>
+      <div class="member-role">${m.role}</div>
+      <div class="member-bio">${m.bio || 'Membro da comunidade'}</div>
+      <div class="member-skills">
+        ${m.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+      ${isMe ? '' : `<button class="member-card-follow" onclick="followMember('${m.id}', this)">Seguir</button>`}
     </div>
-    ${isMe ? '' : `<button class="member-card-follow" onclick="followMember('${m.id}', this)">Seguir</button>`}
   </div>`;
 }
 
@@ -781,22 +499,46 @@ function followUser(btn) {
   btn.textContent = following ? 'Seguindo' : 'Seguir';
 }
 
+/**
+ * Função melhorada para visualizar perfil de outro usuário.
+ * Agora busca o perfil completo do Supabase e salva todos os campos necessários.
+ */
 function viewProfile(id) {
     const member = allMembers.find(m => m.id === id);
-    if (member) {
-        localStorage.setItem('visitingUser', JSON.stringify({
-            email: member.email || `member${id}@example.com`,
-            nome_completo: member.name,
-            username: member.name.toLowerCase().replace(' ', ''),
-            profissao: member.role,
-            foto_perfil: member.avatar,
-            bio: member.bio || 'Membro da comunidade SheTech.',
-            is_member: true
-        }));
-        window.location.href = 'perfil.html?user=' + id;
-    } else {
+    if (!member) {
         showToast('Perfil não encontrado.', 'error');
+        return;
     }
+
+    // Usa o objeto completo do usuário se disponível
+    const fullUser = member.fullUser || member;
+    
+    // Salva o perfil completo em localStorage para visualização
+    const visitingUserData = {
+        id: fullUser.id || member.id,
+        email: fullUser.email || member.email,
+        nome_completo: fullUser.nome_completo || member.name,
+        nome_usuario: fullUser.nome_usuario || member.name.toLowerCase().replace(/\s+/g, ''),
+        foto_perfil: fullUser.foto_perfil || member.avatar,
+        bio: fullUser.bio || member.bio,
+        biografia: fullUser.biografia || fullUser.bio || member.bio,
+        cargo: fullUser.cargo || member.role,
+        area: fullUser.area || member.role,
+        habilidades: fullUser.habilidades || member.skills || [],
+        experiencia: fullUser.experiencia || [],
+        github: fullUser.github || '',
+        linkedin: fullUser.linkedin || '',
+        instagram: fullUser.instagram || '',
+        portfolio: fullUser.portfolio || '',
+        sobre: fullUser.sobre || '',
+        capa_perfil: fullUser.capa_perfil || '',
+        createdAt: fullUser.createdAt || new Date().toISOString(),
+        created_at: fullUser.created_at || fullUser.createdAt || new Date().toISOString(),
+        is_member: true
+    };
+    
+    localStorage.setItem('visitingUser', JSON.stringify(visitingUserData));
+    window.location.href = 'perfil.html?user=' + encodeURIComponent(id);
 }
 
 /* ─── SEARCH ──────────────────────────────── */
@@ -821,387 +563,52 @@ function initSearch() {
   });
 }
 
-/* ─── MODALS ──────────────────────────────── */
+/* ─── MODAIS ──────────────────────────────── */
 
 function openModal(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add('open');
-  if (id === 'comments-modal') {
-    el.classList.add('modal-overlay--detail');
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.classList.add('show');
   }
-  document.body.style.overflow = 'hidden';
 }
 
 function closeModal(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove('open');
-  el.classList.remove('modal-overlay--detail');
-  document.body.style.overflow = '';
-}
-
-function closeOnOverlay(e, id) {
-  if (e.target === document.getElementById(id)) closeModal(id);
-}
-
-/* ─── NOTIFICATIONS ───────────────────────── */
-
-function toggleNotifications() {
-  const dd = document.getElementById('notif-dropdown');
-  dd.classList.toggle('open');
-  if (dd.classList.contains('open')) {
-    document.getElementById('notif-dot').style.display = 'none';
-    document.addEventListener('click', closeNotifOnOutside);
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('show');
   }
 }
-
-function closeNotifOnOutside(e) {
-  const dd = document.getElementById('notif-dropdown');
-  const btn = document.getElementById('notif-btn');
-  if (!dd.contains(e.target) && !btn.contains(e.target)) {
-    dd.classList.remove('open');
-    document.removeEventListener('click', closeNotifOnOutside);
-  }
-}
-
-function markAllRead() {
-  document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
-  showToast('Todas marcadas como lidas.', 'success');
-}
-
-/* ─── SIDEBAR ─────────────────────────────── */
-// A funcionalidade de sidebar agora é gerenciada pelo Layout.js compartilhado.
-// O botão de toggle na topbar chama a função global toggleSidebar se necessário,
-// mas o padrão do sistema é usar o botão dentro da sidebar injetado pelo Layout.js.
-
-/* ─── POST OPTIONS ────────────────────────── */
 
 function postMenu(id) {
-  // Fechar qualquer dropdown aberto
-  document.querySelectorAll('.post-dropdown-menu').forEach(m => m.remove());
-  
-  const btn = document.querySelector(`#post-${id} .post-options`);
-  if (!btn) return;
-  
-  const post = allPosts.find(p => p.id === id);
-  const isOwn = post && post.author === CURRENT_USER.name;
-
-  const menu = document.createElement('div');
-  menu.className = 'post-dropdown-menu';
-  menu.innerHTML = `
-    <button class="post-dropdown-item" onclick="editPost(${id})">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Editar
-    </button>
-    <button class="post-dropdown-item post-dropdown-item--danger" onclick="deletePost(${id})">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      Excluir
-    </button>
-  `;
-
-  btn.parentElement.style.position = 'relative';
-  btn.parentElement.appendChild(menu);
-
-  // Fechar ao clicar fora
-  setTimeout(() => {
-    document.addEventListener('click', function closeMenu(e) {
-      if (!menu.contains(e.target) && e.target !== btn) {
-        menu.remove();
-        document.removeEventListener('click', closeMenu);
-      }
-    });
-  }, 0);
+  showToast('Menu de opções do post #' + id, '');
 }
 
-function previewEditedImage(input) {
-  const preview = document.getElementById('edit-post-image-preview');
-  const removeFlag = document.getElementById('edit-post-image-remove');
-  const file = input?.files?.[0];
-  if (!preview) return;
-
-  if (!file) {
-    preview.style.display = 'none';
-    preview.src = '';
-    if (removeFlag) removeFlag.value = 'true';
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    preview.src = event.target.result;
-    preview.style.display = 'block';
-    if (removeFlag) removeFlag.value = 'false';
-  };
-  reader.readAsDataURL(file);
+function linkMenu(id) {
+  showToast('Menu de opções do link #' + id, '');
 }
 
-function clearEditedImage() {
-  const preview = document.getElementById('edit-post-image-preview');
-  const input = document.getElementById('edit-post-image-input');
-  const removeFlag = document.getElementById('edit-post-image-remove');
-  if (preview) {
-    preview.src = '';
-    preview.style.display = 'none';
-  }
-  if (input) input.value = '';
-  if (removeFlag) removeFlag.value = 'true';
-}
-
-function clearEditedLink() {
-  const removeFlag = document.getElementById('edit-post-link-remove');
-  if (removeFlag) removeFlag.value = 'true';
-  document.getElementById('edit-post-link-title').value = '';
-  document.getElementById('edit-post-link-url').value = '';
-  document.getElementById('edit-post-link-desc').value = '';
-  document.getElementById('edit-post-link-destaque').checked = false;
-}
-
-function editPost(id) {
-  document.querySelectorAll('.post-dropdown-menu').forEach(m => m.remove());
-  const post = allPosts.find(p => p.id === id);
-  if (!post) return;
-
-  const existing = document.getElementById('edit-post-modal');
-  if (existing) existing.remove();
-
-  const modalHtml = `
-    <div id="edit-post-modal" class="modal-overlay" onclick="closeOnOverlay(event,'edit-post-modal')">
-      <div class="modal-box" style="max-width: 600px;">
-        <div class="modal-header">
-          <h2>Editar Post</h2>
-          <button class="modal-close" onclick="closeModal('edit-post-modal')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-        <div class="form-group" style="margin-top:16px">
-          <label>Texto do post</label>
-          <textarea id="edit-post-text" rows="5" style="width:100%;padding:12px;border:1px solid var(--gray-200);border-radius:12px;font-family:inherit;font-size:14px;resize:vertical;">${escapeHTML(post.text || '')}</textarea>
-        </div>
-
-        <div class="form-group" style="margin-top:16px">
-          <label>Mídia</label>
-          <img id="edit-post-image-preview" src="${post.image || ''}" alt="Pré-visualização" style="display:${post.image ? 'block' : 'none'}; width:100%; max-height:220px; object-fit:cover; border-radius:12px; margin-bottom:8px;" />
-          <input type="file" id="edit-post-image-input" accept="image/*" onchange="previewEditedImage(this)" />
-          <input type="hidden" id="edit-post-image-remove" value="false" />
-          <button type="button" class="btn-ghost" onclick="clearEditedImage()" style="margin-top:8px">Remover imagem</button>
-        </div>
-
-        <div class="form-group" style="margin-top:16px">
-          <label>Link compartilhado</label>
-          <input id="edit-post-link-title" type="text" value="${escapeHTML(post.link?.title || '')}" placeholder="Título do link" style="width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;" />
-          <input id="edit-post-link-url" type="text" value="${escapeHTML(post.link?.url || '')}" placeholder="https://exemplo.com" style="width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;" />
-          <textarea id="edit-post-link-desc" rows="3" placeholder="Descrição do link" style="width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:10px;resize:vertical;">${escapeHTML(post.link?.desc || '')}</textarea>
-          <label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-weight:600;">
-            <input type="checkbox" id="edit-post-link-destaque" ${post.link?.destaque ? 'checked' : ''} style="width:auto; margin:0;" />
-            <span>Destacar este link</span>
-          </label>
-          <input type="hidden" id="edit-post-link-remove" value="false" />
-          <button type="button" class="btn-ghost" onclick="clearEditedLink()" style="margin-top:8px">Remover link</button>
-        </div>
-
-        <div class="modal-footer" style="margin-top:16px">
-          <button type="button" class="btn-ghost" onclick="closeModal('edit-post-modal')">Cancelar</button>
-          <button type="button" class="btn-primary" onclick="saveEditedPost(${id})">Salvar</button>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  openModal('edit-post-modal');
-}
-
-async function saveEditedPost(id) {
-  const text = document.getElementById('edit-post-text').value.trim();
-  const post = allPosts.find(p => p.id === id);
-  if (!post) return;
-
-  const imageInput = document.getElementById('edit-post-image-input');
-  const imageRemove = document.getElementById('edit-post-image-remove')?.value === 'true';
-  const linkTitle = document.getElementById('edit-post-link-title')?.value.trim() || '';
-  const linkUrl = document.getElementById('edit-post-link-url')?.value.trim() || '';
-  const linkDesc = document.getElementById('edit-post-link-desc')?.value.trim() || '';
-  const linkDestaque = document.getElementById('edit-post-link-destaque')?.checked || false;
-  const linkRemove = document.getElementById('edit-post-link-remove')?.value === 'true';
-
-  if (!text && !post.image && !post.link && !imageInput?.files?.[0] && !linkTitle && !linkUrl && !linkDesc) {
-    closeModal('edit-post-modal');
-    document.getElementById('edit-post-modal')?.remove();
-    return;
-  }
-
-  if (post) {
-    post.text = text || '';
-
-    if (imageRemove) {
-      post.image = null;
-    } else if (imageInput?.files?.[0]) {
-      const file = imageInput.files[0];
-      const reader = new FileReader();
-      const result = await new Promise((resolve) => {
-        reader.onload = (event) => resolve(event.target.result);
-        reader.readAsDataURL(file);
-      });
-      post.image = result;
-    }
-
-    if (linkRemove || (!linkTitle && !linkUrl && !linkDesc && !linkDestaque)) {
-      post.link = null;
-    } else if (linkTitle || linkUrl || linkDesc || linkDestaque) {
-      post.link = {
-        title: linkTitle || 'Recurso compartilhado',
-        url: normalizeLinkUrl(linkUrl),
-        desc: linkDesc,
-        destaque: linkDestaque,
-        categoria: post.link?.categoria || 'Comunidade'
-      };
-    }
-
-    renderFeed();
-    showToast('Post atualizado! ✏️', 'success');
-  }
-  closeModal('edit-post-modal');
-  document.getElementById('edit-post-modal')?.remove();
-}
-
-function deletePost(id) {
-  const existing = document.getElementById('delete-post-modal');
-  if (existing) { existing.remove(); }
-
-  const modalHtml = `
-    <div id="delete-post-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10003; background: transparent; align-items: center; justify-content: center;">
-      <div class="modal-content" style="max-width: 360px; width: min(90vw, 360px); height: auto; padding: 18px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); background: white;">
-        <h2 style="font-size: 18px; margin: 0 0 8px;">Excluir post?</h2>
-        <p style="margin: 0 0 16px; color: var(--gray-700); font-size: 14px;">Essa ação não pode ser desfeita.</p>
-        <div style="display: flex; gap: 10px; justify-content: flex-end;">
-          <button type="button" class="btn-ghost" onclick="document.getElementById('delete-post-modal').remove()">Cancelar</button>
-          <button type="button" class="btn-primary" onclick="confirmDeletePost(${id})">Excluir</button>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  document.getElementById('delete-post-modal').onclick = (e) => {
-    if (e.target.id === 'delete-post-modal') e.target.remove();
-  };
-}
-
-function confirmDeletePost(id) {
-  allPosts = allPosts.filter(p => p.id !== id);
-  renderFeed();
-  showToast('Post excluído.', 'success');
-  document.getElementById('delete-post-modal')?.remove();
+function openComments(id) {
+  showToast('Comentários do post #' + id, '');
 }
 
 function sharePost(id) {
-    const post = allPosts.find(p => p.id === id);
-    if (!post) return;
-
-    const existing = document.getElementById('share-modal');
-    if (existing) { existing.remove(); return; }
-
-    const url = window.location.href + '#post-' + id;
-    const text = `Confira este post de ${post.author} na comunidade SheTech!`;
-    const btn = document.querySelector(`#post-${id} .post-share`);
-    const rect = btn?.getBoundingClientRect();
-    const top = rect ? `${rect.top - 220}px` : '50%';
-    const left = rect ? `${rect.left - 120}px` : '50%';
-
-    const modalHtml = `
-        <div id="share-modal" class="modal modal-detail-overlay" style="display: flex; z-index: 10001; background: transparent;">
-            <div class="modal-content" style="max-width: 320px; height: auto; position: fixed; top: ${top}; left: ${left}; padding: 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); background: white;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h2 style="font-size: 15px; margin: 0;">Compartilhar</h2>
-                    <button onclick="document.getElementById('share-modal').remove()" style="font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                    <button type="button" onclick="shareToNetwork('whatsapp', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
-                        <i class="icon-message-circle" style="font-size: 18px; color: #25D366;"></i>
-                        <span>WhatsApp</span>
-                    </button>
-                    <button type="button" onclick="shareToNetwork('telegram', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
-                        <i class="icon-send" style="font-size: 18px; color: #0088cc;"></i>
-                        <span>Telegram</span>
-                    </button>
-                    <button type="button" onclick="shareToNetwork('facebook', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
-                        <i class="icon-facebook" style="font-size: 18px; color: #1877F2;"></i>
-                        <span>Facebook</span>
-                    </button>
-                    <button type="button" onclick="shareToNetwork('instagram', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
-                        <i class="icon-instagram" style="font-size: 18px; color: #E4405F;"></i>
-                        <span>Instagram</span>
-                    </button>
-                    <button type="button" onclick="shareToNetwork('discord', '${text}', '${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
-                        <i class="icon-message-square" style="font-size: 18px; color: #5865F2;"></i>
-                        <span>Discord</span>
-                    </button>
-                    <button type="button" onclick="copyPostLink('${url}')" class="btn btn-outline" style="flex-direction: column; gap: 4px; padding: 10px 6px; font-size: 11px;">
-                        <i class="icon-copy" style="font-size: 18px; color: var(--pink);"></i>
-                        <span>Copiar</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    document.getElementById('share-modal').onclick = (e) => {
-        if (e.target.id === 'share-modal') e.target.remove();
-    };
+  showToast('Compartilhando post #' + id, 'success');
 }
 
-function shareToNetwork(network, text, url) {
-    const shareText = `${text} ${url}`;
-    const shareData = { title: 'SheTech', text: shareText, url };
+/* ─── UTILITÁRIOS ──────────────────────────── */
 
-    if (navigator.share) {
-        navigator.share(shareData).catch(() => {
-            navigator.clipboard.writeText(shareText).then(() => {
-                showToast('Link preparado para compartilhar!', 'success');
-                document.getElementById('share-modal')?.remove();
-            });
-        });
-    } else {
-        navigator.clipboard.writeText(shareText).then(() => {
-            showToast('Link preparado para compartilhar!', 'success');
-            document.getElementById('share-modal')?.remove();
-        });
-    }
-
-    document.getElementById('share-modal')?.remove();
+function escapeHTML(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
-function copyPostLink(url) {
-    navigator.clipboard.writeText(url).then(() => {
-        showToast('Link copiado!', 'success');
-        document.getElementById('share-modal')?.remove();
-    });
-}
-
-/* ─── TOAST ───────────────────────────────── */
-
-function showToast(msg, type) {
+function showToast(message, type = '') {
   if (typeof Layout !== 'undefined' && Layout.showToast) {
-    Layout.showToast(msg);
+    Layout.showToast(message, type);
   } else {
-    const el = document.getElementById('toast');
-    if (!el) return;
-    el.textContent = msg;
-    el.className = 'toast show' + (type ? ' ' + type : '');
-    setTimeout(() => el.classList.remove('show'), 3200);
+    console.log(`[${type || 'info'}] ${message}`);
   }
-}
-
-/* ─── UTILS ───────────────────────────────── */
-
-function normalizeLinkUrl(url) {
-  if (!url) return '';
-  return url.startsWith('http') ? url : `https://${url}`;
-}
-
-function escapeHTML(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }

@@ -293,7 +293,23 @@ document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
     // Salva no Supabase para visibilidade global
     if (window.SupabaseAuth?.client) {
       const profileToSync = {
-        ...updatedUser,
+        id: updatedUser.id,
+        email: updatedUser.email,
+        nome_completo: updatedUser.nome_completo,
+        nome_usuario: updatedUser.nome_usuario,
+        bio: updatedUser.biografia || updatedUser.bio,
+        biografia: updatedUser.biografia || updatedUser.bio,
+        sobre: updatedUser.sobre,
+        cargo: updatedUser.cargo,
+        area: updatedUser.area,
+        linkedin: updatedUser.linkedin,
+        github: updatedUser.github,
+        portfolio: updatedUser.portfolio,
+        instagram: updatedUser.instagram,
+        habilidades: updatedUser.habilidades,
+        foto_perfil: updatedUser.foto_perfil,
+        capa_perfil: updatedUser.capa_perfil,
+        createdAt: updatedUser.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
       window.SupabaseAuth.client
@@ -301,6 +317,7 @@ document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
         .upsert(profileToSync, { onConflict: 'id' })
         .then(({ error }) => {
           if (error) console.error('Erro ao sincronizar perfil com Supabase:', error);
+          else console.log('[Editar Perfil] Perfil sincronizado com sucesso');
         });
     }
 
