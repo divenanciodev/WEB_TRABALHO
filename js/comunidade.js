@@ -74,14 +74,7 @@ async function loadMembers() {
         createdAt: currentUser.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
-     const { data, error } = await client
-  .from('users')
-  .upsert(profileToSync, {
-    onConflict: 'id'
-  });
-
-console.log("UPSERT DATA:", data);
-console.log("UPSERT ERROR:", error);
+      await client.from('users').upsert(profileToSync, { onConflict: 'id' });
     } catch (syncErr) {
       console.warn('[Comunidade] Não foi possível sincronizar usuário atual:', syncErr);
     }
@@ -103,10 +96,8 @@ console.log("UPSERT ERROR:", error);
     console.warn('[Comunidade] Não foi possível buscar membros do Supabase:', err);
   }
 
-  if (members.length === 0) {
-    const localUsers = State.getUsers ? State.getUsers() : [];
-    members = localUsers.map((u, i) => mapUserToMember(u, i));
-  }
+  // Removido fallback local para evitar que o usuário veja apenas a si mesmo.
+  // A lista deve vir sempre do Supabase para garantir visibilidade global.
 
   if (currentUser) {
     const alreadyIn = members.some(m => m.email === currentUser.email);

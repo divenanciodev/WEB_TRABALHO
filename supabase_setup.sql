@@ -77,8 +77,89 @@ CREATE TRIGGER set_users_updated_at
     EXECUTE FUNCTION public.set_updated_at();
 
 -- ============================================================
--- DICA DE OURO: Se o erro persistir, significa que sua tabela 
--- 'users' foi criada com o ID como TEXTO em vez de UUID.
--- Você pode tentar rodar este comando extra para converter a coluna:
--- ALTER TABLE public.users ALTER COLUMN id TYPE UUID USING id::uuid;
+-- 8. Tabelas Adicionais para Sincronização Global
 -- ============================================================
+
+-- PROJETOS
+CREATE TABLE IF NOT EXISTS public.shetech_projetos (
+    id TEXT PRIMARY KEY,
+    titulo TEXT,
+    categoria TEXT,
+    status TEXT,
+    progresso INTEGER,
+    repo TEXT,
+    demo TEXT,
+    descricao TEXT,
+    tecnologias JSONB,
+    criador_id TEXT,
+    proprietaria_id TEXT,
+    author_id UUID REFERENCES auth.users(id),
+    author_email TEXT,
+    "createdAt" TIMESTAMPTZ DEFAULT NOW(),
+    "updatedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- EVENTOS
+CREATE TABLE IF NOT EXISTS public.shetech_eventos (
+    id TEXT PRIMARY KEY,
+    titulo TEXT,
+    tipo TEXT,
+    link TEXT,
+    endereco TEXT,
+    data TEXT,
+    horario TEXT,
+    categoria TEXT,
+    descricao TEXT,
+    criador_id TEXT,
+    organizador_id TEXT,
+    author_id UUID REFERENCES auth.users(id),
+    author_email TEXT,
+    "createdAt" TIMESTAMPTZ DEFAULT NOW(),
+    "updatedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- LINKS
+CREATE TABLE IF NOT EXISTS public.links (
+    id BIGINT PRIMARY KEY,
+    titulo TEXT,
+    url TEXT,
+    descricao TEXT,
+    categoria TEXT,
+    "folderId" BIGINT,
+    proprietaria_id TEXT,
+    favorito BOOLEAN DEFAULT false,
+    author_id UUID REFERENCES auth.users(id),
+    author_email TEXT,
+    "createdAt" TIMESTAMPTZ DEFAULT NOW(),
+    "updatedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- PASTAS (FOLDERS)
+CREATE TABLE IF NOT EXISTS public.folders (
+    id BIGINT PRIMARY KEY,
+    nome TEXT,
+    proprietaria_id TEXT,
+    author_id UUID REFERENCES auth.users(id),
+    "createdAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. Habilitar RLS para todas as tabelas
+ALTER TABLE public.shetech_projetos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shetech_eventos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.links ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.folders ENABLE ROW LEVEL SECURITY;
+
+-- 10. Políticas de Leitura (Qualquer usuário autenticado pode ver tudo)
+CREATE POLICY "Leitura global de projetos" ON public.shetech_projetos FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Leitura global de eventos" ON public.shetech_eventos FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Leitura global de links" ON public.links FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Leitura global de pastas" ON public.folders FOR SELECT TO authenticated USING (true);
+
+-- 11. Políticas de Escrita (Qualquer usuário autenticado pode criar/editar)
+CREATE POLICY "Escrita global de projetos" ON public.shetech_projetos FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Escrita global de eventos" ON public.shetech_eventos FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Escrita global de links" ON public.links FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Escrita global de pastas" ON public.folders FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- DICA: Se a coluna id da tabela users for texto, rode:
+-- ALTER TABLE public.users ALTER COLUMN id TYPE UUID USING id::uuid;

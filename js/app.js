@@ -125,10 +125,10 @@ const State = {
     },
 
     async saveGlobalData(table, item) {
-        if (!window.SupabaseAuth || !window.SupabaseAuth.client) {
-            this.saveData(table, item);
-            return;
-        }
+        // Salva localmente primeiro para garantir funcionamento offline/fallback
+        this.saveData(table, item);
+
+        if (!window.SupabaseAuth || !window.SupabaseAuth.client) return;
         
         const user = this.getCurrentUser();
         const dataToSave = {
@@ -139,16 +139,39 @@ const State = {
             author_email: user ? user.email : null
         };
 
-        const { data, error } = await window.SupabaseAuth.client
+        // Remove campos que podem ser específicos do localStorage e não do DB se necessário
+        // mas o upsert geralmente lida bem com isso se a tabela tiver as colunas.
+
+        const { error } = await window.SupabaseAuth.client
             .from(table)
-            .upsert(dataToSave)
-            .select();
+            .upsert(dataToSave);
 
         if (error) {
-            console.error(`Erro ao salvar em ${table}:`, error);
-            this.saveData(table, item); // Fallback para local
+            console.error(`Erro ao salvar globalmente em ${table}:`, error);
         }
-        return data;
+    },
+
+    async loadGlobalData(table, localStorageKey) {
+        if (!window.SupabaseAuth || !window.SupabaseAuth.client) {
+            return this.getData(localStorageKey);
+        }
+
+        const { data, error } = await window.SupabaseAuth.client
+            .from(table)
+            .select('*')
+            .order('createdAt', { ascending: false });
+
+        if (error) {
+            console.error(`Erro ao carregar globalmente ${table}:`, error);
+            return this.getData(localStorageKey);
+        }
+
+        if (data && data.length > 0) {
+            localStorage.setItem(localStorageKey, JSON.stringify(data));
+            return data;
+        }
+
+        return this.getData(localStorageKey);
     },
 
     getProjects() { return this.getData('shetech_projetos'); },

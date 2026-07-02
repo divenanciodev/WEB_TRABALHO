@@ -351,6 +351,15 @@
     }
 
     saveEvents(events);
+    
+    // Sincroniza com Supabase
+    if (typeof State !== 'undefined' && State.saveGlobalData) {
+      const eventToSave = editingId 
+        ? events.find(e => e.id === editingId)
+        : events[events.length - 1];
+      State.saveGlobalData('shetech_eventos', eventToSave);
+    }
+
     closeModal();
     updateStats();
     renderEvents();
@@ -556,6 +565,18 @@
     toast.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  /* ── Sincronização Global ── */
+  async function loadEventsFromSupabase() {
+    if (typeof State !== 'undefined' && State.loadGlobalData) {
+      const globalEvents = await State.loadGlobalData('shetech_eventos', STORAGE_KEY);
+      if (globalEvents) {
+        events = globalEvents;
+        updateStats();
+        renderEvents();
+      }
+    }
   }
 
   /* ── Init ────────────────────────────────────────────────────── */

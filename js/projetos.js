@@ -344,6 +344,15 @@
     }
 
     saveProjects(projects);
+    
+    // Sincroniza com Supabase
+    if (typeof State !== 'undefined' && State.saveGlobalData) {
+      const projectToSave = editingId 
+        ? projects.find(p => p.id === editingId)
+        : projects[projects.length - 1];
+      State.saveGlobalData('shetech_projetos', projectToSave);
+    }
+
     closeModal();
     updateStats();
     renderProjects();
@@ -533,6 +542,18 @@
     toast.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  /* ── Sincronização Global ── */
+  async function loadProjectsFromSupabase() {
+    if (typeof State !== 'undefined' && State.loadGlobalData) {
+      const globalProjects = await State.loadGlobalData('shetech_projetos', STORAGE_KEY);
+      if (globalProjects) {
+        projects = globalProjects;
+        updateStats();
+        renderProjects();
+      }
+    }
   }
 
   /* ── Init ────────────────────────────────────────────────────── */

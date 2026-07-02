@@ -123,6 +123,12 @@ document.getElementById('link-form').addEventListener('submit', (e) => {
     };
     
     State.saveLink(linkData);
+    
+    // Sincroniza com Supabase
+    if (typeof State !== 'undefined' && State.saveGlobalData) {
+        State.saveGlobalData('links', linkData);
+    }
+
     UI.closeModal('link-modal');
     renderLinks();
     State.addNotification(user.email, `Link "${linkData.titulo}" salvo com sucesso!`);
@@ -139,6 +145,12 @@ document.getElementById('folder-form').addEventListener('submit', (e) => {
     };
     
     State.saveFolder(folderData);
+    
+    // Sincroniza com Supabase
+    if (typeof State !== 'undefined' && State.saveGlobalData) {
+        State.saveGlobalData('folders', folderData);
+    }
+
     UI.closeModal('folder-modal');
     renderLinks();
     updateFolderSelect();
@@ -216,10 +228,20 @@ function toggleFav(id) {
     }
 }
 
+async function loadGlobalLinks() {
+    if (typeof State !== 'undefined' && State.loadGlobalData) {
+        await State.loadGlobalData('links', 'links');
+        await State.loadGlobalData('folders', 'folders');
+        renderLinks();
+        updateFolderSelect();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof Layout !== 'undefined') {
         Layout.init({ active: 'links', requireAuth: true });
     }
     renderLinks();
     updateFolderSelect();
+    loadGlobalLinks();
 });
