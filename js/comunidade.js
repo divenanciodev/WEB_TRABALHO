@@ -74,7 +74,14 @@ async function loadMembers() {
         createdAt: currentUser.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
-      await client.from('users').upsert(profileToSync, { onConflict: 'id' });
+     const { data, error } = await client
+  .from('users')
+  .upsert(profileToSync, {
+    onConflict: 'id'
+  });
+
+console.log("UPSERT DATA:", data);
+console.log("UPSERT ERROR:", error);
     } catch (syncErr) {
       console.warn('[Comunidade] Não foi possível sincronizar usuário atual:', syncErr);
     }
