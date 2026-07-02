@@ -133,8 +133,8 @@ const State = {
         const user = this.getCurrentUser();
         const dataToSave = {
             ...item,
-            createdat: item.createdAt || item.createdat || new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            createdAt: item.createdAt || item.createdat || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
             author_id: user ? user.id : null,
             author_email: user ? user.email : null
         };

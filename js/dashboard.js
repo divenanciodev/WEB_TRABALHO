@@ -28,8 +28,8 @@ async function syncUserToSupabase() {
             bio: user.bio || '',
             habilidades: user.habilidades || [],
             experiencia: user.experiencia || [],
-            createdat: user.createdAt || new Date().toISOString(),
-            updatedat: new Date().toISOString()
+            createdAt: user.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
 
         const { error } = await client.from('users').upsert(profileToSync, { onConflict: 'id' });
@@ -48,13 +48,13 @@ async function updateMembersCountFromSupabase() {
     if (!client) return;
 
     try {
-        const { data: users, error } = await client
+        const { count, error } = await client
             .from('users')
             .select('id', { count: 'exact', head: true });
 
-        if (!error && users !== null) {
+        if (!error && typeof count === 'number') {
             const countEl = document.getElementById('dash-members-count');
-            if (countEl) countEl.innerText = users.length || 0;
+            if (countEl) countEl.innerText = count || 0;
         }
     } catch (err) {
         console.warn('[Dashboard] Erro ao contar membros:', err);

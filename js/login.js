@@ -27,8 +27,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         bio: profile.bio || '',
         habilidades: profile.habilidades || [],
         experiencia: profile.experiencia || [],
-        createdat: profile.createdAt || new Date().toISOString(),
-        updatedat: new Date().toISOString()
+        createdAt: profile.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       const { error: upsertError } = await window.SupabaseAuth.client

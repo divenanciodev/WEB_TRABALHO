@@ -73,8 +73,8 @@ async function loadMembers() {
         bio: currentUser.bio || '',
         habilidades: currentUser.habilidades || [],
         experiencia: currentUser.experiencia || [],
-        createdat: currentUser.createdAt || new Date().toISOString(),
-        updatedat: new Date().toISOString()
+        createdAt: currentUser.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       await client.from('users').upsert(profileToSync, { onConflict: 'id' });
     } catch (syncErr) {
