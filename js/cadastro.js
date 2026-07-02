@@ -51,8 +51,8 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
       const userToSave = {
         ...userWithoutPassword,
         id: data.user.id,
-        createdAt: data.user.created_at || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdat: data.user.created_at || new Date().toISOString(),
+        updatedat: new Date().toISOString()
       };
 
       const { error: upsertError } = await window.SupabaseAuth.client

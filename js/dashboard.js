@@ -28,8 +28,8 @@ async function syncUserToSupabase() {
             bio: user.bio || '',
             habilidades: user.habilidades || [],
             experiencia: user.experiencia || [],
-            createdAt: user.createdAt || new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            createdat: user.createdAt || new Date().toISOString(),
+            updatedat: new Date().toISOString()
         };
 
         const { error } = await client.from('users').upsert(profileToSync, { onConflict: 'id' });

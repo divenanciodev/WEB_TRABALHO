@@ -309,8 +309,8 @@ document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
         habilidades: updatedUser.habilidades,
         foto_perfil: updatedUser.foto_perfil,
         capa_perfil: updatedUser.capa_perfil,
-        createdAt: updatedUser.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdat: updatedUser.createdAt || new Date().toISOString(),
+        updatedat: new Date().toISOString()
       };
       window.SupabaseAuth.client
         .from('users')
