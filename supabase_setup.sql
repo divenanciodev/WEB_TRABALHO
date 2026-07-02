@@ -150,12 +150,20 @@ ALTER TABLE public.links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.folders ENABLE ROW LEVEL SECURITY;
 
 -- 10. Políticas de Leitura (Qualquer usuário autenticado pode ver tudo)
+DROP POLICY IF EXISTS "Leitura global de projetos" ON public.shetech_projetos;
+DROP POLICY IF EXISTS "Leitura global de eventos" ON public.shetech_eventos;
+DROP POLICY IF EXISTS "Leitura global de links" ON public.links;
+DROP POLICY IF EXISTS "Leitura global de pastas" ON public.folders;
 CREATE POLICY "Leitura global de projetos" ON public.shetech_projetos FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Leitura global de eventos" ON public.shetech_eventos FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Leitura global de links" ON public.links FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Leitura global de pastas" ON public.folders FOR SELECT TO authenticated USING (true);
 
 -- 11. Políticas de Escrita (Qualquer usuário autenticado pode criar/editar)
+DROP POLICY IF EXISTS "Escrita global de projetos" ON public.shetech_projetos;
+DROP POLICY IF EXISTS "Escrita global de eventos" ON public.shetech_eventos;
+DROP POLICY IF EXISTS "Escrita global de links" ON public.links;
+DROP POLICY IF EXISTS "Escrita global de pastas" ON public.folders;
 CREATE POLICY "Escrita global de projetos" ON public.shetech_projetos FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Escrita global de eventos" ON public.shetech_eventos FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Escrita global de links" ON public.links FOR ALL TO authenticated USING (true) WITH CHECK (true);
