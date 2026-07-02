@@ -55,13 +55,38 @@ async function loadMembers() {
 
   let members = [];
 
+  // Garante que o usuário logado esteja na tabela 'users' do Supabase
+  // para que outros usuários possam vê-lo na comunidade.
+  const currentUser = State.getCurrentUser();
+  const client = window.SupabaseAuth && window.SupabaseAuth.client;
+
+  if (currentUser && client) {
+    try {
+      const profileToSync = {
+        id: currentUser.id,
+        email: currentUser.email,
+        nome_completo: currentUser.nome_completo || '',
+        nome_usuario: currentUser.nome_usuario || '',
+        foto_perfil: currentUser.foto_perfil || '',
+        bio: currentUser.bio || '',
+        habilidades: currentUser.habilidades || [],
+        experiencia: currentUser.experiencia || [],
+        createdAt: currentUser.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      await client.from('users').upsert(profileToSync, { onConflict: 'id' });
+    } catch (syncErr) {
+      console.warn('[Comunidade] Não foi possível sincronizar usuário atual:', syncErr);
+    }
+  }
+
   try {
-    const client = window.SupabaseAuth && window.SupabaseAuth.client;
     if (client) {
       const { data: users, error } = await client
         .from('users')
         .select('*')
-        .limit(100);
+        .order('createdAt', { ascending: false })
+        .limit(200);
 
       if (!error && users && users.length > 0) {
         members = users.map((u, i) => mapUserToMember(u, i));
@@ -76,7 +101,6 @@ async function loadMembers() {
     members = localUsers.map((u, i) => mapUserToMember(u, i));
   }
 
-  const currentUser = State.getCurrentUser();
   if (currentUser) {
     const alreadyIn = members.some(m => m.email === currentUser.email);
     if (!alreadyIn) members.unshift(mapUserToMember(currentUser, -1));

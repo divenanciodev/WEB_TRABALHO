@@ -224,6 +224,47 @@ function renderCreatorStats() {
     `;
 }
 
+/* ── SINCRONIZA PERFIL NO SUPABASE ── */
+async function syncUserToSupabase() {
+    const currentUser = State.getCurrentUser();
+    const client = window.SupabaseAuth && window.SupabaseAuth.client;
+    if (!currentUser || !client) return;
+    try {
+        const profileToSync = {
+            id: currentUser.id,
+            email: currentUser.email,
+            nome_completo: currentUser.nome_completo || '',
+            nome_usuario: currentUser.nome_usuario || '',
+            foto_perfil: currentUser.foto_perfil || '',
+            bio: currentUser.bio || '',
+            habilidades: currentUser.habilidades || [],
+            experiencia: currentUser.experiencia || [],
+            createdAt: currentUser.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        await client.from('users').upsert(profileToSync, { onConflict: 'id' });
+    } catch (err) {
+        console.warn('[Dashboard] Não foi possível sincronizar perfil:', err);
+    }
+}
+
+/* ── ATUALIZA CONTAGEM DE MEMBROS DO SUPABASE ── */
+async function updateMembersCountFromSupabase() {
+    const client = window.SupabaseAuth && window.SupabaseAuth.client;
+    if (!client) return;
+    try {
+        const { count, error } = await client
+            .from('users')
+            .select('*', { count: 'exact', head: true });
+        if (!error && count !== null) {
+            const el = document.getElementById('dash-members-count');
+            if (el) el.innerText = count;
+        }
+    } catch (err) {
+        console.warn('[Dashboard] Não foi possível buscar contagem de membros:', err);
+    }
+}
+
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
     renderWelcome();
@@ -233,4 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderUpcomingEvents();
     renderCreatorStats();
     renderProfileProgress();
+    // Sincroniza perfil e atualiza contagem global em background
+    syncUserToSupabase();
+    updateMembersCountFromSupabase();
 });
