@@ -169,10 +169,14 @@ function postHTML(post) {
           ${post.link.desc ? `<div class="post-link-desc">${escapeHTML(post.link.desc)}</div>` : ''}
         </div>
       </a>
-      <button class="post-link-save-btn" onclick="savePostLinkToMyLinks('${escapeHTML(post.link.title).replace(/'/g, "\\'")}', '${post.link.url}', event)" title="Salvar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      </button>
-    </div>` : ''}
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button onclick="copyLinkToClipboard('${post.link.url}')" title="Copiar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+        </button>
+        <button class="post-link-save-btn" onclick="savePostLinkToMyLinks('${escapeHTML(post.link.title).replace(/'/g, "\\'")}', '${post.link.url}', event)" title="Salvar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </button>
+      </div>` : ''}
     <div class="post-footer">
       <button class="reaction-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id}, this)">
         <svg viewBox="0 0 24 24" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -334,7 +338,7 @@ function insertEmoji(emoji) {
 }
 
 function renderLinks(links) {
-  const list = document.getElementById('links-list');
+  const list = document.getElementById('links-grid');
   if (!list) return;
   const data = links || allLinks;
   if (data.length === 0) {
@@ -346,18 +350,30 @@ function renderLinks(links) {
 
 function linkHTML(link) {
   return `
-  <div class="link-card" id="link-${link.id}">
-    <div class="link-header">
-      <div class="link-icon">
+  <div class="link-card ${link.destaque ? 'link-card--featured' : ''}" id="link-${link.id}">
+    <div class="link-card-top">
+      <div class="link-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       </div>
-      <div class="link-title">${link.title}</div>
+      <div style="flex:1;">
+        <div class="link-card-title">${link.title}</div>
+        ${link.destaque ? '<span class="link-feature-badge">✨ Destaque</span>' : ''}
+      </div>
     </div>
-    <div class="link-url">${link.url}</div>
-    ${link.desc ? `<div class="link-desc">${link.desc}</div>` : ''}
-    <div class="link-footer">
-      <span class="link-category">${link.category || 'Geral'}</span>
-      <button class="link-save" onclick="saveLinkToMyLinks(${link.id}, this)">Salvar</button>
+    <div class="link-card-url" title="${link.url}">${link.url}</div>
+    ${link.desc ? `<div class="link-card-desc">${link.desc}</div>` : ''}
+    <div class="link-card-footer">
+      <span class="link-cat-badge">${link.category || 'Geral'}</span>
+      <div style="display:flex;gap:6px;">
+        <button onclick="copyLinkToClipboard('${link.url}')" class="link-open-btn" title="Copiar link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          Copiar
+        </button>
+        <button onclick="saveLinkToMyLinks(${link.id}, this)" class="link-open-btn" title="Salvar link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar
+        </button>
+      </div>
     </div>
   </div>`;
 }
@@ -538,3 +554,12 @@ function showToast(message, type = '') {
 window.addEventListener('beforeunload', () => {
   unsubscribeFns.forEach(fn => fn());
 });
+
+function copyLinkToClipboard(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Link copiado com sucesso! 📋', 'success');
+  }).catch(err => {
+    console.error('Erro ao copiar:', err);
+    showToast('Erro ao copiar link.', 'error');
+  });
+}
