@@ -273,29 +273,64 @@ function addLink() {
 }
 
 function addEmoji() {
-  const emojis = ['🚀', '💜', '✨', '🎉', '💡', '🔥', '👩‍💻', '🌟', '🤝', '🙌'];
-  const existing = document.getElementById('emoji-picker-modal');
-  if (existing) { existing.remove(); return; }
-  const emojiBtn = event.target.closest('button');
-  const rect = emojiBtn ? emojiBtn.getBoundingClientRect() : null;
-  const top = rect ? (rect.top - 320) + 'px' : '50%';
-  const left = rect ? (rect.left - 100) + 'px' : '50%';
-  document.body.insertAdjacentHTML('beforeend', `
-    <div id="emoji-picker-modal" class="modal modal-detail-overlay" style="display:flex;z-index:10001;background:transparent;">
-      <div class="modal-content" style="max-width:300px;padding:15px;position:fixed;top:${top};left:${left};background:white;border-radius:16px;">
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
-          ${emojis.map(e => `<button onclick="insertEmoji('${e}')" style="font-size:20px;border:none;background:transparent;cursor:pointer;">${e}</button>`).join('')}
-        </div>
+  const emojis = [
+    '🚀', '💜', '✨', '🎉', '💡', '🔥', '👩‍💻', '🌟', '🤝', '🙌',
+    '😍', '😂', '🤔', '😎', '👏', '💪', '🌈', '💻', '🎨', '📚',
+    '🎯', '📢', '✅', '❌', '💖', '💎', '🌍', '⚡', '☕', '🍕'
+  ];
+  
+  const existing = document.getElementById('emoji-picker-container');
+  if (existing) { existing.remove(); document.getElementById('emoji-overlay')?.remove(); return; }
+  
+  const emojiBtn = event.currentTarget;
+  const rect = emojiBtn.getBoundingClientRect();
+  
+  // Posicionamento inteligente: tenta abrir acima do botão
+  let top = rect.top - 280; 
+  let left = rect.left - 140;
+  
+  // Ajuste se sair da tela (topo)
+  if (top < 10) top = rect.bottom + 10;
+  // Ajuste se sair da tela (esquerda/direita)
+  if (left < 10) left = 10;
+  if (left + 320 > window.innerWidth) left = window.innerWidth - 330;
+
+  const overlay = `<div id="emoji-overlay" class="emoji-picker-overlay"></div>`;
+  const picker = `
+    <div id="emoji-picker-container" class="emoji-picker-container" style="top:${top}px; left:${left}px;">
+      <div class="emoji-picker-header">
+        <span class="emoji-picker-title">Escolha um emoji</span>
       </div>
-    </div>`);
-  document.getElementById('emoji-picker-modal').onclick = (e) => {
-    if (e.target.id === 'emoji-picker-modal') e.target.remove();
+      <div class="emoji-grid">
+        ${emojis.map(e => `<button class="emoji-item" onclick="insertEmoji('${e}')">${e}</button>`).join('')}
+      </div>
+    </div>`;
+    
+  document.body.insertAdjacentHTML('beforeend', overlay + picker);
+  
+  const closePicker = () => {
+    document.getElementById('emoji-picker-container')?.remove();
+    document.getElementById('emoji-overlay')?.remove();
   };
+  
+  document.getElementById('emoji-overlay').onclick = closePicker;
 }
 
 function insertEmoji(emoji) {
-  document.getElementById('composer-field').innerText += emoji;
-  document.getElementById('emoji-picker-modal')?.remove();
+  const field = document.getElementById('composer-field');
+  if (field) {
+    field.innerText += emoji;
+    // Move o cursor para o final
+    field.focus();
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(field);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  document.getElementById('emoji-picker-container')?.remove();
+  document.getElementById('emoji-overlay')?.remove();
 }
 
 function renderLinks(links) {
