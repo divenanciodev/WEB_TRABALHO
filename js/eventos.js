@@ -7,32 +7,28 @@
 (function () {
   "use strict";
 
-  /* ── Storage ───────────────────────────────────────────────── */
-  const STORAGE_KEY = "shetech_eventos";
+  /* ── Storage (Supabase) ───────────────────────────────────── */
+  let events = [];
 
-  function loadEvents() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    } catch {
-      return [];
-    }
+  async function loadEvents() {
+    events = await State.getEvents();
   }
 
-  function saveEvents(list) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  async function persistEvent(event) {
+    await State.saveEvent(event);
+  }
+
+  async function removeEvent(id) {
+    await State.deleteEvent(id);
   }
 
   /* ── Estado ────────────────────────────────────────────────── */
-  let events = loadEvents();
   let filterActive = "todos";
   let searchQuery = "";
   let isListView = false;
   let editingId = null;
 
-  /* ── Conteúdo inicial vazio ───────────────────────────────── */
-  if (events.length === 0) {
-    saveEvents([]);
-  }
+  /* ── Conteúdo inicial ───────────────────────────────── */
 
   /* ── Helpers ────────────────────────────────────────────────── */
   function uid() {
@@ -207,7 +203,7 @@
     });
 
     // Menu de opções
-    const user = typeof Layout !== 'undefined' ? Layout.init({ requireAuth: false }) : null;
+    const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
     const isOwner = ev.criador_id === userEmail || ev.organizador_id === userEmail;
 
@@ -302,7 +298,7 @@
   });
 
   /* ── Submit do form ──────────────────────────────────────────── */
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const tipo = document.getElementById("event-tipo").value;
@@ -319,7 +315,7 @@
     if (tipo === "online" && !link) { showToast("Cole o link da reunião online.", "error"); return; }
     if (tipo === "presencial" && !endereco) { showToast("Informe o endereço do evento.", "error"); return; }
 
-    const user = typeof Layout !== 'undefined' ? Layout.init({ requireAuth: false }) : null;
+    const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
 
     if (editingId) {
@@ -350,14 +346,12 @@
       showToast("Evento criado com sucesso!", "success");
     }
 
-    saveEvents(events);
-    
-    // Sincroniza com Supabase
-    if (typeof State !== 'undefined' && State.saveGlobalData) {
-      const eventToSave = editingId 
-        ? events.find(e => e.id === editingId)
-        : events[events.length - 1];
-      State.saveGlobalData('shetech_eventos', eventToSave);
+    try {
+      const saved = editingId ? events.find(ev => ev.id === editingId) : events[events.length - 1];
+      await persistEvent(saved);
+    } catch (err) {
+      showToast("Erro ao salvar no Supabase.", "error");
+      return;
     }
 
     closeModal();
@@ -472,7 +466,7 @@
       </div>
     `;
 
-        const user = typeof Layout !== 'undefined' ? Layout.init({ requireAuth: false }) : null;
+        const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
     const isOwner = ev.criador_id === userEmail || ev.organizador_id === userEmail;
 
@@ -502,11 +496,15 @@
   detailModal.addEventListener("click", (e) => { if (e.target === detailModal) closeDetail(); });
 
   /* ── Deletar ─────────────────────────────────────────────────── */
-  function deleteEvent(id) {
-    // Substituindo confirm nativo por fluxo do sistema
+  async function deleteEvent(id) {
     Layout.showToast("Evento excluído com sucesso!", "success");
+    try {
+      await removeEvent(id);
+    } catch (err) {
+      showToast("Erro ao excluir evento.", "error");
+      return;
+    }
     events = events.filter((e) => e.id !== id);
-    saveEvents(events);
     updateStats();
     renderEvents();
     showToast("Evento excluído.", "success");
@@ -567,28 +565,19 @@
     toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
-  /* ── Sincronização Global ── */
-  async function loadEventsFromSupabase() {
-    if (typeof State !== 'undefined' && State.loadGlobalData) {
-      const globalEvents = await State.loadGlobalData('shetech_eventos', STORAGE_KEY);
-      if (globalEvents) {
-        events = globalEvents;
-        updateStats();
-        renderEvents();
-      }
+  document.addEventListener("DOMContentLoaded", async () => {
+    await State.ensureReady();
+    if (typeof Layout !== 'undefined') {
+      await Layout.init({ active: 'eventos' });
     }
-  }
+    await loadEvents();
+    updateStats();
+    renderEvents();
 
-  /* ── Init ────────────────────────────────────────────────────── */
-  if (typeof Layout !== 'undefined') {
-    Layout.init({ active: 'eventos' });
-  }
-  loadEventsFromSupabase();
-
-  // Abrir detalhe se houver ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const eventId = urlParams.get('id');
-  if (eventId) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('id');
+    if (eventId) {
       setTimeout(() => openDetail(eventId), 300);
-  }
+    }
+  });
 })();

@@ -1,9 +1,17 @@
-const user = Layout.init({ active: 'perfil' });
-if (!user) throw new Error('auth');
+let user = null;
+let currentAvatar = '';
+let currentCover = '';
+let skills = [];
 
-let currentAvatar = user.foto_perfil || '';
-let currentCover = user.capa_perfil || '';
-let skills = Array.isArray(user.habilidades) ? [...user.habilidades] : [];
+document.addEventListener('DOMContentLoaded', async () => {
+    await State.ensureReady();
+    user = await Layout.init({ active: 'editar-perfil' });
+    if (!user) return;
+    currentAvatar = user.foto_perfil || '';
+    currentCover = user.capa_perfil || '';
+    skills = Array.isArray(user.habilidades) ? [...user.habilidades] : [];
+    loadFields();
+});
 
 /* ─── CARREGAR CAMPOS ─────────────────────────────────── */
 function loadFields() {
@@ -260,7 +268,7 @@ function validate() {
 }
 
 /* ─── SALVAR ──────────────────────────────────────────── */
-document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
+document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
@@ -288,42 +296,7 @@ document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
         capa_perfil:   currentCover
     };
 
-    State.setCurrentUser(updatedUser);
-    
-    // Salva no Supabase para visibilidade global
-    if (window.SupabaseAuth?.client) {
-      const profileToSync = {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        nome_completo: updatedUser.nome_completo,
-        nome_usuario: updatedUser.nome_usuario,
-        bio: updatedUser.biografia || updatedUser.bio,
-        biografia: updatedUser.biografia || updatedUser.bio,
-        sobre: updatedUser.sobre,
-        cargo: updatedUser.cargo,
-        area: updatedUser.area,
-        linkedin: updatedUser.linkedin,
-        github: updatedUser.github,
-        portfolio: updatedUser.portfolio,
-        instagram: updatedUser.instagram,
-        habilidades: updatedUser.habilidades,
-        foto_perfil: updatedUser.foto_perfil,
-        capa_perfil: updatedUser.capa_perfil,
-        createdAt: updatedUser.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      window.SupabaseAuth.client
-        .from('users')
-        .upsert(profileToSync, { onConflict: 'id' })
-        .then(({ error }) => {
-          if (error) console.error('Erro ao sincronizar perfil com Supabase:', error);
-          else console.log('[Editar Perfil] Perfil sincronizado com sucesso');
-        });
-    }
-
+    await State.setCurrentUser(updatedUser);
     Layout.showToast('Perfil atualizado com sucesso! ✨');
     setTimeout(() => window.location.href = 'perfil.html', 1100);
 });
-
-/* ─── INIT ────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', loadFields);

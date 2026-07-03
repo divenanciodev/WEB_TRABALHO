@@ -1,5 +1,6 @@
 const Layout = {
-    init(options = {}) {
+    async init(options = {}) {
+        await State.ensureReady();
         const user = State.getCurrentUser();
         if (options.requireAuth !== false && !user) {
             window.location.href = 'login.html';
@@ -8,7 +9,7 @@ const Layout = {
 
         this.initTopbar(options);
         this.highlightActiveNav(options.active || '');
-        
+
         return user;
     },
 
@@ -68,9 +69,12 @@ const Layout = {
         if (name) name.innerText = `Olá, ${firstName}`;
         if (welcomeName) welcomeName.innerText = firstName;
 
-        const notifs = State.getNotifications(user.email).filter(n => !n.lida);
-        const dot = document.getElementById('notif-dot');
-        if (dot) dot.style.display = notifs.length > 0 ? 'block' : 'none';
+        const notifs = [];
+        State.getNotifications(user.email).then(items => {
+            const unread = items.filter(n => !n.lida);
+            const dot = document.getElementById('notif-dot');
+            if (dot) dot.style.display = unread.length > 0 ? 'block' : 'none';
+        }).catch(() => {});
     },
 
     highlightActiveNav(active) {

@@ -7,30 +7,29 @@
 (function () {
   "use strict";
 
-  /* ── Storage ───────────────────────────────────────────────── */
-  const STORAGE_KEY = "shetech_projetos";
+  /* ── Storage (Supabase) ───────────────────────────────────── */
+  let projects = [];
 
-  function loadProjects() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-    catch { return []; }
+  async function loadProjects() {
+    projects = await State.getProjects();
   }
 
-  function saveProjects(list) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  async function persistProject(project) {
+    await State.saveProject(project);
+  }
+
+  async function removeProject(id) {
+    await State.deleteProject(id);
   }
 
   /* ── Estado ────────────────────────────────────────────────── */
-  let projects = loadProjects();
   let filterActive = "todos";
   let searchQuery = "";
   let isListView = false;
   let editingId = null;
   let techTags = []; // tags temporárias no form
 
-  /* ── Conteúdo inicial vazio ───────────────────────────────── */
-  if (projects.length === 0) {
-    saveProjects([]);
-  }
+  /* ── Conteúdo inicial ───────────────────────────────── */
 
   /* ── Helpers ─────────────────────────────────────────────────── */
   function uid() {
@@ -172,7 +171,7 @@
     });
 
     // Menu de opções
-    const user = typeof Layout !== 'undefined' ? Layout.init({ requireAuth: false }) : null;
+    const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
     const isOwner = p.criador_id === userEmail || p.proprietaria_id === userEmail;
 
@@ -299,7 +298,7 @@
   }
 
   /* ── Submit ──────────────────────────────────────────────────── */
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const titulo    = document.getElementById("project-titulo").value.trim();
@@ -312,7 +311,7 @@
 
     if (!titulo) { showToast("Informe o título do projeto.", "error"); return; }
 
-    const user = typeof Layout !== 'undefined' ? Layout.init({ requireAuth: false }) : null;
+    const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
 
     if (editingId) {
@@ -343,14 +342,12 @@
       showToast("Projeto criado com sucesso!", "success");
     }
 
-    saveProjects(projects);
-    
-    // Sincroniza com Supabase
-    if (typeof State !== 'undefined' && State.saveGlobalData) {
-      const projectToSave = editingId 
-        ? projects.find(p => p.id === editingId)
-        : projects[projects.length - 1];
-      State.saveGlobalData('shetech_projetos', projectToSave);
+    try {
+      const saved = editingId ? projects.find(p => p.id === editingId) : projects[projects.length - 1];
+      await persistProject(saved);
+    } catch (err) {
+      showToast("Erro ao salvar no Supabase.", "error");
+      return;
     }
 
     closeModal();
@@ -449,7 +446,7 @@
       </div>
     `;
 
-    const user = typeof Layout !== 'undefined' ? Layout.init({ requireAuth: false }) : null;
+    const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
     const isOwner = p.criador_id === userEmail || p.proprietaria_id === userEmail;
 
@@ -479,11 +476,15 @@
   detailModal.addEventListener("click", (e) => { if (e.target === detailModal) closeDetail(); });
 
   /* ── Deletar ─────────────────────────────────────────────────── */
-  function deleteProject(id) {
-    // Substituindo confirm nativo por fluxo do sistema (para este trabalho, executaremos a ação com feedback visual)
+  async function deleteProject(id) {
     Layout.showToast("Projeto excluído com sucesso!", "success");
+    try {
+      await removeProject(id);
+    } catch (err) {
+      showToast("Erro ao excluir projeto.", "error");
+      return;
+    }
     projects = projects.filter((p) => p.id !== id);
-    saveProjects(projects);
     updateStats();
     renderProjects();
     showToast("Projeto excluído.", "success");
@@ -544,28 +545,20 @@
     toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
-  /* ── Sincronização Global ── */
-  async function loadProjectsFromSupabase() {
-    if (typeof State !== 'undefined' && State.loadGlobalData) {
-      const globalProjects = await State.loadGlobalData('shetech_projetos', STORAGE_KEY);
-      if (globalProjects) {
-        projects = globalProjects;
-        updateStats();
-        renderProjects();
-      }
-    }
-  }
-
   /* ── Init ────────────────────────────────────────────────────── */
-  if (typeof Layout !== 'undefined') {
-    Layout.init({ active: 'projetos' });
-  }
-  loadProjectsFromSupabase();
+  document.addEventListener("DOMContentLoaded", async () => {
+    await State.ensureReady();
+    if (typeof Layout !== 'undefined') {
+      await Layout.init({ active: 'projetos' });
+    }
+    await loadProjects();
+    updateStats();
+    renderProjects();
 
-  // Abrir detalhe se houver ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const projectId = urlParams.get('id');
-  if (projectId) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('id');
+    if (projectId) {
       setTimeout(() => openDetail(projectId), 300);
-  }
+    }
+  });
 })();

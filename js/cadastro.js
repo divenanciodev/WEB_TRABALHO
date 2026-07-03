@@ -13,23 +13,14 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     nome_completo: document.getElementById('nome_completo').value.trim(),
     nome_usuario: document.getElementById('nome_usuario').value.trim(),
     email: document.getElementById('email').value.trim(),
-    senha,
-    data_cadastro: new Date().toISOString(),
     foto_perfil: '',
     bio: '',
     habilidades: [],
     experiencia: []
   };
 
-  // Verifica duplicidade apenas no localStorage (fallback local)
-  const users = State.getUsers();
-  if (users.find(u => u.email === newUser.email || u.nome_usuario === newUser.nome_usuario)) {
-    Layout.showToast('E-mail ou nome de usuário já cadastrado!', 'error');
-    return;
-  }
-
   try {
-    const { data, error } = await window.SupabaseAuth.signUp(newUser.email, newUser.senha, {
+    const { data, error } = await window.SupabaseAuth.signUp(newUser.email, senha, {
       nome_completo: newUser.nome_completo,
       nome_usuario: newUser.nome_usuario,
       foto_perfil: newUser.foto_perfil,
@@ -43,28 +34,12 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
       return;
     }
 
-    // Salva na tabela 'users' para visibilidade global.
-    // Funciona tanto quando o e-mail é confirmado automaticamente (data.user)
-    // quanto quando ainda aguarda confirmação (data.user pode existir mas sem sessão).
-    if (data?.user && window.SupabaseAuth?.client) {
-      const { senha: _senha, ...userWithoutPassword } = newUser;
-      const userToSave = {
-        ...userWithoutPassword,
+    if (data?.user) {
+      await State.setCurrentUser({
+        ...newUser,
         id: data.user.id,
-        createdAt: data.user.created_at || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      const { error: upsertError } = await window.SupabaseAuth.client
-        .from('users')
-        .upsert(userToSave, { onConflict: 'id' });
-
-      if (upsertError) {
-        console.warn('[Cadastro] Não foi possível salvar perfil no Supabase:', upsertError.message);
-      }
-
-      // Atualiza também o estado local
-      State.setUsers([...State.getUsers(), userToSave]);
+        createdAt: data.user.created_at || new Date().toISOString()
+      });
     }
 
     const message = data?.session

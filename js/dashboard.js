@@ -1,76 +1,24 @@
-const user = State.getCurrentUser();
-if (!user) throw new Error('auth');
+let user = null;
 
-/* ── MÉTRICAS ── */
-function updateDashboardStats() {
-    const projects = State.getProjects();
-    const events   = State.getEvents();
-    const members  = State.getUsers();
+async function updateDashboardStats() {
+    const [projects, events, membersCount] = await Promise.all([
+        State.getProjects(),
+        State.getEvents(),
+        State.getMembersCount()
+    ]);
 
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
     set('dash-projects-count', projects.length);
-    set('dash-events-count',   events.length);
-    set('dash-members-count',  members.length);
+    set('dash-events-count', events.length);
+    set('dash-members-count', membersCount);
 }
 
-/* ── SINCRONIZAÇÃO COM SUPABASE ── */
-async function syncUserToSupabase() {
-    const client = window.SupabaseAuth && window.SupabaseAuth.client;
-    if (!client || !user) return;
-
-    try {
-        const profileToSync = {
-            id: user.id,
-            email: user.email,
-            nome_completo: user.nome_completo || '',
-            nome_usuario: user.nome_usuario || '',
-            foto_perfil: user.foto_perfil || '',
-            bio: user.bio || '',
-            habilidades: user.habilidades || [],
-            experiencia: user.experiencia || [],
-            createdAt: user.createdAt || new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-
-        const { error } = await client.from('users').upsert(profileToSync, { onConflict: 'id' });
-        if (error) {
-            console.warn('[Dashboard] Erro ao sincronizar perfil:', error.message);
-        } else {
-            console.log('[Dashboard] Perfil sincronizado com sucesso');
-        }
-    } catch (err) {
-        console.warn('[Dashboard] Erro ao sincronizar:', err);
-    }
-}
-
-async function updateMembersCountFromSupabase() {
-    const client = window.SupabaseAuth && window.SupabaseAuth.client;
-    if (!client) return;
-
-    try {
-        const { count, error } = await client
-            .from('users')
-            .select('id', { count: 'exact', head: true });
-
-        if (!error && typeof count === 'number') {
-            const countEl = document.getElementById('dash-members-count');
-            if (countEl) countEl.innerText = count || 0;
-        }
-    } catch (err) {
-        console.warn('[Dashboard] Erro ao contar membros:', err);
-    }
-}
-
-/* ── BOAS-VINDAS ── */
 function renderWelcome() {
-    const nameEl   = document.getElementById('welcome-name');
+    const nameEl = document.getElementById('welcome-name');
     if (nameEl) nameEl.textContent = user.nome_completo || user.nome || user.name || 'Usuária';
-
-    // Chama lucide.createIcons para garantir que ícones injetados via JS também apareçam
     if (window.lucide) lucide.createIcons();
 }
 
-// Removendo streak logic se não houver chip-streak no HTML
 function dummyStreak() {
     const streakEl = document.getElementById('chip-streak');
     if (streakEl && user.createdAt) {
@@ -82,10 +30,9 @@ function dummyStreak() {
     }
 }
 
-/* ── PROGRESSO DO PERFIL ── */
 function renderProfileProgress() {
     const campos = [
-        !!user.avatar,
+        !!user.foto_perfil,
         !!(user.habilidades && user.habilidades.length),
         !!(user.experiencia || user.bio),
         !!user.linkedin,
@@ -94,13 +41,11 @@ function renderProfileProgress() {
     const pct = Math.round((campos.filter(Boolean).length / campos.length) * 100);
     const pctStr = pct + '%';
 
-    // Card grande (bottom-grid)
-    const bar    = document.getElementById('progresso-bar');
-    const badge  = document.getElementById('pct-badge');
-    if (bar)   bar.style.width = pctStr;
+    const bar = document.getElementById('progresso-bar');
+    const badge = document.getElementById('pct-badge');
+    if (bar) bar.style.width = pctStr;
     if (badge) badge.textContent = pctStr;
 
-    // Checklist dinâmica
     const labels = [
         'Foto de perfil adicionada',
         'Habilidades preenchidas',
@@ -118,19 +63,17 @@ function renderProfileProgress() {
         `).join('');
     }
 
-    // Mini barra no stat-card
     const miniBar = document.getElementById('mini-bar');
     const miniPct = document.getElementById('dash-profile-pct');
     if (miniBar) miniBar.style.width = pctStr;
     if (miniPct) miniPct.textContent = pctStr;
 }
 
-/* ── ATIVIDADES RECENTES ── */
-function renderRecentActivity() {
+async function renderRecentActivity() {
     const container = document.getElementById('recent-activity-list');
     if (!container) return;
 
-    const posts = State.getPosts ? State.getPosts().slice(-3).reverse() : [];
+    const posts = (await State.getPosts()).slice(0, 3);
 
     if (posts.length === 0) {
         container.innerHTML = `
@@ -144,11 +87,7 @@ function renderRecentActivity() {
 
     container.innerHTML = posts.map(p => `
         <div class="activity-row">
-            <img
-                src="${p.autor_avatar || `assets/avatars/avatar.svg`}"
-                alt="${p.author}"
-                style="width:32px;height:32px;border-radius:50%;object-fit:cover"
-            />
+            <img src="${p.avatar || 'assets/avatars/avatar.svg'}" alt="${p.author}" style="width:32px;height:32px;border-radius:50%;object-fit:cover" />
             <div style="flex:1">
                 <div style="font-weight:500;font-size:14px">${p.author}</div>
                 <div style="font-size:12px;color:var(--gray-500)">${p.text?.substring(0, 50)}...</div>
@@ -158,50 +97,31 @@ function renderRecentActivity() {
     `).join('');
 }
 
-/* ── QUICK ACTIONS ── */
 function setupQuickActions() {
-    const newProjectBtn = document.getElementById('new-project-btn');
-    if (newProjectBtn) {
-        newProjectBtn.addEventListener('click', () => {
-            window.location.href = 'projetos.html';
-        });
-    }
-
-    const newEventBtn = document.getElementById('new-event-btn');
-    if (newEventBtn) {
-        newEventBtn.addEventListener('click', () => {
-            window.location.href = 'eventos.html';
-        });
-    }
-
-    const communityBtn = document.getElementById('community-btn');
-    if (communityBtn) {
-        communityBtn.addEventListener('click', () => {
-            window.location.href = 'comunidade.html';
-        });
-    }
+    document.getElementById('new-project-btn')?.addEventListener('click', () => { window.location.href = 'projetos.html'; });
+    document.getElementById('new-event-btn')?.addEventListener('click', () => { window.location.href = 'eventos.html'; });
+    document.getElementById('community-btn')?.addEventListener('click', () => { window.location.href = 'comunidade.html'; });
 }
 
-/* ── INICIALIZAÇÃO ── */
 document.addEventListener('DOMContentLoaded', async () => {
-    if (typeof Layout !== 'undefined') {
-        Layout.init({ active: 'dashboard' });
+    await State.ensureReady();
+    user = State.getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
     }
 
-    // Sincroniza o perfil do usuário com Supabase
-    await syncUserToSupabase();
+    if (typeof Layout !== 'undefined') {
+    await Layout.init({ active: 'dashboard' });
+    }
 
-    // Atualiza contagem de membros do Supabase
-    await updateMembersCountFromSupabase();
-
-    // Renderiza componentes
+    await State.setCurrentUser(user);
     renderWelcome();
     dummyStreak();
-    updateDashboardStats();
+    await updateDashboardStats();
     renderProfileProgress();
-    renderRecentActivity();
+    await renderRecentActivity();
     setupQuickActions();
 
-    // Chama lucide para renderizar ícones
     if (window.lucide) lucide.createIcons();
 });
