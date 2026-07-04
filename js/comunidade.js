@@ -732,7 +732,79 @@ async function confirmDeletePost(id) {
 }
 function linkMenu(id) { showToast('Menu de opções do link #' + id, ''); }
 function openComments(id) { showToast('Comentários do post #' + id, ''); }
-function sharePost(id) { showToast('Compartilhando post #' + id, 'success'); }
+function sharePost(id) {
+  const post = allPosts.find(p => p.id === id);
+  if (!post) return;
+
+  const existing = document.getElementById('share-popover-container');
+  if (existing) { existing.remove(); document.getElementById('share-popover-overlay')?.remove(); return; }
+
+  const shareBtn = event.currentTarget;
+  const rect = shareBtn.getBoundingClientRect();
+  
+  const shareUrl = window.location.origin + window.location.pathname + '?post=' + id;
+  const shareText = `Confira esta postagem de ${post.author} na SheTech: ${post.text.substring(0, 100)}...`;
+
+  // Posicionamento inteligente (acima do botão)
+  let top = rect.top - 200; 
+  let left = rect.left - 140;
+  
+  if (top < 10) top = rect.bottom + 10;
+  if (left < 10) left = 10;
+  if (left + 320 > window.innerWidth) left = window.innerWidth - 330;
+
+  const overlay = `<div id="share-popover-overlay" class="share-popover-overlay"></div>`;
+  const popover = `
+    <div id="share-popover-container" class="share-popover-container" style="top:${top}px; left:${left}px;">
+      <span class="share-popover-title">Compartilhar postagem</span>
+      <div class="share-options-grid">
+        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + shareUrl)}" class="share-option-item" target="_blank">
+          <div class="share-icon-circle whatsapp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+          <span>WhatsApp</span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" class="share-option-item" target="_blank">
+          <div class="share-icon-circle facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+          <span>Facebook</span>
+        </a>
+        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" class="share-option-item" target="_blank">
+          <div class="share-icon-circle x-twitter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></div>
+          <span>X</span>
+        </a>
+        <a href="mailto:?subject=${encodeURIComponent('Postagem interessante na SheTech')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}" class="share-option-item" target="_blank">
+          <div class="share-icon-circle email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <span>E-mail</span>
+        </a>
+      </div>
+      <div class="share-url-box">
+        <input type="text" id="share-url-input" value="${shareUrl}" readonly>
+        <button class="btn-copy-small" onclick="copyPostLinkFromInput()">Copiar</button>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', overlay + popover);
+
+  const closePopover = () => {
+    document.getElementById('share-popover-container')?.remove();
+    document.getElementById('share-popover-overlay')?.remove();
+  };
+
+  document.getElementById('share-popover-overlay').onclick = closePopover;
+}
+
+function copyPostLinkFromInput() {
+  const urlInput = document.getElementById('share-url-input');
+  urlInput.select();
+  urlInput.setSelectionRange(0, 99999);
+  
+  navigator.clipboard.writeText(urlInput.value).then(() => {
+    showToast('Link copiado! 📋', 'success');
+    // Fecha o popover após copiar
+    document.getElementById('share-popover-container')?.remove();
+    document.getElementById('share-popover-overlay')?.remove();
+  }).catch(err => {
+    showToast('Erro ao copiar link.', 'error');
+  });
+}
 
 function escapeHTML(text) {
   const div = document.createElement('div');

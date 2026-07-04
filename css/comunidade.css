@@ -1401,3 +1401,112 @@ body {
   .feed-sidebar { grid-template-columns: 1fr; }
   .members-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
+
+/* Estilos para o Menu de Compartilhamento (Popover) */
+.share-popover-container {
+  position: fixed;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  padding: 16px;
+  width: 320px;
+  animation: popover-in 0.2s ease-out;
+}
+
+@keyframes popover-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.share-popover-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 999;
+}
+
+.share-popover-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+  display: block;
+}
+
+.share-options-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.share-option-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--text-2);
+  transition: transform 0.2s;
+}
+
+.share-option-item:hover {
+  transform: translateY(-2px);
+}
+
+.share-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.share-icon-circle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.share-icon-circle.whatsapp { background-color: #25D366; }
+.share-icon-circle.facebook { background-color: #1877F2; }
+.share-icon-circle.x-twitter { background-color: #000000; }
+.share-icon-circle.email { background-color: #EA4335; }
+
+.share-option-item span {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.share-url-box {
+  display: flex;
+  gap: 8px;
+  background: var(--gray-100);
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-200);
+}
+
+.share-url-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 12px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
+}
+
+.btn-copy-small {
+  background: var(--pink);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
