@@ -176,7 +176,8 @@ function postHTML(post) {
         <button class="post-link-save-btn" onclick="savePostLinkToMyLinks('${escapeHTML(post.link.title).replace(/'/g, "\\'")}', '${post.link.url}', event)" title="Salvar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         </button>
-      </div>` : ''}
+      </div>
+    </div>` : ''}
     <div class="post-footer">
       <button class="reaction-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id}, this)">
         <svg viewBox="0 0 24 24" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -209,6 +210,8 @@ async function toggleLike(postId, btn) {
   }
 }
 
+let currentPostLink = null;
+
 async function createPost() {
   const field = document.getElementById('composer-field');
   const text = field.innerText.trim();
@@ -230,13 +233,19 @@ async function createPost() {
     comments: 0,
     liked: false,
     image: hasImg ? imgEl.src : null,
+    link: currentPostLink,
     createdAt: new Date().toISOString()
   };
 
   try {
     await State.savePost(post);
+    
+    // Se houver um link, também salvar na comunidade_links se o usuário desejar (opcional)
+    // No fluxo atual, o usuário quer que apareça no feed.
+    
     field.innerText = '';
     clearMedia();
+    currentPostLink = null; // Limpa o link temporário
     showToast('Post publicado! 🎉', 'success');
   } catch (err) {
     showToast('Erro ao publicar. Tente novamente.', 'error');
@@ -387,7 +396,7 @@ async function saveLink(event) {
     id: Date.now(),
     title: document.getElementById('link-titulo').value.trim(),
     url: document.getElementById('link-url').value.trim(),
-    descricao: document.getElementById('link-desc').value.trim(),
+    desc: document.getElementById('link-desc').value.trim(),
     category: document.getElementById('link-categoria')?.value || 'Geral',
     destaque: document.getElementById('link-destaque')?.checked || false,
     author_email: user.email
@@ -399,9 +408,16 @@ async function saveLink(event) {
   }
 
   try {
-    await State.saveCommunityLink(link);
+    // Se estivermos no feed, guardamos o link para o post
+    if (currentTab === 'feed') {
+      currentPostLink = link;
+      showToast('Link anexado ao post!', 'success');
+    } else {
+      // Se estivermos na aba de links, salvamos direto no banco de links da comunidade
+      await State.saveCommunityLink(link);
+      showToast('Link compartilhado com a comunidade!', 'success');
+    }
     closeModal('link-modal');
-    showToast('Link compartilhado com a comunidade!', 'success');
   } catch (err) {
     showToast('Erro ao salvar link.', 'error');
   }

@@ -519,6 +519,10 @@ body {
   box-shadow: var(--shadow-sm);
   padding: 18px;
   transition: box-shadow var(--trans);
+  margin-bottom: 20px;
+  display: block;
+  overflow: hidden;
+  clear: both;
 }
 .post-card:hover { box-shadow: var(--shadow); }
 
