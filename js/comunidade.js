@@ -136,6 +136,8 @@ function renderFeed(posts) {
 }
 
 function postHTML(post) {
+  const user = State.getCurrentUser();
+  const isOwner = user && (post.author_email === user.email || post.author_id === user.id);
   const text = escapeHTML(post.text).replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
   return `
   <div class="post-card" id="post-${post.id}">
@@ -148,9 +150,21 @@ function postHTML(post) {
           · ${post.time}
         </div>
       </div>
-      <button class="post-options" onclick="postMenu(${post.id})" title="Opções">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-      </button>
+      <div style="position:relative">
+        <button class="post-options" onclick="togglePostMenu(${post.id}, event)" title="Opções" ${!isOwner ? 'style="display:none"' : ''}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+        <div class="post-dropdown-menu" id="post-menu-${post.id}" style="display:none">
+          <button class="post-dropdown-item" onclick="openEditPost(${post.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar
+          </button>
+          <button class="post-dropdown-item post-dropdown-item--danger" onclick="confirmDeletePost(${post.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            Excluir
+          </button>
+        </div>
+      </div>
     </div>
     <div class="post-text">${text}</div>
     ${post.image ? `<img src="${post.image}" class="post-image" alt="imagem do post" />` : ''}
@@ -170,9 +184,6 @@ function postHTML(post) {
         </div>
       </a>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button onclick="copyLinkToClipboard('${post.link.url}')" title="Copiar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-        </button>
         <button class="post-link-save-btn" onclick="savePostLinkToMyLinks('${escapeHTML(post.link.title).replace(/'/g, "\\'")}', '${post.link.url}', event)" title="Salvar link" style="background:var(--pink-soft);color:var(--pink);border:none;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         </button>
@@ -226,6 +237,8 @@ async function createPost() {
     author: user ? user.nome_completo : 'Membro SheTech',
     role: user ? (user.cargo || user.area || 'Membro') : 'Membro',
     avatar: user ? (user.foto_perfil || 'assets/avatars/avatar.svg') : 'assets/avatars/avatar.svg',
+    author_id: user ? user.id : null,
+    author_email: user ? user.email : null,
     time: 'Agora mesmo',
     text,
     tags: [],
@@ -551,7 +564,81 @@ function closeModal(id) {
   if (modal) { modal.style.display = 'none'; modal.classList.remove('show'); }
 }
 
-function postMenu(id) { showToast('Menu de opções do post #' + id, ''); }
+let editingPostId = null;
+
+function togglePostMenu(id, event) {
+  event.stopPropagation();
+  const allMenus = document.querySelectorAll('.post-dropdown-menu');
+  allMenus.forEach(menu => {
+    if (menu.id !== `post-menu-${id}`) menu.style.display = 'none';
+  });
+  
+  const menu = document.getElementById(`post-menu-${id}`);
+  if (menu) {
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.post-dropdown-menu').forEach(menu => menu.style.display = 'none');
+});
+
+function openEditPost(id) {
+  const post = allPosts.find(p => p.id === id);
+  if (!post) return;
+  
+  editingPostId = id;
+  const modal = document.getElementById('edit-post-modal');
+  const textArea = document.getElementById('edit-post-text');
+  const mediaPreview = document.getElementById('edit-post-media-preview');
+  const previewImg = document.getElementById('edit-preview-img');
+  
+  textArea.value = post.text;
+  if (post.image) {
+    previewImg.src = post.image;
+    mediaPreview.style.display = 'block';
+  } else {
+    mediaPreview.style.display = 'none';
+  }
+  
+  openModal('edit-post-modal');
+}
+
+async function updatePost(event) {
+  event.preventDefault();
+  if (!editingPostId) return;
+  
+  const text = document.getElementById('edit-post-text').value.trim();
+  if (!text) { showToast('O texto não pode estar vazio.', 'error'); return; }
+  
+  const post = allPosts.find(p => p.id === editingPostId);
+  if (!post) return;
+  
+  post.text = text;
+  post.updatedAt = new Date().toISOString();
+  
+  try {
+    await State.savePost(post);
+    showToast('Postagem atualizada! ✨', 'success');
+    closeModal('edit-post-modal');
+    editingPostId = null;
+    loadPosts();
+  } catch (err) {
+    showToast('Erro ao atualizar postagem.', 'error');
+  }
+}
+
+async function confirmDeletePost(id) {
+  if (confirm('Tem certeza que deseja excluir esta postagem?')) {
+    try {
+      await State.deleteRow('posts', id);
+      showToast('Postagem excluída.', 'success');
+      loadPosts();
+    } catch (err) {
+      showToast('Erro ao excluir postagem.', 'error');
+    }
+  }
+}
 function linkMenu(id) { showToast('Menu de opções do link #' + id, ''); }
 function openComments(id) { showToast('Comentários do post #' + id, ''); }
 function sharePost(id) { showToast('Compartilhando post #' + id, 'success'); }

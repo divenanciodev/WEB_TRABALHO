@@ -221,6 +221,31 @@
     </div>
   </main>
 
+  <!-- Modal Editar Post -->
+  <div id="edit-post-modal" class="modal-overlay" onclick="closeOnOverlay(event,'edit-post-modal')">
+    <div class="modal-box modal-overlay--detail">
+      <div class="modal-header">
+        <h2>Editar Postagem</h2>
+        <button class="modal-close" onclick="closeModal('edit-post-modal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="edit-post-form" onsubmit="updatePost(event)">
+        <div class="form-group">
+          <label for="edit-post-text">Texto da Postagem</label>
+          <textarea id="edit-post-text" placeholder="O que você está pensando?" rows="4" required></textarea>
+        </div>
+        <div id="edit-post-media-preview" class="media-preview" style="display:none; margin: 10px 22px;">
+          <img id="edit-preview-img" alt="Preview" style="max-width:100%; border-radius:8px;" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeModal('edit-post-modal')">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal Link -->
   <div id="link-modal" class="modal-overlay" onclick="closeOnOverlay(event,'link-modal')">
     <div class="modal-box">
