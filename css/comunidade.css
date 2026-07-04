@@ -447,10 +447,11 @@ body {
 }
 .media-preview img {
   max-width: 100%;
-  max-height: 240px;
-  object-fit: cover;
+  max-height: 400px;
+  object-fit: contain;
   border-radius: var(--radius-sm);
   display: block;
+  margin: 0 auto;
 }
 .remove-media {
   position: absolute;
@@ -581,16 +582,19 @@ body {
   margin-bottom: 12px;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .post-text .hashtag { color: var(--brand); font-weight: 500; }
 
 .post-image {
   width: 100%;
+  max-width: 100%;
   border-radius: var(--radius-sm);
   margin-bottom: 12px;
-  max-height: 320px;
-  object-fit: cover;
+  max-height: 500px;
+  object-fit: contain;
   display: block;
+  background: #f8f9fa;
 }
 
 .post-link-preview-wrap {
@@ -611,6 +615,8 @@ body {
   text-decoration: none;
   background: var(--bg);
   transition: background var(--trans), transform var(--trans), border-color var(--trans);
+  overflow: hidden;
+  max-width: 100%;
 }
 .post-link-preview:hover { background: var(--brand-light); }
 .post-link-preview--featured {
@@ -645,7 +651,7 @@ body {
 }
 .post-link-icon svg { width: 16px; height: 16px; }
 .post-link-title { font-size: 13px; font-weight: 600; color: var(--text); }
-.post-link-url { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.post-link-url { font-size: 11px; color: var(--text-3); margin-top: 2px; word-break: break-all; overflow-wrap: anywhere; }
 
 .post-link-save-btn {
   position: absolute;
@@ -1204,12 +1210,14 @@ body {
 }
 
 .modal-overlay--detail .modal-box {
+  width: 100%;
   max-width: 600px; 
   height: auto; 
   max-height: 90vh; 
   border-radius: 20px; 
   margin: 20px;
   padding: 32px;
+  overflow-x: hidden;
 }
 
 #link-form, #comment-form {
