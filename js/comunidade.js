@@ -765,15 +765,31 @@ async function updatePost(event) {
 }
 
 async function confirmDeletePost(id) {
-  if (confirm('Tem certeza que deseja excluir esta postagem?')) {
+  const modal = document.getElementById('confirm-delete-modal');
+  const confirmBtn = document.getElementById('confirm-delete-btn');
+  const title = modal.querySelector('h2');
+  const text = modal.querySelector('p');
+  
+  title.textContent = 'Excluir postagem?';
+  text.textContent = 'Essa ação não poderá ser desfeita. A postagem será removida permanentemente.';
+  
+  openModal('confirm-delete-modal');
+  
+  confirmBtn.onclick = async () => {
     try {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Excluindo...';
       await State.deleteRow('posts', id);
       showToast('Postagem excluída.', 'success');
       loadPosts();
+      closeModal('confirm-delete-modal');
     } catch (err) {
       showToast('Erro ao excluir postagem.', 'error');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Excluir';
     }
-  }
+  };
 }
 function linkMenu(id) { showToast('Menu de opções do link #' + id, ''); }
 let currentCommentsPostId = null;
@@ -879,6 +895,11 @@ async function submitComment() {
 function confirmDeleteComment(commentId, postId) {
   const modal = document.getElementById('confirm-delete-modal');
   const confirmBtn = document.getElementById('confirm-delete-btn');
+  const title = modal.querySelector('h2');
+  const text = modal.querySelector('p');
+  
+  title.textContent = 'Excluir comentário?';
+  text.textContent = 'Essa ação não poderá ser desfeita. O comentário será removido permanentemente.';
   
   openModal('confirm-delete-modal');
   
