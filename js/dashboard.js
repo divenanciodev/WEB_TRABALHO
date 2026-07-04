@@ -122,8 +122,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     dummyStreak();
     await updateDashboardStats();
     renderProfileProgress();
-    await renderRecentActivity();
+    await renderPerformanceChart();
     setupQuickActions();
 
     if (window.lucide) lucide.createIcons();
 });
+async function renderPerformanceChart() {
+    const canvas = document.getElementById('performance-chart');
+    if (!canvas) return;
+    // Fetch performance data (dummy if not implemented)
+    let data = [];
+    if (State.getPerformanceData) {
+        data = await State.getPerformanceData();
+    } else {
+        // fallback dummy data for the past 7 days
+        const today = new Date();
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            data.push({ date: d.toISOString().split('T')[0], score: Math.floor(Math.random() * 100) + 1 });
+        }
+    }
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: 'Desempenho',
+                data: data.map(d => d.score),
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+    // Attach PDF download handler
+    const btn = document.getElementById('download-pdf');
+    if (btn) {
+        btn.addEventListener('click', downloadPerformancePDF);
+    }
+}
+
+function downloadPerformancePDF() {
+    const canvas = document.getElementById('performance-chart');
+    if (!canvas) return;
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('landscape');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+    pdf.save('desempenho.pdf');
+}
