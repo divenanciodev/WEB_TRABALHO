@@ -77,67 +77,86 @@
           <div class="stat-num" id="dash-profile-pct">—</div>
           <div class="mini-bar-wrap"><div class="mini-bar" id="mini-bar"></div></div>
           <a href="perfil.html" class="stat-link">Completar perfil →</a>
-          <ul class="checklist" id="checklist">
-            <li class="check-item done"><i data-lucide="check-circle"></i> Foto de perfil adicionada</li>
-            <li class="check-item done"><i data-lucide="check-circle"></i> Habilidades preenchidas</li>
-            <li class="check-item done"><i data-lucide="check-circle"></i> Experiência adicionada</li>
-            <li class="check-item pend"><i data-lucide="circle"></i> Adicione um link do LinkedIn</li>
-            <li class="check-item pend"><i data-lucide="circle"></i> Escreva uma bio de apresentação</li>
-          </ul>
+        </div>
+      </div>
+
+      <!-- LINHA PRINCIPAL: ATIVIDADES + PROJETOS EM DESTAQUE -->
+      <div class="profile-grid">
+        <div class="col">
+          <div class="card">
+            <div class="card-head">
+              <h3><i data-lucide="activity"></i> Atividades Recentes</h3>
+              <a href="comunidade.html" class="link">Ver Feed</a>
+            </div>
+            <div id="recent-activity-list" style="display:flex;flex-direction:column;gap:12px">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando atividades...</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-head">
+              <h3><i data-lucide="star"></i> Projetos em Destaque</h3>
+              <a href="projetos.html" class="link">Ver Todos</a>
+            </div>
+            <div id="featured-projects-list" style="display:flex;flex-direction:column;gap:12px">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando projetos...</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- PRÓXIMOS EVENTOS E DESEMPENHO -->
       <div class="profile-grid">
         <div class="col">
-
+          <div class="card">
+            <div class="card-head">
+              <h3><i data-lucide="calendar-days"></i> Próximos Eventos</h3>
+              <a href="eventos.html" class="link">Ver Todos</a>
+            </div>
+            <div id="upcoming-events-list" style="display:flex;flex-direction:column;gap:12px">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando eventos...</p>
+            </div>
+          </div>
         </div>
         <div class="col">
           <div class="card">
             <div class="card-head">
               <h3><i data-lucide="trending-up"></i> Seu Desempenho</h3>
             </div>
-              <div id="performance-chart-container" style="display:flex;flex-direction:column;gap:12px">
-                <canvas id="performance-chart" width="400" height="200"></canvas>
-                <button id="download-pdf" class="btn-download">Baixar PDF</button>
-              </div>
+            <div id="creator-stats-container" style="display:flex;flex-direction:column;gap:12px">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando estatísticas...</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- ANÁLISES -->
-      <section id="analytics">
-        <div class="dashboard-grid">
-          <div class="chart-card">
-            <h3><i data-lucide="trending-up"></i> Participação ao longo do tempo</h3>
-            <canvas id="participation-line" width="400" height="200"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3><i data-lucide="pie-chart"></i> Distribuição de atividades</h3>
-            <canvas id="activity-pie" width="400" height="200"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3><i data-lucide="bar-chart-2"></i> Participação por categoria</h3>
-            <canvas id="category-bar" width="400" height="200"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3><i data-lucide="calendar"></i> Eventos por mês</h3>
-            <canvas id="events-month-bar" width="400" height="200"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3><i data-lucide="check-square"></i> Projetos concluídos x em andamento</h3>
-            <canvas id="project-status-bar" width="400" height="200"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3><i data-lucide="cpu"></i> Tecnologias utilizadas</h3>
-            <canvas id="tech-bar" width="400" height="200"></canvas>
-          </div>
-        </div>
-      </section>
       <!-- LINHA INFERIOR: AVISOS + PROGRESSO DO PERFIL -->
       <div class="bottom-grid">
 
-
+        <!-- AVISOS DA PLATAFORMA -->
+        <div class="card avisos-card">
+          <div class="card-head">
+            <h3><i data-lucide="megaphone"></i> Avisos da Plataforma</h3>
+          </div>
+          <div class="avisos-lista" id="avisos-lista">
+            <div class="aviso-item aviso-destaque">
+              <span class="aviso-icon">✨</span>
+              <div>
+                <p class="aviso-titulo">Seu espaço está pronto</p>
+                <p class="aviso-desc">Comece a organizar seus projetos, eventos e conexões a partir de agora.</p>
+                <span class="aviso-tempo">agora</span>
+              </div>
+            </div>
+            <div class="aviso-item">
+              <span class="aviso-icon">🧭</span>
+              <div>
+                <p class="aviso-titulo">Complete seu perfil</p>
+                <p class="aviso-desc">Adicione sua bio, habilidades e links para deixar sua presença mais completa.</p>
+                <span class="aviso-tempo">em breve</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- PROGRESSO DO PERFIL -->

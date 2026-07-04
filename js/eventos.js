@@ -149,9 +149,8 @@
     card.dataset.id = ev.id;
 
     const horarioStr = ev.horario ? ` às ${ev.horario}` : "";
-    const locLabel = isOnline ? platformLabel(ev.link) : (ev.endereco || "Local não informado");
+    const locLabel = isOnline ? platformLabel(ev.link) : ev.endereco;
     const locIcon = isOnline ? "icon-video" : "icon-map-pin";
-    const locLink = !isOnline && ev.endereco ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.endereco)}` : null;
 
     card.innerHTML = `
       <div class="event-card-stripe ${isOnline ? "" : "event-card-stripe--presencial"}"></div>
@@ -254,7 +253,6 @@
       if (!ev) return;
       document.getElementById("event-titulo").value = ev.titulo;
       document.getElementById("event-link").value = ev.link || "";
-      document.getElementById("event-cep").value = ev.cep || "";
       document.getElementById("event-endereco").value = ev.endereco || "";
       document.getElementById("event-data").value = ev.data;
       document.getElementById("event-horario").value = ev.horario || "";
@@ -286,60 +284,9 @@
     document.getElementById("campo-presencial").style.display = tipo === "presencial" ? "block" : "none";
   }
 
-  // ---------- CEP Lookup ----------
-  async function fetchAddressByCep(cep) {
-    const cleanCep = cep.replace(/\D/g, "");
-    const statusEl = document.getElementById('cep-status');
-    const addressInput = document.getElementById('event-endereco');
-    const mapBtn = document.getElementById('map-link');
-    // Prepare UI for loading
-    statusEl.textContent = 'Buscando...';
-    addressInput.value = '';
-    addressInput.setAttribute('readonly', true);
-    if (mapBtn) mapBtn.style.display = 'none';
-
-    if (cleanCep.length !== 8) {
-      showToast('CEP inválido. Insira 8 dígitos.', 'error');
-      statusEl.textContent = '';
-      return;
-    }
-    try {
-      const resp = await fetch(`https://brasilapi.com.br/api/cep/v2/${cleanCep}`);
-      if (!resp.ok) throw new Error('Erro ao buscar CEP');
-      const data = await resp.json();
-      const formatted = `${data.street || ''}, ${data.city || ''} - ${data.state || ''}`;
-      addressInput.value = formatted;
-      addressInput.removeAttribute('readonly');
-      // Update map link
-      if (mapBtn) {
-        const query = encodeURIComponent(formatted);
-        mapBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
-        mapBtn.style.display = 'inline-block';
-      }
-      statusEl.textContent = '✔';
-    } catch (e) {
-      console.error(e);
-      showToast('Não foi possível buscar o endereço para o CEP informado.', 'error');
-      // Allow manual entry
-      addressInput.removeAttribute('readonly');
-      statusEl.textContent = '❌';
-    }
-  }
-
-  document.querySelectorAll('.tipo-btn').forEach((btn) => {
-    btn.addEventListener('click', () => setTipo(btn.dataset.tipo));
+  document.querySelectorAll(".tipo-btn").forEach((btn) => {
+    btn.addEventListener("click", () => setTipo(btn.dataset.tipo));
   });
-
-  // Auto-fetch CEP when 8 digits entered
-  const cepInput = document.getElementById('event-cep');
-  if (cepInput) {
-    cepInput.addEventListener('input', (e) => {
-      const val = e.target.value.replace(/\D/g, '');
-      if (val.length === 8) {
-        fetchAddressByCep(val);
-      }
-    });
-  }
 
   /* ── Atalhos de plataforma ───────────────────────────────────── */
   document.querySelectorAll(".plat-btn").forEach((btn) => {
@@ -358,7 +305,6 @@
     const titulo = document.getElementById("event-titulo").value.trim();
     const link = document.getElementById("event-link").value.trim();
     const endereco = document.getElementById("event-endereco").value.trim();
-    const cep = document.getElementById("event-cep").value.trim();
     const data = document.getElementById("event-data").value;
     const horario = document.getElementById("event-horario").value;
     const categoria = document.getElementById("event-categoria").value;
@@ -367,10 +313,7 @@
     if (!titulo) { showToast("Informe o nome do evento.", "error"); return; }
     if (!data) { showToast("Informe a data do evento.", "error"); return; }
     if (tipo === "online" && !link) { showToast("Cole o link da reunião online.", "error"); return; }
-    if (tipo === "presencial") {
-      if (!cep) { showToast("Informe o CEP do local.", "error"); return; }
-      if (!endereco) { showToast("Informe o endereço do evento.", "error"); return; }
-    }
+    if (tipo === "presencial" && !endereco) { showToast("Informe o endereço do evento.", "error"); return; }
 
     const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
@@ -383,7 +326,7 @@
           showToast("Você não tem permissão para editar este evento.", "error");
           return;
         }
-        events[idx] = { ...events[idx], titulo, tipo, link, endereco, cep, data, horario, categoria, descricao };
+        events[idx] = { ...events[idx], titulo, tipo, link, endereco, data, horario, categoria, descricao };
         showToast("Evento atualizado com sucesso!", "success");
       }
     } else {
