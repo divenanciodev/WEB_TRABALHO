@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,20 +9,29 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
+
 <body>
   <aside class="sidebar">
     <div class="logo"><span class="logo-text">She<span class="accent">Tech</span></span></div>
     <nav class="nav">
-      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i data-lucide="home"></i> <span class="nav-label">Início</span></a>
-      <a href="projetos.html" class="nav-item" data-page="projetos"><i data-lucide="folder-kanban"></i> <span class="nav-label">Projetos</span></a>
-      <a href="eventos.html" class="nav-item" data-page="eventos"><i data-lucide="calendar-days"></i> <span class="nav-label">Eventos</span></a>
-      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i data-lucide="users"></i> <span class="nav-label">Comunidade</span></a>
-      <a href="perfil.html" class="nav-item" data-page="perfil"><i data-lucide="user"></i> <span class="nav-label">Perfil</span></a>
-      <a href="links.html" class="nav-item" data-page="links"><i data-lucide="link"></i> <span class="nav-label">Links</span></a>
-      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i data-lucide="settings"></i> <span class="nav-label">Configurações</span></a>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard"><i data-lucide="home"></i> <span
+          class="nav-label">Início</span></a>
+      <a href="projetos.html" class="nav-item" data-page="projetos"><i data-lucide="folder-kanban"></i> <span
+          class="nav-label">Projetos</span></a>
+      <a href="eventos.html" class="nav-item" data-page="eventos"><i data-lucide="calendar-days"></i> <span
+          class="nav-label">Eventos</span></a>
+      <a href="comunidade.html" class="nav-item" data-page="comunidade"><i data-lucide="users"></i> <span
+          class="nav-label">Comunidade</span></a>
+      <a href="perfil.html" class="nav-item" data-page="perfil"><i data-lucide="user"></i> <span
+          class="nav-label">Perfil</span></a>
+      <a href="links.html" class="nav-item" data-page="links"><i data-lucide="link"></i> <span
+          class="nav-label">Links</span></a>
+      <a href="configuracoes.html" class="nav-item" data-page="configuracoes"><i data-lucide="settings"></i> <span
+          class="nav-label">Configurações</span></a>
     </nav>
     <div class="sidebar-foot">
-      <a href="#" class="nav-item" onclick="State.logout(); window.location.href='login.html';" style="color: var(--pink-2);">
+      <a href="#" class="nav-item" onclick="State.logout(); window.location.href='login.html';"
+        style="color: var(--pink-2);">
         <i data-lucide="log-out"></i> <span class="nav-label">Sair</span>
       </a>
     </div>
@@ -75,89 +85,59 @@
         <div class="card stat-card stat-card-perfil">
           <h3><i data-lucide="badge-check"></i> Perfil</h3>
           <div class="stat-num" id="dash-profile-pct">—</div>
-          <div class="mini-bar-wrap"><div class="mini-bar" id="mini-bar"></div></div>
+          <div class="mini-bar-wrap">
+            <div class="mini-bar" id="mini-bar"></div>
+          </div>
           <a href="perfil.html" class="stat-link">Completar perfil →</a>
         </div>
       </div>
 
-      <!-- LINHA PRINCIPAL: ATIVIDADES + PROJETOS EM DESTAQUE -->
-      <div class="profile-grid">
-        <div class="col">
-          <div class="card">
-            <div class="card-head">
-              <h3><i data-lucide="activity"></i> Atividades Recentes</h3>
-              <a href="comunidade.html" class="link">Ver Feed</a>
+      <!-- LINHA PRINCIPAL: PROJETOS EM DESTAQUE + PRÓXIMOS EVENTOS -->
+        <div class="profile-grid">
+          <div class="col">
+            <div class="card">
+              <div class="card-head">
+                <h3><i data-lucide="star"></i> Projetos em Destaque</h3>
+                <a href="projetos.html" class="link">Ver Todos</a>
+              </div>
+              <div id="featured-projects-list" style="display:flex;flex-direction:column;gap:12px">
+                <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando projetos...</p>
+              </div>
             </div>
-            <div id="recent-activity-list" style="display:flex;flex-direction:column;gap:12px">
-              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando atividades...</p>
+          </div>
+          <div class="col">
+            <div class="card">
+              <div class="card-head">
+                <h3><i data-lucide="calendar-days"></i> Próximos Eventos</h3>
+                <a href="eventos.html" class="link">Ver Todos</a>
+              </div>
+              <div id="upcoming-events-list" style="display:flex;flex-direction:column;gap:12px">
+                <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando eventos...</p>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-head">
-              <h3><i data-lucide="star"></i> Projetos em Destaque</h3>
-              <a href="projetos.html" class="link">Ver Todos</a>
-            </div>
-            <div id="featured-projects-list" style="display:flex;flex-direction:column;gap:12px">
-              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando projetos...</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- PRÓXIMOS EVENTOS E DESEMPENHO -->
-      <div class="profile-grid">
-        <div class="col">
-          <div class="card">
-            <div class="card-head">
-              <h3><i data-lucide="calendar-days"></i> Próximos Eventos</h3>
-              <a href="eventos.html" class="link">Ver Todos</a>
-            </div>
-            <div id="upcoming-events-list" style="display:flex;flex-direction:column;gap:12px">
-              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando eventos...</p>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-head">
-              <h3><i data-lucide="trending-up"></i> Seu Desempenho</h3>
-            </div>
-            <div id="creator-stats-container" style="display:flex;flex-direction:column;gap:12px">
-              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando estatísticas...</p>
+
+        <!-- DESENVOLVIMENTO: DESEMPENHO -->
+        <div class="profile-grid">
+          <div class="col">
+            <div class="card">
+              <div class="card-head">
+                <h3><i data-lucide="trending-up"></i> Seu Desempenho</h3>
+              </div>
+              <div id="creator-stats-container" style="display:flex;flex-direction:column;gap:12px">
+                <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando estatísticas...</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       <!-- LINHA INFERIOR: AVISOS + PROGRESSO DO PERFIL -->
       <div class="bottom-grid">
 
         <!-- AVISOS DA PLATAFORMA -->
-        <div class="card avisos-card">
-          <div class="card-head">
-            <h3><i data-lucide="megaphone"></i> Avisos da Plataforma</h3>
-          </div>
-          <div class="avisos-lista" id="avisos-lista">
-            <div class="aviso-item aviso-destaque">
-              <span class="aviso-icon">✨</span>
-              <div>
-                <p class="aviso-titulo">Seu espaço está pronto</p>
-                <p class="aviso-desc">Comece a organizar seus projetos, eventos e conexões a partir de agora.</p>
-                <span class="aviso-tempo">agora</span>
-              </div>
-            </div>
-            <div class="aviso-item">
-              <span class="aviso-icon">🧭</span>
-              <div>
-                <p class="aviso-titulo">Complete seu perfil</p>
-                <p class="aviso-desc">Adicione sua bio, habilidades e links para deixar sua presença mais completa.</p>
-                <span class="aviso-tempo">em breve</span>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <!-- PROGRESSO DO PERFIL -->
         <div class="card progresso-card">
@@ -188,8 +168,12 @@
   <script src="js/app.js"></script>
   <script src="js/layout.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="js/analytics.js"></script>
   <script>
     lucide.createIcons();
   </script>
 </body>
+
 </html>

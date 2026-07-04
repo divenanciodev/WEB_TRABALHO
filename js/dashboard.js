@@ -125,5 +125,114 @@ document.addEventListener('DOMContentLoaded', async () => {
     await renderRecentActivity();
     setupQuickActions();
 
+    await window.renderFeaturedProjects();
+    await window.renderUpcomingEvents();
+    await window.renderCreatorStats();
+
     if (window.lucide) lucide.createIcons();
 });
+
+window.renderFeaturedProjects = async function() {
+    const container = document.getElementById('featured-projects-list');
+    if (!container) return;
+    const allProjects = await State.getProjects();
+    const currentUser = window.State?.getCurrentUser();
+    
+    // Sort by createdAt desc, take top 3
+    const projects = allProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+    
+    if (projects.length === 0) {
+        container.innerHTML = `<p style="color:var(--gray-500);text-align:center;padding:20px">Nenhum projeto encontrado.</p>`;
+        return;
+    }
+
+    container.innerHTML = projects.map(p => {
+        let btnHtml = '';
+        if (currentUser && p.author_id !== currentUser.id) {
+            const isSubscribed = Array.isArray(p.membros) && p.membros.includes(currentUser.id);
+            const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
+            const icon = isSubscribed ? 'check' : 'user-plus';
+            const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
+            btnHtml = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')" style="cursor:pointer; padding:4px 8px; border-radius:4px; font-size:12px; border:1px solid var(--primary); background: ${isSubscribed ? 'var(--primary)' : 'transparent'}; color: ${isSubscribed ? '#fff' : 'var(--primary)'}"><i class="icon-${icon}"></i> ${text}</button>`;
+        }
+        return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--gray-200); border-radius:8px; background:#fff;">
+            <div>
+                <h4 style="margin:0; font-size:14px; color:var(--gray-800)">${p.titulo}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--gray-500)">${p.categoria || 'Sem Categoria'} • ${p.status || 'Novo'}</p>
+            </div>
+            ${btnHtml}
+        </div>`;
+    }).join('');
+};
+
+window.renderUpcomingEvents = async function() {
+    const container = document.getElementById('upcoming-events-list');
+    if (!container) return;
+    const allEvents = await State.getEvents();
+    const currentUser = window.State?.getCurrentUser();
+    
+    const events = allEvents.sort((a, b) => (a.data || '').localeCompare(b.data || '')).slice(0, 3);
+    
+    if (events.length === 0) {
+        container.innerHTML = `<p style="color:var(--gray-500);text-align:center;padding:20px">Nenhum evento encontrado.</p>`;
+        return;
+    }
+
+    container.innerHTML = events.map(ev => {
+        let btnHtml = '';
+        if (currentUser && ev.author_id !== currentUser.id) {
+            const isSubscribed = Array.isArray(ev.membros) && ev.membros.includes(currentUser.id);
+            const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
+            const icon = isSubscribed ? 'check' : 'user-plus';
+            const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
+            btnHtml = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleEventSubscription('${ev.id}')" style="cursor:pointer; padding:4px 8px; border-radius:4px; font-size:12px; border:1px solid var(--primary); background: ${isSubscribed ? 'var(--primary)' : 'transparent'}; color: ${isSubscribed ? '#fff' : 'var(--primary)'}"><i class="icon-${icon}"></i> ${text}</button>`;
+        }
+        return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--gray-200); border-radius:8px; background:#fff;">
+            <div>
+                <h4 style="margin:0; font-size:14px; color:var(--gray-800)">${ev.titulo}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--gray-500)">${ev.data || 'Em breve'}</p>
+            </div>
+            ${btnHtml}
+        </div>`;
+    }).join('');
+};
+
+window.renderCreatorStats = async function() {
+    const container = document.getElementById('creator-stats-container');
+    if (!container) return;
+    const currentUser = window.State?.getCurrentUser();
+    if (!currentUser) return;
+
+    const [projects, events] = await Promise.all([
+        State.getProjects(),
+        State.getEvents()
+    ]);
+
+    const myProjects = projects.filter(p => p.author_id === currentUser.id).length;
+    const joinedProjects = projects.filter(p => Array.isArray(p.membros) && p.membros.includes(currentUser.id)).length;
+    const myEvents = events.filter(e => e.author_id === currentUser.id).length;
+    const joinedEvents = events.filter(e => Array.isArray(e.membros) && e.membros.includes(currentUser.id)).length;
+
+    container.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div style="padding:16px; border:1px solid var(--gray-200); border-radius:8px; text-align:center;">
+                <h4 style="margin:0; font-size:24px; color:var(--primary);">${myProjects + joinedProjects}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--gray-500)">Projetos Envolvidos</p>
+            </div>
+            <div style="padding:16px; border:1px solid var(--gray-200); border-radius:8px; text-align:center;">
+                <h4 style="margin:0; font-size:24px; color:var(--primary);">${myEvents + joinedEvents}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--gray-500)">Eventos Participados</p>
+            </div>
+            <div style="padding:16px; border:1px solid var(--gray-200); border-radius:8px; text-align:center;">
+                <h4 style="margin:0; font-size:24px; color:var(--primary);">${myProjects}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--gray-500)">Projetos Criados</p>
+            </div>
+            <div style="padding:16px; border:1px solid var(--gray-200); border-radius:8px; text-align:center;">
+                <h4 style="margin:0; font-size:24px; color:var(--primary);">${myEvents}</h4>
+                <p style="margin:4px 0 0; font-size:12px; color:var(--gray-500)">Eventos Criados</p>
+            </div>
+        </div>
+    `;
+};

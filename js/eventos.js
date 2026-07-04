@@ -190,9 +190,22 @@
           </div>
         </div>
 
-        <span class="date-pill ${cls}">
-          <i class="icon-clock-4"></i> ${label}
-        </span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+          <span class="date-pill ${cls}">
+            <i class="icon-clock-4"></i> ${label}
+          </span>
+          ${(() => {
+            const currentUser = window.State?.getCurrentUser();
+            if (currentUser && ev.author_id && ev.author_id !== currentUser.id) {
+              const isSubscribed = Array.isArray(ev.membros) && ev.membros.includes(currentUser.id);
+              const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
+              const icon = isSubscribed ? 'check' : 'user-plus';
+              const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
+              return \`<button class="\${btnClass}" onclick="event.stopPropagation(); window.toggleEventSubscription('\${ev.id}')" style="cursor:pointer; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:500; border:1px solid var(--primary); background: \${isSubscribed ? 'var(--primary)' : 'transparent'}; color: \${isSubscribed ? '#fff' : 'var(--primary)'}"><i class="icon-\${icon}"></i> \${text}</button>\`;
+            }
+            return '';
+          })()}
+        </div>
       </div>
     `;
 

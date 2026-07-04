@@ -122,7 +122,20 @@
     const linkBtns = [
       p.repo ? `<a class="card-link-btn" href="${p.repo}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="icon-github"></i> Repo</a>` : "",
       p.demo ? `<a class="card-link-btn" href="${p.demo}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="icon-external-link"></i> Demo</a>` : "",
-    ].join("");
+    ];
+    
+    const currentUser = window.State?.getCurrentUser();
+    let subscribeBtn = '';
+    if (currentUser && p.author_id && p.author_id !== currentUser.id) {
+      const isSubscribed = Array.isArray(p.membros) && p.membros.includes(currentUser.id);
+      const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
+      const icon = isSubscribed ? 'check' : 'user-plus';
+      const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
+      subscribeBtn = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')" style="cursor:pointer; border:1px solid var(--primary); background: ${isSubscribed ? 'var(--primary)' : 'transparent'}; color: ${isSubscribed ? '#fff' : 'var(--primary)'}"><i class="icon-${icon}"></i> ${text}</button>`;
+      linkBtns.push(subscribeBtn);
+    }
+    
+    const linksHtml = linkBtns.join("");
 
     card.innerHTML = `
       <div class="project-card-stripe ${stripeClass(p.categoria)}"></div>
@@ -149,7 +162,7 @@
 
         ${techPills ? `<div class="tech-pill-row">${techPills}</div>` : ""}
 
-        ${linkBtns ? `<div class="card-links">${linkBtns}</div>` : ""}
+        ${linksHtml ? `<div class="card-links" style="display:flex;gap:8px;align-items:center;margin-top:12px;">${linksHtml}</div>` : ""}
 
         <div class="progress-wrap">
           <div class="progress-header">

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang='pt-BR'>
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <title>Analytics • SheTech</title>
+  <link rel='stylesheet' href='vendor/fonts/fonts.css' />
+  <link rel='stylesheet' href='css/base.css' />
+  <link rel='stylesheet' href='css/analytics.css' />
+  <script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'></script>
+</head>
+<body>
+  <aside class='sidebar'>
+    <div class='logo'><span class='logo-text'>She<span class='accent'>Tech</span></span></div>
+    <nav class='nav'>
+      <a href='dashboard.html' class='nav-item' data-page='dashboard'><i class='icon-house'></i> <span class='nav-label'>Início</span></a>
+      <a href='analytics.html' class='nav-item' data-page='analytics'><i class='icon-pie-chart'></i> <span class='nav-label'>Análise</span></a>
+    </nav>
+  </aside>
+  <main class='main'>
+    <header class='topbar'>
+      <h1 class='page-title' id='page-title'>Dashboard Analítico</h1>
+      <div class='topbar-actions'>
+        <button class='icon-btn' title='Notificações' onclick= window.location.href=notificacoes.html><i class='icon-bell'></i><span class='dot' id='notif-dot' style='display:none'></span></button>
+        <a href='perfil.html' class='me'><img id='top-avatar' src='' alt='' /><span id='top-name'>Olá</span></a>
+      </div>
+    </header>
+    <section id='analytics' class='analytics-section'>
+      <div class='grid'>
+        <div class='card chart-card'>
+          <h3 class='chart-title'>Tecnologias mais utilizadas pela comunidade</h3>
+          <p class='chart-subtitle'>Percentual de usuárias que declararam cada tecnologia</p>
+          <canvas id='chart-tech'></canvas>
+        </div>
+        <div class='card chart-card'>
+          <h3 class='chart-title'>Projetos por categoria</h3>
+          <p class='chart-subtitle'>Tipos de projetos mais desenvolvidos</p>
+          <canvas id='chart-proj-cat'></canvas>
+        </div>
+        <div class='card chart-card'>
+          <h3 class='chart-title'>Participação em Eventos</h3>
+          <p class='chart-subtitle'>Quantidade de participantes por evento</p>
+          <canvas id='chart-event-part'></canvas>
+        </div>
+        <div class='card chart-card'>
+          <h3 class='chart-title'>Áreas de interesse da comunidade</h3>
+          <p class='chart-subtitle'>Distribuição de áreas de atuação</p>
+          <canvas id='chart-interest'></canvas>
+        </div>
+        <div class='card chart-card'>
+          <h3 class='chart-title'>Status dos Projetos</h3>
+          <p class='chart-subtitle'>Andamento atual dos projetos</p>
+          <canvas id='chart-proj-status'></canvas>
+        </div>
+      </div>
+      <button id='export-pdf' class='btn btn-primary' style='margin-top:20px;'>Exportar desempenho em PDF</button>
+    </section>
+  </main>
+  <script src='js/supabase.js'></script>
+  <script src='js/app.js'></script>
+  <script src='js/analytics.js'></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await State.ensureReady();
+      const user = State.getCurrentUser();
+      if (user) {
+        document.getElementById('top-avatar').src = user.foto_perfil || 'assets/avatars/avatar.svg';
+        document.getElementById('top-name').textContent = user.nome_completo || user.nome_usuario || 'Usuária';
+      }
+    });
+  </script>
+</body>
+</html>

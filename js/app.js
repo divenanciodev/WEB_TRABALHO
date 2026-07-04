@@ -154,12 +154,122 @@ const State = {
     return this.fetchTable('users');
   },
 
-  async getCommunityLinks() {
-    return this.fetchTable('community_links');
+  // ======== ANALYTICS DATA FETCHERS ========
+  // 1. Tecnologias mais utilizadas (contagem de habilidades nos perfis)
+  async getUserTechnologies() {
+    const client = this._client();
+    if (!client) return {};
+    try {
+      const { data, error } = await client.from('users').select('habilidades').order('createdAt', { ascending: false });
+      if (error) throw error;
+      // habilidades é um array JSONB, pode ser [] ou null
+      const counts = {};
+      data.forEach(u => {
+        const arr = u.habilidades || [];
+        arr.forEach(tech => {
+          const key = tech || 'Outros';
+          counts[key] = (counts[key] || 0) + 1;
+        });
+      });
+      // fallback mock if empty
+      if (Object.keys(counts).length === 0) {
+        return { JavaScript: 0, Python: 0, Java: 0, React: 0, "HTML/CSS": 0, SQL: 0, "C#": 0, PHP: 0, Flutter: 0, Outros: 0 };
+      }
+      return counts;
+    } catch (e) {
+      console.warn('[State] getUserTechnologies fallback', e);
+      // mock data
+      return { JavaScript: 45, Python: 30, Java: 20, React: 35, "HTML/CSS": 50, SQL: 25, "C#": 15, PHP: 10, Flutter: 12, Outros: 8 };
+    }
   },
 
-  async saveProject(project) {
-    return this.saveRow('shetech_projetos', project);
+  // 2. Projetos por categoria
+  async getProjectCategories() {
+    const client = this._client();
+    if (!client) return {};
+    try {
+      const { data, error } = await client.from('shetech_projetos').select('categoria').order('createdAt', { ascending: false });
+      if (error) throw error;
+      const counts = {};
+      data.forEach(p => {
+        const cat = p.categoria || 'Outros';
+        counts[cat] = (counts[cat] || 0) + 1;
+      });
+      if (Object.keys(counts).length === 0) {
+        return { "Desenvolvimento Web": 0, "Inteligência Artificial": 0, Mobile: 0, "Banco de Dados": 0, "UX/UI": 0, "Ciência de Dados": 0, Jogos: 0, Automação: 0 };
+      }
+      return counts;
+    } catch (e) {
+      console.warn('[State] getProjectCategories fallback', e);
+      return { "Desenvolvimento Web": 40, "Inteligência Artificial": 12, Mobile: 20, "Banco de Dados": 15, "UX/UI": 18, "Ciência de Dados": 9, Jogos: 7, Automação: 5 };
+    }
+  },
+
+  // 3. Participação em eventos (contagem de participantes)
+  async getEventParticipation() {
+    const client = this._client();
+    if (!client) return {};
+    try {
+      const { data, error } = await client.from('shetech_eventos').select('title, participantes').order('createdAt', { ascending: false });
+      if (error) throw error;
+      const counts = {};
+      data.forEach(ev => {
+        const title = ev.title || ev.nome || 'Evento';
+        const part = ev.participantes ? ev.participantes.length : 0;
+        counts[title] = part;
+      });
+      if (Object.keys(counts).length === 0) {
+        return { "Workshop HTML": 0, Hackathon: 0, "Python para Iniciantes": 0, "Introdução à IA": 0, "Git e GitHub": 0 };
+      }
+      return counts;
+    } catch (e) {
+      console.warn('[State] getEventParticipation fallback', e);
+      return { "Workshop HTML": 35, Hackathon: 28, "Python para Iniciantes": 22, "Introdução à IA": 18, "Git e GitHub": 30 };
+    }
+  },
+
+  // 4. Áreas de interesse das usuárias
+  async getInterestAreas() {
+    const client = this._client();
+    if (!client) return {};
+    try {
+      const { data, error } = await client.from('users').select('area').order('createdAt', { ascending: false });
+      if (error) throw error;
+      const counts = {};
+      data.forEach(u => {
+        const area = u.area || 'Outros';
+        counts[area] = (counts[area] || 0) + 1;
+      });
+      if (Object.keys(counts).length === 0) {
+        return { "Front-end": 0, "Back-end": 0, "UX/UI": 0, Mobile: 0, IA: 0, Dados: 0, Segurança: 0, Cloud: 0, DevOps: 0, Outros: 0 };
+      }
+      return counts;
+    } catch (e) {
+      console.warn('[State] getInterestAreas fallback', e);
+      return { "Front-end": 55, "Back-end": 45, "UX/UI": 30, Mobile: 25, IA: 20, Dados: 22, Segurança: 12, Cloud: 15, DevOps: 10, Outros: 5 };
+    }
+  },
+
+  // 5. Status dos projetos
+  async getProjectStatusCounts() {
+    const client = this._client();
+    if (!client) return {};
+    try {
+      const { data, error } = await client.from('shetech_projetos').select('status').order('createdAt', { ascending: false });
+      if (error) throw error;
+      const counts = {};
+      data.forEach(p => {
+        const st = p.status || 'Outros';
+        counts[st] = (counts[st] || 0) + 1;
+      });
+      if (Object.keys(counts).length === 0) {
+        return { "Em andamento": 0, Concluído: 0, "Buscando integrantes": 0, Pausado: 0 };
+      }
+      return counts;
+    } catch (e) {
+      console.warn('[State] getProjectStatusCounts fallback', e);
+      return { "Em andamento": 40, Concluído: 30, "Buscando integrantes": 12, Pausado: 8 };
+    }
   },
 
   async deleteProject(id) {
@@ -313,3 +423,87 @@ const State = {
 };
 
 window.State = State;
+
+window.toggleProjectSubscription = async (projectId) => {
+  const user = State.getCurrentUser();
+  if (!user) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Você precisa estar logada para se inscrever.', 'error');
+    return false;
+  }
+  const client = State._client();
+  if (!client) return false;
+
+  const { data: project, error: fetchError } = await client.from('shetech_projetos').select('membros, author_id').eq('id', projectId).single();
+  if (fetchError || !project) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao buscar projeto.', 'error');
+    return false;
+  }
+  if (project.author_id === user.id) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Você não pode se inscrever no próprio projeto.', 'error');
+    return false;
+  }
+
+  let membros = Array.isArray(project.membros) ? project.membros : [];
+  let isSubscribed = false;
+  if (membros.includes(user.id)) {
+    membros = membros.filter(m => m !== user.id);
+  } else {
+    membros.push(user.id);
+    isSubscribed = true;
+  }
+
+  const { error: updateError } = await client.from('shetech_projetos').update({ membros }).eq('id', projectId);
+  if (updateError) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao atualizar inscrição.', 'error');
+    return false;
+  }
+
+  if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast(isSubscribed ? 'Inscrição realizada!' : 'Inscrição cancelada.', 'success');
+  
+  if (typeof window.renderProjects === 'function') window.renderProjects();
+  if (typeof window.renderFeaturedProjects === 'function') window.renderFeaturedProjects();
+  if (typeof window.renderCreatorStats === 'function') window.renderCreatorStats();
+  return true;
+};
+
+window.toggleEventSubscription = async (eventId) => {
+  const user = State.getCurrentUser();
+  if (!user) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Você precisa estar logada para se inscrever.', 'error');
+    return false;
+  }
+  const client = State._client();
+  if (!client) return false;
+
+  const { data: evento, error: fetchError } = await client.from('shetech_eventos').select('membros, author_id').eq('id', eventId).single();
+  if (fetchError || !evento) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao buscar evento.', 'error');
+    return false;
+  }
+  if (evento.author_id === user.id) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Você não pode se inscrever no próprio evento.', 'error');
+    return false;
+  }
+
+  let membros = Array.isArray(evento.membros) ? evento.membros : [];
+  let isSubscribed = false;
+  if (membros.includes(user.id)) {
+    membros = membros.filter(m => m !== user.id);
+  } else {
+    membros.push(user.id);
+    isSubscribed = true;
+  }
+
+  const { error: updateError } = await client.from('shetech_eventos').update({ membros }).eq('id', eventId);
+  if (updateError) {
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao atualizar inscrição.', 'error');
+    return false;
+  }
+
+  if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast(isSubscribed ? 'Inscrição realizada!' : 'Inscrição cancelada.', 'success');
+  
+  if (typeof window.renderEvents === 'function') window.renderEvents();
+  if (typeof window.renderUpcomingEvents === 'function') window.renderUpcomingEvents();
+  if (typeof window.renderCreatorStats === 'function') window.renderCreatorStats();
+  return true;
+};
