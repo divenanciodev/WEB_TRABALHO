@@ -49,6 +49,10 @@ const State = {
 
     if (error) {
       console.error('[State] Erro ao salvar perfil:', error);
+      // Exibe aviso ao usuário se o Layout estiver disponível
+      if (typeof Layout !== 'undefined' && Layout.showToast) {
+        Layout.showToast('Erro ao salvar perfil. Verifique sua conexão.', 'error');
+      }
     }
   },
 

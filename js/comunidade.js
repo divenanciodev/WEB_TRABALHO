@@ -39,10 +39,11 @@ async function syncCurrentUserProfile() {
   const user = State.getCurrentUser();
   if (!user) return;
   
+  // CORREÇÃO: apenas atualiza os ícones visuais na página.
+  // Removida a chamada a State.setCurrentUser(user) que sobrescrevia
+  // foto_perfil e capa_perfil no banco com dados potencialmente incompletos
+  // do cache local.
   updateAllProfileIcons(user);
-
-  // Atualizar State se necessário
-  await State.setCurrentUser(user);
 }
 
 function updateAllProfileIcons(user) {
@@ -67,7 +68,11 @@ function updateAllProfileIcons(user) {
     img.src = avatarUrl;
   });
 
-  // 5. Atualizar o cache de membros
+  // 5. CORREÇÃO: Avatar do modal de comentários
+  const commentAvatar = document.getElementById('comment-avatar');
+  if (commentAvatar) commentAvatar.src = avatarUrl;
+
+  // 6. Atualizar o cache de membros
   if (allMembers && allMembers.length > 0) {
     const memberIndex = allMembers.findIndex(m => m.email === user.email);
     if (memberIndex !== -1) {
@@ -94,12 +99,17 @@ async function loadMembers() {
   renderMembers();
   const countEl = document.getElementById('members-count');
   if (countEl) countEl.textContent = allMembers.length > 0 ? `(${allMembers.length})` : '';
+
+  // Atualizar widget Membras Ativas após carregar membros
+  updateSidebarWidgets();
 }
 
 async function loadPosts() {
   allPosts = await State.getPosts();
   allPosts = allPosts.map(p => ({ ...p, time: p.time || formatPostTime(p.createdAt) }));
   renderFeed();
+  // Atualizar widget Trending após carregar posts
+  updateSidebarWidgets();
 }
 
 async function loadCommunityLinks() {
@@ -167,6 +177,12 @@ function switchTab(tab) {
       btn.setAttribute('aria-selected', String(isActive));
     }
   });
+
+  // CORREÇÃO: garantir que os widgets da sidebar apareçam apenas na aba feed
+  // e atualizar sempre que a aba feed é exibida
+  if (tab === 'feed') {
+    updateSidebarWidgets();
+  }
 }
 
 function renderFeed(posts) {
@@ -804,6 +820,13 @@ async function openComments(postId) {
 
   list.innerHTML = '<p style="text-align:center;padding:20px;color:var(--gray-500);">Carregando comentários...</p>';
   if (input) input.value = '';
+
+  // CORREÇÃO: atualiza o avatar do modal de comentários com a foto do usuário logado
+  const user = State.getCurrentUser();
+  const commentAvatar = document.getElementById('comment-avatar');
+  if (commentAvatar && user) {
+    commentAvatar.src = user.foto_perfil || 'assets/avatars/avatar.svg';
+  }
   
   openModal('comments-modal');
 
@@ -1027,4 +1050,101 @@ function copyLinkToClipboard(url) {
     console.error('Erro ao copiar:', err);
     showToast('Erro ao copiar link.', 'error');
   });
+}
+/* ============================================
+   WIDGETS DA SIDEBAR: Trending e Membras Ativas
+   ============================================ */
+
+/**
+ * Renderiza o widget "Trending na SheTech" na sidebar do feed.
+ * Extrai hashtags dos posts e mostra as mais populares.
+ */
+function renderTrendingWidget() {
+  const container = document.getElementById('trending-widget-content');
+  if (!container) return;
+
+  // Extrair hashtags de todos os posts
+  const hashtagMap = {};
+  allPosts.forEach(post => {
+    const text = post.text || '';
+    const matches = text.match(/#(\w+)/g);
+    if (matches) {
+      matches.forEach(tag => {
+        const cleaned = tag.toLowerCase();
+        hashtagMap[cleaned] = { display: tag, count: (hashtagMap[cleaned]?.count || 0) + 1 };
+      });
+    }
+  });
+
+  // Ordenar por popularidade e pegar top 5
+  const trending = Object.values(hashtagMap)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  if (trending.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 16px 8px; text-align: center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" style="width:28px;height:28px;margin-bottom:8px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        <p style="color:var(--gray-500);font-size:13px;margin:0;">Nenhuma tendência ainda.<br>Compartilhe algo para começar!</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = trending.map((item, i) => `
+    <div class="trending-item" style="display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:8px;cursor:pointer;transition:background 0.2s;">
+      <span class="trending-rank" style="font-size:13px;font-weight:700;color:var(--pink);width:20px;text-align:center;">${i + 1}</span>
+      <div style="flex:1;min-width:0;">
+        <span class="trending-tag" style="font-size:13px;font-weight:600;color:var(--brand);">${item.display}</span>
+        <div class="trending-count" style="font-size:11px;color:var(--gray-500);">${item.count} ${item.count === 1 ? 'post' : 'posts'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/**
+ * Renderiza o widget "Membras Ativas" na sidebar do feed.
+ * Mostra os membros mais recentes e seus perfis.
+ */
+function renderActiveMembersWidget() {
+  const container = document.getElementById('active-members-content');
+  if (!container) return;
+
+  if (!allMembers || allMembers.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--gray-500);padding:10px;">Nenhum membro encontrado.</p>';
+    return;
+  }
+
+  // Pegar até 5 membros (excluindo o usuário atual)
+  const currentUser = State.getCurrentUser();
+  const membersToShow = allMembers
+    .filter(m => currentUser ? m.email !== currentUser.email : true)
+    .slice(0, 5);
+
+  if (membersToShow.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--gray-500);padding:10px;">Seja a primeira membras a aparecer!</p>';
+    return;
+  }
+
+  container.innerHTML = membersToShow.map(m => `
+    <div class="active-member" style="display:flex;align-items:center;gap:9px;padding:8px;border-radius:8px;cursor:pointer;transition:background 0.2s;" onclick="viewProfile('${m.id}')">
+      <div class="member-thumb-wrap" style="position:relative;flex-shrink:0;">
+        <img src="${m.avatar || 'assets/avatars/avatar.svg'}" alt="${m.name}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #fff;display:block;" />
+        ${m.online ? '<span class="online-indicator" style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#10B981;border:2px solid var(--surface);"></span>' : ''}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <span class="active-name" style="display:block;font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</span>
+        <span class="active-role" style="font-size:11px;color:var(--gray-500);">${m.role || 'Membro'}</span>
+      </div>
+      <button class="follow-mini-btn" onclick="event.stopPropagation(); followMember('${m.id}', this)">Seguir</button>
+    </div>
+  `).join('');
+}
+
+/**
+ * Atualiza ambos os widgets da sidebar.
+ * Chama-se após carregar posts e membros.
+ */
+function updateSidebarWidgets() {
+  renderTrendingWidget();
+  renderActiveMembersWidget();
 }

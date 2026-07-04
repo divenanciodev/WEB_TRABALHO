@@ -114,6 +114,42 @@ function subscribeToTable(table, callback, filter = '*') {
   };
 }
 
+/**
+ * CORREÇÃO: Comprime imagem Base64 para reduzir o tamanho antes de salvar no banco.
+ * Imagens grandes (próximas de 2 MB) em Base64 ficam com ~2,7 MB de texto,
+ * podendo causar falha silenciosa no upsert do Supabase.
+ * Esta função redimensiona e recomprime para no máximo ~300 KB de Base64.
+ */
+async function compressImageBase64(base64String, maxWidth = 800, quality = 0.75) {
+  if (!base64String || !base64String.startsWith('data:image')) return base64String;
+
+  // Se já for pequena (menos de 400 KB em base64), não comprime
+  if (base64String.length < 400 * 1024) return base64String;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const compressed = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressed);
+    };
+    img.onerror = () => resolve(base64String);
+    img.src = base64String;
+  });
+}
+
 window.SupabaseAuth = {
   client: supabaseClient,
   ready: authReady,
@@ -155,8 +191,15 @@ window.SupabaseAuth = {
   async upsertProfile(profile) {
     if (!supabaseClient) return { error: { message: 'Cliente indisponível' } };
 
+    // CORREÇÃO: comprime as imagens antes de salvar para evitar falha silenciosa
+    // por payload muito grande no upsert do Supabase.
+    const fotoComprimida = await compressImageBase64(profile.foto_perfil || '');
+    const capaComprimida = await compressImageBase64(profile.capa_perfil || '');
+
     const payload = {
       ...profile,
+      foto_perfil: fotoComprimida,
+      capa_perfil: capaComprimida,
       updatedAt: new Date().toISOString()
     };
 
@@ -164,7 +207,14 @@ window.SupabaseAuth = {
       .from('users')
       .upsert(payload, { onConflict: 'id' });
 
-    if (!error) await refreshProfile();
+    if (error) {
+      console.error('[Supabase] Erro no upsert do perfil:', error);
+    } else {
+      // CORREÇÃO: após salvar com sucesso, atualiza o cache local com os dados
+      // recém-salvos (incluindo as imagens comprimidas), garantindo consistência.
+      await refreshProfile();
+    }
+
     return { error };
   }
 };

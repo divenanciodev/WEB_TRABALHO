@@ -154,17 +154,12 @@
           <aside class="feed-sidebar">
             <div class="widget card">
               <h3 class="widget-title">Trending na SheTech</h3>
-              <div style="padding: 8px 0; color: var(--gray-600); font-size: 14px;">
-                Nenhuma tendência registrada ainda.
-              </div>
+              <div id="trending-widget-content"></div>
             </div>
 
             <div class="widget card">
               <h3 class="widget-title">Membras ativas</h3>
-              <div class="active-members">
-                <!-- Populando via JS em tempo real -->
-                <p style="font-size:12px;color:var(--gray-500);padding:10px;">Carregando membras...</p>
-              </div>
+              <div class="active-members" id="active-members-content"></div>
             </div>
           </aside>
         </div>
@@ -377,7 +372,7 @@
       </div>
       <div id="comments-list" class="comments-list"></div>
       <div class="comment-input-wrap">
-        <img src="assets/avatars/avatar.svg" alt="Você" class="comment-avatar" />
+        <img id="comment-avatar" src="assets/avatars/avatar.svg" alt="Você" class="comment-avatar" />
         <input type="text" id="comment-input" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter') submitComment()" />
         <button class="comment-send" onclick="submitComment()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>

@@ -115,7 +115,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Layout.init({ active: 'dashboard' });
     }
 
-    await State.setCurrentUser(user);
+    // CORREÇÃO: removida chamada desnecessária a setCurrentUser no carregamento
+    // do dashboard, que sobrescrevia foto_perfil e capa_perfil com dados do cache
+    // possivelmente incompletos (sem buscar o perfil atualizado do banco).
     renderWelcome();
     dummyStreak();
     await updateDashboardStats();

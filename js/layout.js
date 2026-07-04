@@ -65,6 +65,10 @@ const Layout = {
         const avatarUrl = user.foto_perfil || `assets/avatars/avatar.svg`;
 
         if (avatar) avatar.src = avatarUrl;
+
+        // CORREÇÃO: atualizar avatar do modal de comentários (se existir na página)
+        const commentAvatar = document.getElementById('comment-avatar');
+        if (commentAvatar) commentAvatar.src = avatarUrl;
         
         // Atualizar todos os avatares do usuário na página atual
         const userIdClass = `user-avatar-${user.id || user.email.replace(/[^a-zA-Z0-9]/g, '')}`;

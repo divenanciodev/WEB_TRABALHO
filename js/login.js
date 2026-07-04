@@ -12,8 +12,11 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       return;
     }
 
-    const profile = window.SupabaseAuth.buildUserProfile(data.user);
-    await State.setCurrentUser(profile);
+    // CORREÇÃO: após o signIn, o refreshProfile já foi chamado internamente
+    // e o cachedProfile já contém os dados do banco (foto_perfil, capa_perfil etc.).
+    // NÃO chamamos setCurrentUser aqui para não sobrescrever o banco com dados
+    // incompletos vindos apenas do user_metadata do Auth.
+    // O perfil em cache já está atualizado pelo refreshProfile dentro de signIn.
 
     window.location.href = 'dashboard.html';
   } catch (err) {

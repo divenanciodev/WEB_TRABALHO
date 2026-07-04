@@ -70,16 +70,49 @@ function setImg(id, src) {
     if (el) el.src = src;
 }
 
+/* ─── COMPRESSÃO DE IMAGEM ────────────────────────────── */
+/**
+ * Comprime uma imagem Base64 para reduzir o tamanho antes de salvar.
+ * Redimensiona para no máximo maxWidth px e recomprime em JPEG.
+ */
+function compressImage(base64String, maxWidth = 800, quality = 0.75) {
+    return new Promise((resolve) => {
+        if (!base64String || !base64String.startsWith('data:image')) {
+            resolve(base64String);
+            return;
+        }
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let { width, height } = img;
+            if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(base64String);
+        img.src = base64String;
+    });
+}
+
 /* ─── UPLOADS ────────────────────────────────────────── */
 document.getElementById('avatar-upload').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-        Layout.showToast('Imagem muito grande. Máx. 2 MB.'); return;
+    if (file.size > 5 * 1024 * 1024) {
+        Layout.showToast('Imagem muito grande. Máx. 5 MB.'); return;
     }
     const reader = new FileReader();
-    reader.onload = (ev) => {
-        currentAvatar = ev.target.result;
+    reader.onload = async (ev) => {
+        // CORREÇÃO: comprime a imagem antes de armazenar para evitar
+        // falha silenciosa no Supabase por payload muito grande.
+        const compressed = await compressImage(ev.target.result, 800, 0.8);
+        currentAvatar = compressed;
         setImg('edit-avatar-preview', currentAvatar);
         setImg('preview-avatar-img',  currentAvatar);
     };
@@ -89,12 +122,14 @@ document.getElementById('avatar-upload').addEventListener('change', (e) => {
 document.getElementById('cover-upload').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-        Layout.showToast('Imagem muito grande. Máx. 2 MB.'); return;
+    if (file.size > 5 * 1024 * 1024) {
+        Layout.showToast('Imagem muito grande. Máx. 5 MB.'); return;
     }
     const reader = new FileReader();
-    reader.onload = (ev) => {
-        currentCover = ev.target.result;
+    reader.onload = async (ev) => {
+        // CORREÇÃO: comprime a imagem de capa antes de armazenar.
+        const compressed = await compressImage(ev.target.result, 1200, 0.8);
+        currentCover = compressed;
         const coverImg = document.getElementById('edit-cover-preview');
         if (coverImg) {
             coverImg.src = currentCover;
@@ -279,6 +314,13 @@ document.getElementById('edit-profile-form').addEventListener('submit', async (e
         finalArea = customAreaInput.value.trim();
     }
 
+    // Desabilitar botão durante o salvamento para evitar duplo clique
+    const submitBtn = document.querySelector('[form="edit-profile-form"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Salvando...';
+    }
+
     const updatedUser = {
         ...user,
         nome_completo: document.getElementById('edit-name')?.value.trim(),
@@ -297,6 +339,13 @@ document.getElementById('edit-profile-form').addEventListener('submit', async (e
     };
 
     await State.setCurrentUser(updatedUser);
+
+    // Reabilitar botão em caso de erro
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="icon-check"></i> Salvar Alterações';
+    }
+
     Layout.showToast('Perfil atualizado com sucesso! ✨');
     setTimeout(() => window.location.href = 'perfil.html', 1100);
 });
