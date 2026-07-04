@@ -65,6 +65,12 @@ const Layout = {
         const avatarUrl = user.foto_perfil || `assets/avatars/avatar.svg`;
 
         if (avatar) avatar.src = avatarUrl;
+        
+        // Atualizar todos os avatares do usuário na página atual
+        const userIdClass = `user-avatar-${user.id || user.email.replace(/[^a-zA-Z0-9]/g, '')}`;
+        document.querySelectorAll(`.${userIdClass}`).forEach(img => {
+            img.src = avatarUrl;
+        });
         const firstName = user.nome_completo.split(' ')[0];
         if (name) name.innerText = `Olá, ${firstName}`;
         if (welcomeName) welcomeName.innerText = firstName;

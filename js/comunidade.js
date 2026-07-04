@@ -38,7 +38,43 @@ function formatPostTime(createdAt) {
 async function syncCurrentUserProfile() {
   const user = State.getCurrentUser();
   if (!user) return;
+  
+  updateAllProfileIcons(user);
+
+  // Atualizar State se necessário
   await State.setCurrentUser(user);
+}
+
+function updateAllProfileIcons(user) {
+  if (!user) return;
+  const avatarUrl = user.foto_perfil || 'assets/avatars/avatar.svg';
+  const userIdClass = `user-avatar-${user.id || user.email.replace(/[^a-zA-Z0-9]/g, '')}`;
+  
+  // 1. Avatar do composer
+  const composerAvatar = document.querySelector('.composer-avatar');
+  if (composerAvatar) composerAvatar.src = avatarUrl;
+  
+  // 2. Avatar na topbar
+  const topAvatar = document.getElementById('top-avatar');
+  if (topAvatar) topAvatar.src = avatarUrl;
+
+  // 3. Avatar na sidebar
+  const sidebarAvatar = document.querySelector('.sidebar-user img');
+  if (sidebarAvatar) sidebarAvatar.src = avatarUrl;
+
+  // 4. Avatares em posts e comentários (global por classe)
+  document.querySelectorAll(`.${userIdClass}`).forEach(img => {
+    img.src = avatarUrl;
+  });
+
+  // 5. Atualizar o cache de membros
+  if (allMembers && allMembers.length > 0) {
+    const memberIndex = allMembers.findIndex(m => m.email === user.email);
+    if (memberIndex !== -1) {
+      allMembers[memberIndex].avatar = avatarUrl;
+      if (currentTab === 'members') renderMembers();
+    }
+  }
 }
 
 async function loadMembers() {
@@ -86,7 +122,11 @@ function setupRealtime() {
   unsubscribeFns.push(
     State.subscribe('posts', () => loadPosts()),
     State.subscribe('community_links', () => loadCommunityLinks()),
-    State.subscribe('users', () => loadMembers()),
+    State.subscribe('users', async () => {
+      await loadMembers();
+      const user = State.getCurrentUser();
+      if (user) updateAllProfileIcons(user);
+    }),
     State.subscribe('comments', () => {
       if (currentCommentsPostId) {
         State.getComments(currentCommentsPostId).then(renderComments);
@@ -145,9 +185,9 @@ function postHTML(post) {
   const isOwner = user && (post.author_email === user.email || post.author_id === user.id);
   const text = escapeHTML(post.text).replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
   return `
-  <div class="post-card" id="post-${post.id}">
+  <div class="post-card" id="post-${post.id}" data-author-email="${post.author_email}">
     <div class="post-header">
-      <img src="${post.avatar}" alt="${post.author}" class="post-avatar" />
+      <img src="${post.avatar}" alt="${post.author}" class="post-avatar user-avatar-${post.author_id || post.author_email.replace(/[^a-zA-Z0-9]/g, '')}" />
       <div class="post-meta">
         <div class="post-author">${post.author}</div>
         <div class="post-info">
@@ -773,8 +813,8 @@ function renderComments(comments) {
   list.innerHTML = comments.map(c => {
     const isOwner = currentUser && (c.author_email === currentUser.email || c.author_id === currentUser.id);
     return `
-      <div class="comment-item" id="comment-${c.id}">
-        <img src="${c.avatar || 'assets/avatars/avatar.svg'}" alt="${c.author}" class="comment-avatar" />
+      <div class="comment-item" id="comment-${c.id}" data-author-email="${c.author_email}">
+        <img src="${c.avatar || 'assets/avatars/avatar.svg'}" alt="${c.author}" class="comment-avatar user-avatar-${c.author_id || c.author_email.replace(/[^a-zA-Z0-9]/g, '')}" />
         <div class="comment-content">
           <div class="comment-bubble">
             <div class="comment-author">${c.author}</div>
@@ -836,27 +876,39 @@ async function submitComment() {
   }
 }
 
-async function confirmDeleteComment(commentId, postId) {
-  if (!confirm('Deseja excluir seu comentário?')) return;
+function confirmDeleteComment(commentId, postId) {
+  const modal = document.getElementById('confirm-delete-modal');
+  const confirmBtn = document.getElementById('confirm-delete-btn');
+  
+  openModal('confirm-delete-modal');
+  
+  confirmBtn.onclick = async () => {
+    try {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Excluindo...';
+      
+      await State.deleteComment(commentId);
+      
+      // Atualizar contador
+      const post = allPosts.find(p => p.id === postId);
+      if (post) {
+        post.comments = Math.max(0, (post.comments || 0) - 1);
+        await State.savePost(post);
+        const countEl = document.querySelector(`#post-${post.id} .reaction-btn:nth-child(2) span`);
+        if (countEl) countEl.textContent = post.comments;
+      }
 
-  try {
-    await State.deleteComment(commentId);
-    
-    // Atualizar contador
-    const post = allPosts.find(p => p.id === postId);
-    if (post) {
-      post.comments = Math.max(0, (post.comments || 0) - 1);
-      await State.savePost(post);
-      const countEl = document.querySelector(`#post-${post.id} .reaction-btn:nth-child(2) span`);
-      if (countEl) countEl.textContent = post.comments;
+      const updatedComments = await State.getComments(postId);
+      renderComments(updatedComments);
+      showToast('Comentário excluído.', 'success');
+      closeModal('confirm-delete-modal');
+    } catch (err) {
+      showToast('Erro ao excluir comentário.', 'error');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Excluir';
     }
-
-    const updatedComments = await State.getComments(postId);
-    renderComments(updatedComments);
-    showToast('Comentário excluído.', 'success');
-  } catch (err) {
-    showToast('Erro ao excluir comentário.', 'error');
-  }
+  };
 }
 function sharePost(id) {
   const post = allPosts.find(p => p.id === id);
