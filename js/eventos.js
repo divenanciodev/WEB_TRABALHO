@@ -201,7 +201,7 @@
               const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
               const icon = isSubscribed ? 'check' : 'user-plus';
               const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-              return \`<button class="\${btnClass}" onclick="event.stopPropagation(); window.toggleEventSubscription('\${ev.id}')" style="cursor:pointer; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:500; border:1px solid var(--primary); background: \${isSubscribed ? 'var(--primary)' : 'transparent'}; color: \${isSubscribed ? '#fff' : 'var(--primary)'}"><i class="icon-\${icon}"></i> \${text}</button>\`;
+              return \`<button class="\${btnClass}" onclick="event.stopPropagation(); window.toggleEventSubscription('\${ev.id}')"><i class="icon-\${icon}"></i> \${text}</button>\`;
             }
             return '';
           })()}

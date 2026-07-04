@@ -131,7 +131,7 @@
       const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
       const icon = isSubscribed ? 'check' : 'user-plus';
       const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-      subscribeBtn = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')" style="cursor:pointer; border:1px solid var(--primary); background: ${isSubscribed ? 'var(--primary)' : 'transparent'}; color: ${isSubscribed ? '#fff' : 'var(--primary)'}"><i class="icon-${icon}"></i> ${text}</button>`;
+      subscribeBtn = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')"><i class="icon-${icon}"></i> ${text}</button>`;
       linkBtns.push(subscribeBtn);
     }
     

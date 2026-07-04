@@ -433,7 +433,7 @@ window.toggleProjectSubscription = async (projectId) => {
   const client = State._client();
   if (!client) return false;
 
-  const { data: project, error: fetchError } = await client.from('shetech_projetos').select('membros, author_id').eq('id', projectId).single();
+  const { data: project, error: fetchError } = await client.from('shetech_projetos').select('membros, author_id, author_email, titulo').eq('id', projectId).single();
   if (fetchError || !project) {
     if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao buscar projeto.', 'error');
     return false;
@@ -444,26 +444,55 @@ window.toggleProjectSubscription = async (projectId) => {
   }
 
   let membros = Array.isArray(project.membros) ? project.membros : [];
-  let isSubscribed = false;
   if (membros.includes(user.id)) {
     membros = membros.filter(m => m !== user.id);
+    const { error: updateError } = await client.from('shetech_projetos').update({ membros }).eq('id', projectId);
+    if (updateError) {
+      if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao cancelar inscrição.', 'error');
+      return false;
+    }
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Inscrição cancelada.', 'success');
   } else {
-    membros.push(user.id);
-    isSubscribed = true;
+    // Send request via notification
+    const reqMsg = `A usuária <strong>${user.nome_completo || user.nome_usuario || user.email}</strong> solicitou inscrição no seu projeto <strong>${project.titulo || 'Projeto'}</strong>.<br><br><div style="display:flex;gap:8px;" class="request-actions"><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;border-radius:6px;cursor:pointer;border:none;color:#fff;" onclick="window.acceptProjectRequest('${projectId}', '${user.id}', this)">Aceitar</button><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:6px;border:1px solid var(--gray-300);background:transparent;cursor:pointer;" onclick="window.denyProjectRequest(this)">Negar</button></div>`;
+    
+    await State.addNotification(project.author_email, reqMsg);
+    
+    if (typeof Layout !== 'undefined' && Layout.showSuccessModal) {
+      Layout.showSuccessModal('Solicitação Enviada!', 'O criador do projeto receberá uma notificação para aprovar a sua participação.');
+    }
   }
 
-  const { error: updateError } = await client.from('shetech_projetos').update({ membros }).eq('id', projectId);
-  if (updateError) {
-    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao atualizar inscrição.', 'error');
-    return false;
-  }
-
-  if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast(isSubscribed ? 'Inscrição realizada!' : 'Inscrição cancelada.', 'success');
-  
   if (typeof window.renderProjects === 'function') window.renderProjects();
   if (typeof window.renderFeaturedProjects === 'function') window.renderFeaturedProjects();
   if (typeof window.renderCreatorStats === 'function') window.renderCreatorStats();
   return true;
+};
+
+window.acceptProjectRequest = async (projectId, userId, btnEl) => {
+  const client = State._client();
+  if (!client) return;
+
+  const { data: project } = await client.from('shetech_projetos').select('membros').eq('id', projectId).single();
+  if (project) {
+    let membros = Array.isArray(project.membros) ? project.membros : [];
+    if (!membros.includes(userId)) {
+      membros.push(userId);
+      await client.from('shetech_projetos').update({ membros }).eq('id', projectId);
+    }
+  }
+
+  const actionsDiv = btnEl.closest('.request-actions');
+  if (actionsDiv) {
+    actionsDiv.innerHTML = '<span style="color:var(--success);font-weight:500;"><i class="icon-check-circle"></i> Solicitação Aceita</span>';
+  }
+};
+
+window.denyProjectRequest = (btnEl) => {
+  const actionsDiv = btnEl.closest('.request-actions');
+  if (actionsDiv) {
+    actionsDiv.innerHTML = '<span style="color:var(--danger);font-weight:500;"><i class="icon-x-circle"></i> Solicitação Recusada</span>';
+  }
 };
 
 window.toggleEventSubscription = async (eventId) => {
