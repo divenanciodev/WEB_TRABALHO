@@ -565,6 +565,7 @@ function closeModal(id) {
 }
 
 let editingPostId = null;
+let editingPostLink = null;
 
 function togglePostMenu(id, event) {
   event.stopPropagation();
@@ -588,20 +589,104 @@ function openEditPost(id) {
   if (!post) return;
   
   editingPostId = id;
+  editingPostLink = post.link ? { ...post.link } : null;
+  
   const modal = document.getElementById('edit-post-modal');
   const textArea = document.getElementById('edit-post-text');
   const mediaPreview = document.getElementById('edit-post-media-preview');
   const previewImg = document.getElementById('edit-preview-img');
+  const linkInfo = document.getElementById('edit-post-link-info');
+  const linkTitle = document.getElementById('edit-link-title');
+  const linkUrl = document.getElementById('edit-link-url');
   
   textArea.value = post.text;
+  
   if (post.image) {
     previewImg.src = post.image;
     mediaPreview.style.display = 'block';
+    document.getElementById('remove-image-btn').style.display = 'block';
   } else {
+    previewImg.src = '';
     mediaPreview.style.display = 'none';
+    document.getElementById('remove-image-btn').style.display = 'none';
+  }
+
+  if (editingPostLink) {
+    linkTitle.textContent = editingPostLink.title;
+    linkUrl.textContent = editingPostLink.url;
+    linkInfo.style.display = 'block';
+    document.getElementById('remove-link-btn').style.display = 'block';
+  } else {
+    linkInfo.style.display = 'none';
+    document.getElementById('remove-link-btn').style.display = 'none';
   }
   
   openModal('edit-post-modal');
+}
+
+function previewEditMedia(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('edit-preview-img').src = ev.target.result;
+    document.getElementById('edit-post-media-preview').style.display = 'block';
+    document.getElementById('remove-image-btn').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearEditMedia() {
+  document.getElementById('edit-post-media-preview').style.display = 'none';
+  document.getElementById('edit-preview-img').src = '';
+  document.getElementById('edit-post-file').value = '';
+  document.getElementById('remove-image-btn').style.display = 'none';
+}
+
+function removeEditLink() {
+  editingPostLink = null;
+  document.getElementById('edit-post-link-info').style.display = 'none';
+  document.getElementById('remove-link-btn').style.display = 'none';
+  showToast('Link removido do rascunho.', '');
+}
+
+function promptReplaceLink() {
+  if (typeof Layout !== 'undefined' && Layout.showSuccessModal) {
+    Layout.showSuccessModal('Substituir Link', 'Você deseja alterar o link desta postagem? Clique em continuar para abrir o formulário.', () => {
+      // Abrir o novo modal personalizado
+      document.getElementById('replace-link-title').value = editingPostLink ? editingPostLink.title : '';
+      document.getElementById('replace-link-url').value = editingPostLink ? editingPostLink.url : '';
+      openModal('replace-link-modal');
+    });
+  } else {
+    // Fallback básico se o Layout falhar
+    const url = prompt('URL:', editingPostLink ? editingPostLink.url : '');
+    if (url) confirmReplaceLinkManual(url);
+  }
+}
+
+function confirmReplaceLink(event) {
+  event.preventDefault();
+  const title = document.getElementById('replace-link-title').value.trim();
+  const url = document.getElementById('replace-link-url').value.trim();
+  
+  if (!title || !url) return;
+
+  editingPostLink = {
+    title: title,
+    url: url,
+    desc: editingPostLink ? editingPostLink.desc : '',
+    destaque: editingPostLink ? editingPostLink.destaque : true
+  };
+
+  const linkInfo = document.getElementById('edit-post-link-info');
+  document.getElementById('edit-link-title').textContent = title;
+  document.getElementById('edit-link-url').textContent = url;
+  linkInfo.style.display = 'block';
+  document.getElementById('remove-link-btn').style.display = 'block';
+  
+  closeModal('replace-link-modal');
+  showToast('Link atualizado! ✨', 'success');
 }
 
 async function updatePost(event) {
@@ -614,7 +699,12 @@ async function updatePost(event) {
   const post = allPosts.find(p => p.id === editingPostId);
   if (!post) return;
   
+  const hasImg = document.getElementById('edit-post-media-preview').style.display !== 'none';
+  const imgEl = document.getElementById('edit-preview-img');
+  
   post.text = text;
+  post.image = hasImg ? imgEl.src : null;
+  post.link = editingPostLink;
   post.updatedAt = new Date().toISOString();
   
   try {
@@ -622,6 +712,7 @@ async function updatePost(event) {
     showToast('Postagem atualizada! ✨', 'success');
     closeModal('edit-post-modal');
     editingPostId = null;
+    editingPostLink = null;
     loadPosts();
   } catch (err) {
     showToast('Erro ao atualizar postagem.', 'error');
