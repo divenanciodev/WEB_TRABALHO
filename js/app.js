@@ -174,6 +174,32 @@ const State = {
     return this.saveRow('posts', post);
   },
 
+  async getComments(postId) {
+    const client = this._client();
+    if (!client) return [];
+
+    const { data, error } = await client
+      .from('comments')
+      .select('*')
+      .eq('post_id', postId)
+      .order('createdAt', { ascending: true });
+
+    if (error) {
+      console.error('[State] Erro ao buscar comentários:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async saveComment(comment) {
+    return this.saveRow('comments', comment);
+  },
+
+  async deleteComment(id) {
+    return this.deleteRow('comments', id);
+  },
+
   async saveCommunityLink(link) {
     return this.saveRow('community_links', link);
   },

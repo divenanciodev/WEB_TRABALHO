@@ -86,7 +86,12 @@ function setupRealtime() {
   unsubscribeFns.push(
     State.subscribe('posts', () => loadPosts()),
     State.subscribe('community_links', () => loadCommunityLinks()),
-    State.subscribe('users', () => loadMembers())
+    State.subscribe('users', () => loadMembers()),
+    State.subscribe('comments', () => {
+      if (currentCommentsPostId) {
+        State.getComments(currentCommentsPostId).then(renderComments);
+      }
+    })
   );
 }
 
@@ -731,7 +736,128 @@ async function confirmDeletePost(id) {
   }
 }
 function linkMenu(id) { showToast('Menu de opções do link #' + id, ''); }
-function openComments(id) { showToast('Comentários do post #' + id, ''); }
+let currentCommentsPostId = null;
+
+async function openComments(postId) {
+  currentCommentsPostId = postId;
+  const modal = document.getElementById('comments-modal');
+  const list = document.getElementById('comments-list');
+  const input = document.getElementById('comment-input');
+  
+  if (!modal || !list) return;
+
+  list.innerHTML = '<p style="text-align:center;padding:20px;color:var(--gray-500);">Carregando comentários...</p>';
+  if (input) input.value = '';
+  
+  openModal('comments-modal');
+
+  try {
+    const comments = await State.getComments(postId);
+    renderComments(comments);
+  } catch (err) {
+    list.innerHTML = '<p style="text-align:center;padding:20px;color:var(--pink);">Erro ao carregar comentários.</p>';
+  }
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('comments-list');
+  if (!list) return;
+
+  if (!comments || comments.length === 0) {
+    list.innerHTML = '<p style="text-align:center;padding:40px 20px;color:var(--gray-400);font-size:14px;">Nenhum comentário ainda. Seja a primeira a comentar!</p>';
+    return;
+  }
+
+  const currentUser = State.getCurrentUser();
+
+  list.innerHTML = comments.map(c => {
+    const isOwner = currentUser && (c.author_email === currentUser.email || c.author_id === currentUser.id);
+    return `
+      <div class="comment-item" id="comment-${c.id}">
+        <img src="${c.avatar || 'assets/avatars/avatar.svg'}" alt="${c.author}" class="comment-avatar" />
+        <div class="comment-content">
+          <div class="comment-bubble">
+            <div class="comment-author">${c.author}</div>
+            <div class="comment-text">${escapeHTML(c.text)}</div>
+          </div>
+          <div class="comment-footer">
+            <span class="comment-time">${formatPostTime(c.createdAt)}</span>
+            ${isOwner ? `<button class="comment-delete-btn" onclick="confirmDeleteComment(${c.id}, ${c.post_id})">Excluir</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Scroll para o final
+  list.scrollTop = list.scrollHeight;
+}
+
+async function submitComment() {
+  if (!currentCommentsPostId) return;
+  
+  const input = document.getElementById('comment-input');
+  const text = input.value.trim();
+  
+  if (!text) return;
+
+  const user = State.getCurrentUser();
+  const comment = {
+    id: Date.now(),
+    post_id: currentCommentsPostId,
+    author: user ? user.nome_completo : 'Membro SheTech',
+    author_id: user ? user.id : null,
+    author_email: user ? user.email : null,
+    avatar: user ? (user.foto_perfil || 'assets/avatars/avatar.svg') : 'assets/avatars/avatar.svg',
+    text: text,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    input.value = '';
+    await State.saveComment(comment);
+    
+    // Atualizar contador de comentários no post
+    const post = allPosts.find(p => p.id === currentCommentsPostId);
+    if (post) {
+      post.comments = (post.comments || 0) + 1;
+      await State.savePost(post);
+      // Não precisa recarregar tudo, apenas atualizar a UI do post se visível
+      const countEl = document.querySelector(`#post-${post.id} .reaction-btn:nth-child(2) span`);
+      if (countEl) countEl.textContent = post.comments;
+    }
+
+    // Recarregar comentários
+    const updatedComments = await State.getComments(currentCommentsPostId);
+    renderComments(updatedComments);
+    
+  } catch (err) {
+    showToast('Erro ao enviar comentário.', 'error');
+  }
+}
+
+async function confirmDeleteComment(commentId, postId) {
+  if (!confirm('Deseja excluir seu comentário?')) return;
+
+  try {
+    await State.deleteComment(commentId);
+    
+    // Atualizar contador
+    const post = allPosts.find(p => p.id === postId);
+    if (post) {
+      post.comments = Math.max(0, (post.comments || 0) - 1);
+      await State.savePost(post);
+      const countEl = document.querySelector(`#post-${post.id} .reaction-btn:nth-child(2) span`);
+      if (countEl) countEl.textContent = post.comments;
+    }
+
+    const updatedComments = await State.getComments(postId);
+    renderComments(updatedComments);
+    showToast('Comentário excluído.', 'success');
+  } catch (err) {
+    showToast('Erro ao excluir comentário.', 'error');
+  }
+}
 function sharePost(id) {
   const post = allPosts.find(p => p.id === id);
   if (!post) return;
