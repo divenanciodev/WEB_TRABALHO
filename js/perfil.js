@@ -49,6 +49,7 @@ function loadUserData() {
     const coverBg = document.getElementById('profile-cover-bg');
     if (coverBg && user.capa_perfil) {
         coverBg.style.backgroundImage = `url(${user.capa_perfil})`;
+        coverBg.classList.add('has-image');
     }
 
     const aboutText = document.getElementById('profile-about-text');

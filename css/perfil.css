@@ -21,6 +21,12 @@
   inset: 0;
   background: linear-gradient(135deg, #ff3d8b 0%, #ff7ab0 55%, #ffb6d1 100%);
   opacity: .85;
+  transition: opacity .3s ease;
+}
+
+/* Quando a capa tem imagem, o overlay fica mais sutil para não esconder a foto */
+.profile-cover.has-image .cover-gradient {
+  opacity: .15;
 }
 
 /* padrão decorativo sobre o cover */
