@@ -309,6 +309,95 @@ const State = {
 
   subscribe(table, callback) {
     return window.SupabaseAuth?.subscribeToTable?.(table, callback) || (() => {});
+  },
+
+  // ---------- ANALYTICS GETTERS ----------
+  // 1. Participation timeline (posts, events, projects over time)
+  async getActivityTimeline() {
+    // Fetch all posts, events, projects and aggregate by date (YYYY-MM-DD)
+    const [posts, events, projects] = await Promise.all([
+      this.getPosts(),
+      this.getEvents(),
+      this.getProjects()
+    ]);
+    const map = {};
+    const addEntry = (dateStr, type) => {
+      if (!dateStr) return;
+      const date = dateStr.split('T')[0]; // ensure YYYY-MM-DD
+      if (!map[date]) map[date] = { date, posts: 0, events: 0, projects: 0 };
+      map[date][type]++;
+    };
+    posts.forEach(p => addEntry(p.createdAt || p.time, 'posts'));
+    events.forEach(e => addEntry(e.createdAt || e.data, 'events'));
+    projects.forEach(pr => addEntry(pr.createdAt, 'projects'));
+    // Convert to sorted array
+    return Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
+  },
+
+  // 2. Overall activity distribution (counts of posts, events, projects)
+  async getActivityDistribution() {
+    const [posts, events, projects] = await Promise.all([
+      this.getPosts(),
+      this.getEvents(),
+      this.getProjects()
+    ]);
+    return { posts: posts.length, events: events.length, projects: projects.length };
+  },
+
+  // 3. Participation by category (technology, design, marketing, empreendedorismo)
+  async getCategoryDistribution() {
+    const events = await this.getEvents();
+    const categories = {};
+    events.forEach(ev => {
+      const cat = ev.categoria || 'Geral';
+      categories[cat] = (categories[cat] || 0) + 1;
+    });
+    return categories;
+  },
+
+  // 4. Events per month (Jan, Fev, ...)
+  async getEventsByMonth() {
+    const events = await this.getEvents();
+    const months = {};
+    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    events.forEach(ev => {
+      if (!ev.data) return;
+      const date = new Date(ev.data);
+      if (isNaN(date)) return;
+      const idx = date.getMonth();
+      const name = monthNames[idx];
+      months[name] = (months[name] || 0) + 1;
+    });
+    return months;
+  },
+
+  // 5. Projects status (concluídos vs em andamento)
+  async getProjectStatus() {
+    const projects = await this.getProjects();
+    const status = { concluido: 0, andamento: 0 };
+    projects.forEach(p => {
+      if (p.status?.toLowerCase().includes('concluido')) {
+        status.concluido++;
+      } else {
+        status.andamento++;
+      }
+    });
+    return status;
+  },
+
+  // 6. Technologies usage (count of each technology tag in projects)
+  async getTechUsage() {
+    const projects = await this.getProjects();
+    const techMap = {};
+    projects.forEach(p => {
+      const techArray = p.tecnologias || [];
+      techArray.forEach(t => {
+        const name = typeof t === 'string' ? t : t.name;
+        if (!name) return;
+        techMap[name] = (techMap[name] || 0) + 1;
+      });
+    });
+    return techMap;
   }
 };
 

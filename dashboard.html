@@ -105,6 +105,35 @@
         </div>
       </div>
 
+      <!-- ANÁLISES -->
+      <section id="analytics">
+        <div class="dashboard-grid">
+          <div class="chart-card">
+            <h3><i data-lucide="trending-up"></i> Participação ao longo do tempo</h3>
+            <canvas id="participation-line" width="400" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3><i data-lucide="pie-chart"></i> Distribuição de atividades</h3>
+            <canvas id="activity-pie" width="400" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3><i data-lucide="bar-chart-2"></i> Participação por categoria</h3>
+            <canvas id="category-bar" width="400" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3><i data-lucide="calendar"></i> Eventos por mês</h3>
+            <canvas id="events-month-bar" width="400" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3><i data-lucide="check-square"></i> Projetos concluídos x em andamento</h3>
+            <canvas id="project-status-bar" width="400" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3><i data-lucide="cpu"></i> Tecnologias utilizadas</h3>
+            <canvas id="tech-bar" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </section>
       <!-- LINHA INFERIOR: AVISOS + PROGRESSO DO PERFIL -->
       <div class="bottom-grid">
 
