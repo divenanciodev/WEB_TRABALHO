@@ -87,7 +87,7 @@ O roadmap da SheTech inclui funcionalidades para aumentar o engajamento:
 - [ ] **Chat em Tempo Real:** Integração de mensagens diretas para facilitar a comunicação entre equipes de projetos.
 - [ ] **Gamificação:** Sistema de badges e conquistas para incentivar a participação ativa e o compartilhamento de conhecimento.
 - [ ] **Recomendações por IA:** Sugerir projetos e eventos com base nos interesses e habilidades cadastradas no perfil.
-- [ ] **Melhorar as informações no perfil do usuário mais compativeis com um perfil estilo curricular**
+- [ ] **Melhorar as informações no perfil do usuário mais compativeis com um perfil estilo curricular.
 
 ---
 
