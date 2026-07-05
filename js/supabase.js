@@ -1,6 +1,8 @@
+/* Credenciais públicas do projeto Supabase */
 const SUPABASE_URL = 'https://gkwlqkfkqlzfwnpvkrsn.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ynOV2iudBlbAzL1qVaueRg_0dPZQms-';
 
+/* Inicializa o cliente Supabase com persistência de sessão no navegador */
 const supabaseClient = window.supabase?.createClient
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
@@ -11,12 +13,14 @@ const supabaseClient = window.supabase?.createClient
     })
   : null;
 
+/* Cache do perfil autenticado e promise que resolve quando a auth estiver pronta */
 let cachedProfile = null;
 let authReadyResolve;
 const authReady = new Promise((resolve) => {
   authReadyResolve = resolve;
 });
 
+/* Monta o objeto de perfil unificando dados do Auth e da tabela users */
 function buildUserProfile(user, dbProfile = null) {
   if (!user) return null;
 
@@ -46,6 +50,7 @@ function buildUserProfile(user, dbProfile = null) {
   };
 }
 
+/* Busca o registro completo do usuário na tabela users pelo ID */
 async function fetchDbProfile(userId) {
   if (!supabaseClient || !userId) return null;
 
@@ -63,6 +68,7 @@ async function fetchDbProfile(userId) {
   return data;
 }
 
+/* Atualiza o cache local com os dados mais recentes da sessão e do banco */
 async function refreshProfile() {
   if (!supabaseClient) {
     cachedProfile = null;
@@ -80,6 +86,7 @@ async function refreshProfile() {
   return cachedProfile;
 }
 
+/* Inicializa a autenticação: carrega perfil e escuta mudanças de sessão */
 async function initAuth() {
   if (!supabaseClient) {
     authReadyResolve();
@@ -97,10 +104,12 @@ async function initAuth() {
   return cachedProfile;
 }
 
+/* Retorna o perfil em cache sem acesso ao banco */
 function getCachedProfile() {
   return cachedProfile;
 }
 
+/* Assina mudanças em tempo real de uma tabela via Supabase Realtime */
 function subscribeToTable(table, callback, filter = '*') {
   if (!supabaseClient) return () => {};
 
@@ -114,16 +123,10 @@ function subscribeToTable(table, callback, filter = '*') {
   };
 }
 
-/**
- * CORREÇÃO: Comprime imagem Base64 para reduzir o tamanho antes de salvar no banco.
- * Imagens grandes (próximas de 2 MB) em Base64 ficam com ~2,7 MB de texto,
- * podendo causar falha silenciosa no upsert do Supabase.
- * Esta função redimensiona e recomprime para no máximo ~300 KB de Base64.
- */
+/* Comprime imagem Base64 antes de salvar no banco para evitar payload grande */
 async function compressImageBase64(base64String, maxWidth = 800, quality = 0.75) {
   if (!base64String || !base64String.startsWith('data:image')) return base64String;
 
-  // Se já for pequena (menos de 400 KB em base64), não comprime
   if (base64String.length < 400 * 1024) return base64String;
 
   return new Promise((resolve) => {
@@ -150,6 +153,7 @@ async function compressImageBase64(base64String, maxWidth = 800, quality = 0.75)
   });
 }
 
+/* API pública exposta globalmente para autenticação e operações de perfil */
 window.SupabaseAuth = {
   client: supabaseClient,
   ready: authReady,
@@ -158,6 +162,8 @@ window.SupabaseAuth = {
   getCachedProfile,
   refreshProfile,
   subscribeToTable,
+
+  /* Autentica o usuário com email e senha */
   async signIn(email, password) {
     if (!supabaseClient) {
       return { data: null, error: { message: 'Cliente do Supabase indisponível.' } };
@@ -167,6 +173,8 @@ window.SupabaseAuth = {
     if (!result.error) await refreshProfile();
     return result;
   },
+
+  /* Cria nova conta no Supabase Auth com metadados de perfil */
   async signUp(email, password, metadata = {}) {
     if (!supabaseClient) {
       return { data: null, error: { message: 'Cliente do Supabase indisponível.' } };
@@ -183,16 +191,18 @@ window.SupabaseAuth = {
       }
     });
   },
+
+  /* Encerra a sessão e limpa o cache */
   async signOut() {
     if (!supabaseClient) return;
     await supabaseClient.auth.signOut();
     cachedProfile = null;
   },
+
+  /* Salva ou atualiza o perfil na tabela users, comprimindo imagens antes */
   async upsertProfile(profile) {
     if (!supabaseClient) return { error: { message: 'Cliente indisponível' } };
 
-    // CORREÇÃO: comprime as imagens antes de salvar para evitar falha silenciosa
-    // por payload muito grande no upsert do Supabase.
     const fotoComprimida = await compressImageBase64(profile.foto_perfil || '');
     const capaComprimida = await compressImageBase64(profile.capa_perfil || '');
 
@@ -210,8 +220,6 @@ window.SupabaseAuth = {
     if (error) {
       console.error('[Supabase] Erro no upsert do perfil:', error);
     } else {
-      // CORREÇÃO: após salvar com sucesso, atualiza o cache local com os dados
-      // recém-salvos (incluindo as imagens comprimidas), garantindo consistência.
       await refreshProfile();
     }
 
@@ -219,6 +227,7 @@ window.SupabaseAuth = {
   }
 };
 
+/* Inicia autenticação automaticamente ao carregar o script */
 if (supabaseClient) {
   initAuth();
 }

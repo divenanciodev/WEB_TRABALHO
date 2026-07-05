@@ -1,18 +1,24 @@
+/* Estado global da aplicação — centraliza acesso ao Supabase e operações de dados */
 const State = {
+
+  /* Retorna o cliente Supabase inicializado em supabase.js */
   _client() {
     return window.SupabaseAuth?.client || null;
   },
 
+  /* Aguarda a autenticação estar pronta antes de continuar */
   async ensureReady() {
     if (window.SupabaseAuth?.ready) {
       await window.SupabaseAuth.ready;
     }
   },
 
+  /* Retorna o perfil do usuário logado a partir do cache */
   getCurrentUser() {
     return window.SupabaseAuth?.getCachedProfile?.() || null;
   },
 
+  /* Redireciona para login se não houver sessão ativa */
   async requireUser() {
     await this.ensureReady();
     const user = this.getCurrentUser();
@@ -23,6 +29,7 @@ const State = {
     return user;
   },
 
+  /* Persiste o perfil do usuário no banco via upsert */
   async setCurrentUser(user) {
     if (!user) return;
 
@@ -49,18 +56,19 @@ const State = {
 
     if (error) {
       console.error('[State] Erro ao salvar perfil:', error);
-      // Exibe aviso ao usuário se o Layout estiver disponível
       if (typeof Layout !== 'undefined' && Layout.showToast) {
         Layout.showToast('Erro ao salvar perfil. Verifique sua conexão.', 'error');
       }
     }
   },
 
+  /* Encerra sessão e redireciona para o login */
   async logout() {
     await window.SupabaseAuth?.signOut?.();
     window.location.href = 'login.html';
   },
 
+  /* Busca todos os registros de uma tabela ordenados por data */
   async fetchTable(table, orderColumn = 'createdAt') {
     const client = this._client();
     if (!client) {
@@ -81,6 +89,7 @@ const State = {
     return data || [];
   },
 
+  /* Salva ou atualiza um registro em qualquer tabela (upsert genérico) */
   async saveRow(table, item) {
     const client = this._client();
     if (!client) throw new Error('Supabase indisponível');
@@ -108,6 +117,7 @@ const State = {
     return data || payload;
   },
 
+  /* Remove um registro de qualquer tabela pelo ID */
   async deleteRow(table, id) {
     const client = this._client();
     if (!client) throw new Error('Supabase indisponível');
@@ -123,6 +133,7 @@ const State = {
     }
   },
 
+  /* Busca um usuário pelo ID diretamente na tabela users */
   async getUserById(userId) {
     const client = this._client();
     if (!client || !userId) return null;
@@ -141,6 +152,7 @@ const State = {
     return data;
   },
 
+  /* Converte uma lista de IDs/objetos de membros em perfis completos */
   async resolveMemberProfiles(membros) {
     if (!Array.isArray(membros) || membros.length === 0) return [];
 
@@ -193,6 +205,7 @@ const State = {
     });
   },
 
+  /* Atalhos de leitura para as principais tabelas do sistema */
   async getProjects() {
     return this.fetchTable('shetech_projetos');
   },
@@ -209,15 +222,13 @@ const State = {
     return this.fetchTable('users');
   },
 
-  // ======== ANALYTICS DATA FETCHERS ========
-  // 1. Tecnologias mais utilizadas (contagem de habilidades nos perfis)
+  /* Funções de dados para a página de Analytics — leem e agregam dados do banco */
   async getUserTechnologies() {
     const client = this._client();
     if (!client) return {};
     try {
       const { data, error } = await client.from('users').select('habilidades').order('createdAt', { ascending: false });
       if (error) throw error;
-      // habilidades é um array JSONB, pode ser [] ou null
       const counts = {};
       data.forEach(u => {
         const arr = u.habilidades || [];
@@ -226,19 +237,16 @@ const State = {
           counts[key] = (counts[key] || 0) + 1;
         });
       });
-      // fallback mock if empty
       if (Object.keys(counts).length === 0) {
         return { JavaScript: 0, Python: 0, Java: 0, React: 0, "HTML/CSS": 0, SQL: 0, "C#": 0, PHP: 0, Flutter: 0, Outros: 0 };
       }
       return counts;
     } catch (e) {
       console.warn('[State] getUserTechnologies fallback', e);
-      // mock data
       return { JavaScript: 45, Python: 30, Java: 20, React: 35, "HTML/CSS": 50, SQL: 25, "C#": 15, PHP: 10, Flutter: 12, Outros: 8 };
     }
   },
 
-  // 2. Projetos por categoria
   async getProjectCategories() {
     const client = this._client();
     if (!client) return {};
@@ -260,7 +268,6 @@ const State = {
     }
   },
 
-  // 3. Participação em eventos (contagem de participantes)
   async getEventParticipation() {
     const client = this._client();
     if (!client) return {};
