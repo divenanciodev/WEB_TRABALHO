@@ -30,10 +30,15 @@
 
   <main class="main">
     <header class="topbar">
-      <h1 class="page-title" id="page-title">Notificações</h1>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="history.back()" class="btn btn-ghost" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px;">
+          <i class="icon-arrow-left"></i> Voltar
+        </button>
+        <h1 class="page-title" id="page-title">Notificações</h1>
+      </div>
       <div class="topbar-actions">
         <button class="icon-btn" title="Notificações" onclick="window.location.href='notificacoes.html'"><i class="icon-bell"></i><span class="dot" id="notif-dot" style="display:none"></span></button>
-        <a href="perfil.html" class="me"><img id="top-avatar" src="" alt="" /><span id="top-name">Olá</span></a>
+        <a href="perfil.html" class="me"><img id="top-avatar" src="assets/avatars/avatar.svg" alt="" /><span id="top-name">Olá</span></a>
       </div>
     </header>
 

@@ -1510,3 +1510,195 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
+
+/* ══════════════════════════════════════════
+   WIDGET MEMBRAS ATIVAS — REDESIGN
+══════════════════════════════════════════ */
+
+/* Contador no cabeçalho do widget */
+.am-header-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #10b981;
+  background: #d1fae5;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Linha de cada membra */
+.am-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.am-row:hover {
+  background: var(--surface-2, #f3f4f6);
+}
+
+/* Avatar + dot de status */
+.am-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.am-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--surface, #fff);
+  display: block;
+}
+
+/* Bolinha de status sobre o avatar */
+.am-dot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--surface, #fff);
+}
+
+.am-dot--online  { background: #10b981; }
+.am-dot--offline { background: #9ca3af; }
+
+/* Info central */
+.am-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.am-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text, #1a1a1f);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.am-you-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--brand-light, #fce4ec);
+  color: var(--brand, #ff3d8b);
+  border-radius: 20px;
+  padding: 1px 6px;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: .02em;
+}
+
+.am-role {
+  font-size: 11px;
+  color: var(--text-3, #6b7280);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Coluna direita: badge de status + botão seguir */
+.am-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Badge Online / Offline */
+.am-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.am-status--online  {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.am-status--offline {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Botão seguir compacto */
+.am-follow-btn {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1.5px solid var(--brand, #ff3d8b);
+  background: transparent;
+  color: var(--brand, #ff3d8b);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+
+.am-follow-btn:hover,
+.am-follow-btn.following {
+  background: var(--brand, #ff3d8b);
+  color: #fff;
+}
+
+/* Linha "Ver todas" */
+.am-show-more {
+  padding: 10px 6px 2px;
+  text-align: center;
+  border-top: 1px solid var(--border, #e5e7eb);
+  margin-top: 6px;
+}
+
+.am-show-more button {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand, #ff3d8b);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background .15s;
+}
+
+.am-show-more button:hover {
+  background: var(--brand-light, #fce4ec);
+}
+
+/* Empty state */
+.active-members-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 10px;
+  color: var(--text-3, #6b7280);
+  font-size: 12px;
+  text-align: center;
+}
+
+.active-members-empty svg {
+  width: 28px;
+  height: 28px;
+  opacity: .4;
+}

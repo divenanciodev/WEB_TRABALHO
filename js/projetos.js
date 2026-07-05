@@ -109,10 +109,14 @@
 
   /* ── Filtro / busca ─────────────────────────────────────────── */
   function filteredProjects() {
+    const currentUser = window.State?.getCurrentUser();
     return projects.filter((p) => {
-      const matchFilter =
-        filterActive === "todos" ||
-        p.status === filterActive;
+      let matchFilter = filterActive === "todos" || p.status === filterActive;
+      if (filterActive === "inscritos") {
+        matchFilter = currentUser &&
+          Array.isArray(p.membros) &&
+          p.membros.includes(currentUser.id);
+      }
       const matchSearch =
         !searchQuery ||
         p.titulo.toLowerCase().includes(searchQuery) ||
@@ -121,6 +125,16 @@
       return matchFilter && matchSearch;
     });
   }
+
+  /* expõe para app.js rerenderizar após inscrição */
+  window.renderProjects = function() {
+    renderProjects();
+  };
+  window.reloadAndRenderProjects = async function() {
+    await loadProjects();
+    updateStats();
+    renderProjects();
+  };
 
   /* ── Renderização ────────────────────────────────────────────── */
   function renderProjects() {
@@ -163,10 +177,11 @@
     let subscribeBtn = '';
     if (currentUser && p.author_id && p.author_id !== currentUser.id) {
       const isSubscribed = Array.isArray(p.membros) && p.membros.includes(currentUser.id);
-      const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
-      const icon = isSubscribed ? 'check' : 'user-plus';
-      const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-      subscribeBtn = `<button class="${btnClass}" onclick="event.stopPropagation(); ${isSubscribed ? `window.toggleProjectSubscription('${p.id}')` : `window.openInscricaoProjetoModal('${p.id}')`}"><i class="icon-${icon}"></i> ${text}</button>`;
+      if (isSubscribed) {
+        subscribeBtn = `<button class="btn-subscribe-projeto btn-subscribe-projeto--inscrito" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')"><i class="icon-check"></i> Inscrita</button>`;
+      } else {
+        subscribeBtn = `<button class="btn-subscribe-projeto" onclick="event.stopPropagation(); window.openInscricaoProjetoModal('${p.id}')"><span class="btn-subscribe-projeto-shine"></span><i class="icon-user-plus"></i> Se inscrever</button>`;
+      }
       linkBtns.push(subscribeBtn);
     }
     

@@ -1,3 +1,9 @@
+.folder-card:hover {
+    border-color: var(--pink) !important;
+    box-shadow: 0 4px 16px rgba(194, 24, 91, 0.10);
+    transform: translateY(-2px);
+}
+
 .link-card {
     display: flex;
     flex-direction: column;

@@ -113,7 +113,8 @@ function bindInscricaoForms() {
       const submitBtn = eventoForm.querySelector('button[type="submit"]');
       if (submitBtn?.disabled) return;
 
-      const eventId = document.getElementById('participacao-evento-id').value;
+      const eventId      = document.getElementById('participacao-evento-id').value;
+      const expectativa  = document.getElementById('ev-expectativa')?.value?.trim() || '';
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -123,9 +124,14 @@ function bindInscricaoForms() {
       try {
         if (window.State?.ensureReady) await window.State.ensureReady();
 
-        const ok = await window.toggleEventSubscription(eventId);
-        if (ok) {
-          window.closeParticipacaoEventoModal();
+        // Fecha o modal do formulário antes de mostrar o de sucesso
+        window.closeParticipacaoEventoModal();
+
+        const ok = await window.toggleEventSubscription(eventId, { expectativa });
+
+        if (!ok) {
+          // Se falhou, reabre o modal para o usuário tentar novamente
+          window.openParticipacaoEventoModal(eventId);
         }
       } catch (error) {
         console.error('Erro ao participar do evento:', error);

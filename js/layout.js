@@ -1,3 +1,32 @@
+const UI = {
+    showModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+    },
+    closeModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    },
+    updateNotificationBadge() {
+        const user = State.getCurrentUser();
+        if (!user) return;
+        State.getNotifications(user.email).then(items => {
+            const unread = items.filter(n => !n.lida);
+            const dot = document.getElementById('notif-dot');
+            if (dot) dot.style.display = unread.length > 0 ? 'block' : 'none';
+        }).catch(() => {});
+    }
+};
+window.UI = UI;
+
 const Layout = {
     async init(options = {}) {
         await State.ensureReady();
@@ -62,7 +91,7 @@ const Layout = {
         const avatar = document.getElementById('top-avatar');
         const name = document.getElementById('top-name');
         const welcomeName = document.getElementById('welcome-name');
-        const avatarUrl = user.foto_perfil || `assets/avatars/avatar.svg`;
+        const avatarUrl = user.foto_perfil || 'assets/avatars/avatar.svg';
 
         if (avatar) avatar.src = avatarUrl;
 
@@ -70,16 +99,10 @@ const Layout = {
         const commentAvatar = document.getElementById('comment-avatar');
         if (commentAvatar) commentAvatar.src = avatarUrl;
         
-        // Atualizar todos os avatares do usuário na página atual
-        const userIdClass = `user-avatar-${user.id || user.email.replace(/[^a-zA-Z0-9]/g, '')}`;
-        document.querySelectorAll(`.${userIdClass}`).forEach(img => {
-            img.src = avatarUrl;
-        });
-        const firstName = user.nome_completo.split(' ')[0];
+        const firstName = (user.nome_completo || 'Usuário').split(' ')[0];
         if (name) name.innerText = `Olá, ${firstName}`;
         if (welcomeName) welcomeName.innerText = firstName;
 
-        const notifs = [];
         State.getNotifications(user.email).then(items => {
             const unread = items.filter(n => !n.lida);
             const dot = document.getElementById('notif-dot');

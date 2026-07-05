@@ -11,7 +11,17 @@
   let events = [];
 
   async function loadEvents() {
-    events = await State.getEvents();
+    try {
+      const data = await State.getEvents();
+      events = Array.isArray(data) ? data : [];
+      if (events.length === 0) {
+        console.warn('[Eventos] Nenhum evento retornado do banco.');
+      }
+    } catch (err) {
+      console.error('[Eventos] Erro ao carregar eventos:', err);
+      events = [];
+      showToast('Erro ao carregar eventos. Verifique sua conexão.', 'error');
+    }
   }
 
   async function persistEvent(event) {
@@ -98,6 +108,7 @@
     hoje.setHours(0, 0, 0, 0);
     const in7 = new Date(hoje);
     in7.setDate(in7.getDate() + 7);
+    const currentUser = window.State?.getCurrentUser();
 
     return events.filter((e) => {
       let matchFilter = filterActive === "todos";
@@ -106,6 +117,10 @@
       } else if (filterActive === "proximos") {
         const d = new Date(e.data + "T00:00:00");
         matchFilter = d >= hoje && d <= in7;
+      } else if (filterActive === "inscritos") {
+        matchFilter = currentUser &&
+          Array.isArray(e.membros) &&
+          e.membros.includes(currentUser.id);
       }
 
       const matchSearch =
@@ -115,6 +130,16 @@
       return matchFilter && matchSearch;
     });
   }
+
+  /* expõe para app.js rerenderizar após inscrição */
+  window.renderEvents = function() {
+    renderEvents();
+  };
+  window.reloadAndRenderEvents = async function() {
+    await loadEvents();
+    updateStats();
+    renderEvents();
+  };
 
   function renderEvents() {
     const container = document.getElementById("events-container");
@@ -198,10 +223,10 @@
             const currentUser = window.State?.getCurrentUser();
             if (currentUser && ev.author_id && ev.author_id !== currentUser.id) {
               const isSubscribed = Array.isArray(ev.membros) && ev.membros.includes(currentUser.id);
-              const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
-              const icon = isSubscribed ? 'check' : 'user-plus';
-              const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-              return \`<button class="\${btnClass}" onclick="event.stopPropagation(); \${isSubscribed ? \`window.toggleEventSubscription('\${ev.id}')\` : \`window.openParticipacaoEventoModal('\${ev.id}')\` }"><i class="icon-\${icon}"></i> \${text}</button>\`;
+              if (isSubscribed) {
+                return `<button class="btn-subscribe-evento btn-subscribe-evento--inscrito" onclick="event.stopPropagation(); window.toggleEventSubscription('${ev.id}')"><i class="icon-check"></i> Inscrita</button>`;
+              }
+              return `<button class="btn-subscribe-evento" onclick="event.stopPropagation(); window.openParticipacaoEventoModal('${ev.id}')"><span class="btn-subscribe-evento-shine"></span><i class="icon-user-plus"></i> Se inscrever</button>`;
             }
             return '';
           })()}
@@ -310,6 +335,68 @@
     });
   });
 
+  /* ── Busca de CEP (ViaCEP) ──────────────────────────────────── */
+  function montaEndereco() {
+    const logradouro  = (document.getElementById("event-logradouro")?.value  || "").trim();
+    const numero      = (document.getElementById("event-numero")?.value      || "").trim();
+    const complemento = (document.getElementById("event-complemento")?.value || "").trim();
+    const bairro      = (document.getElementById("event-bairro")?.value      || "").trim();
+    const cidade      = (document.getElementById("event-cidade")?.value      || "").trim();
+    const uf          = (document.getElementById("event-uf")?.value          || "").trim();
+    const parts = [logradouro, numero, complemento, bairro, cidade ? `${cidade}${uf ? '/' + uf : ''}` : uf].filter(Boolean);
+    const hidden = document.getElementById("event-endereco");
+    if (hidden) hidden.value = parts.join(", ");
+  }
+
+  ["event-logradouro","event-numero","event-complemento","event-bairro","event-cidade","event-uf"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", montaEndereco);
+  });
+
+  async function buscarCEP() {
+    const rawCep = (document.getElementById("event-cep")?.value || "").replace(/\D/g, "");
+    const feedback = document.getElementById("cep-feedback");
+    if (rawCep.length !== 8) {
+      if (feedback) { feedback.textContent = "Digite um CEP com 8 dígitos."; feedback.style.display = "block"; feedback.style.color = "#dc2626"; }
+      return;
+    }
+    if (feedback) { feedback.textContent = "Buscando..."; feedback.style.display = "block"; feedback.style.color = "var(--gray-500)"; }
+    try {
+      const res  = await fetch(`https://viacep.com.br/ws/${rawCep}/json/`);
+      const data = await res.json();
+      if (data.erro) {
+        if (feedback) { feedback.textContent = "CEP não encontrado."; feedback.style.color = "#dc2626"; }
+        return;
+      }
+      if (document.getElementById("event-logradouro")) document.getElementById("event-logradouro").value = data.logradouro || "";
+      if (document.getElementById("event-bairro"))     document.getElementById("event-bairro").value     = data.bairro     || "";
+      if (document.getElementById("event-cidade"))     document.getElementById("event-cidade").value     = data.localidade || "";
+      if (document.getElementById("event-uf"))         document.getElementById("event-uf").value         = data.uf         || "";
+      if (feedback) { feedback.textContent = `${data.localidade}/${data.uf}`; feedback.style.color = "#16a34a"; }
+      montaEndereco();
+      document.getElementById("event-numero")?.focus();
+    } catch (err) {
+      if (feedback) { feedback.textContent = "Erro ao buscar CEP. Verifique sua conexão."; feedback.style.color = "#dc2626"; }
+    }
+  }
+
+  document.getElementById("btn-buscar-cep")?.addEventListener("click", buscarCEP);
+  document.getElementById("event-cep")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); buscarCEP(); }
+    // Formata CEP enquanto digita: 99999-999
+    setTimeout(() => {
+      const el = document.getElementById("event-cep");
+      if (!el) return;
+      el.value = el.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").slice(0, 9);
+    }, 0);
+  });
+  document.getElementById("event-cep")?.addEventListener("input", () => {
+    setTimeout(() => {
+      const el = document.getElementById("event-cep");
+      if (!el) return;
+      el.value = el.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").slice(0, 9);
+    }, 0);
+  });
+
   /* ── Submit do form ──────────────────────────────────────────── */
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -339,11 +426,18 @@
           showToast("Você não tem permissão para editar este evento.", "error");
           return;
         }
-        events[idx] = { ...events[idx], titulo, tipo, link, endereco, data, horario, categoria, descricao };
-        showToast("Evento atualizado com sucesso!", "success");
+        const updated = { ...events[idx], titulo, tipo, link, endereco, data, horario, categoria, descricao };
+        try {
+          await persistEvent(updated);
+          events[idx] = updated;
+          showToast("Evento atualizado com sucesso!", "success");
+        } catch (err) {
+          showToast("Erro ao salvar evento.", "error");
+          return;
+        }
       }
     } else {
-      events.push({ 
+      const newEvent = { 
         id: uid(), 
         titulo, 
         tipo, 
@@ -355,16 +449,15 @@
         descricao,
         criador_id: userEmail,
         organizador_id: userEmail
-      });
-      showToast("Evento criado com sucesso!", "success");
-    }
-
-    try {
-      const saved = editingId ? events.find(ev => ev.id === editingId) : events[events.length - 1];
-      await persistEvent(saved);
-    } catch (err) {
-      showToast("Erro ao salvar no Supabase.", "error");
-      return;
+      };
+      try {
+        await persistEvent(newEvent);
+        events.push(newEvent);
+        showToast("Evento criado com sucesso!", "success");
+      } catch (err) {
+        showToast("Erro ao salvar evento.", "error");
+        return;
+      }
     }
 
     closeModal();
@@ -389,120 +482,96 @@
   }
 
   async function renderEventDetail(ev) {
-
     const isOnline = ev.tipo === "online";
-    const locIcon = isOnline ? "icon-video" : "icon-map-pin";
-    const locLabel = isOnline ? "Link da reunião" : "Endereço";
-    const locValue = isOnline
-      ? `<a href="${ev.link}" target="_blank" rel="noopener">${ev.link}</a>`
-      : `<span>${ev.endereco}</span>`;
+    const locIcon  = isOnline ? "icon-video" : "icon-map-pin";
 
     const memberProfiles = await State.resolveMemberProfiles(ev.membros || []);
     const membrosHTML = memberProfiles.length > 0
-      ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+      ? `<div class="ev-detail-section">
+          <div class="ev-detail-section-title">
             <div class="detail-row-icon"><i class="icon-users"></i></div>
-            <strong>Membros Participantes (${memberProfiles.length})</strong>
+            <strong>Participantes (${memberProfiles.length})</strong>
           </div>
-          <div class="members-list" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+          <div class="ev-members-grid">
             ${memberProfiles.map((m) => `
-              <a href="${m.id ? `perfil.html?user=${encodeURIComponent(m.id)}` : '#'}" class="member-card" style="display:flex;align-items:flex-start;gap:10px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:12px;text-decoration:none;color:inherit;" onclick="event.stopPropagation()">
-                <img src="${m.avatar}" alt="${m.name}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-                <div style="min-width:0;">
-                  <div style="font-weight:600;color:var(--pink);">${m.name}</div>
-                  <div style="font-size:12px;color:var(--gray-600);">${m.role}</div>
-                  ${m.bio ? `<div style="font-size:12px;color:var(--gray-700);margin-top:4px;line-height:1.4;">${m.bio}</div>` : ''}
+              <a href="${m.id ? `perfil.html?user=${encodeURIComponent(m.id)}` : '#'}"
+                 class="ev-member-card" onclick="event.stopPropagation()">
+                <img src="${m.avatar}" alt="${m.name}" class="ev-member-avatar" />
+                <div class="ev-member-info">
+                  <span class="ev-member-name">${m.name}</span>
+                  <span class="ev-member-role">${m.role}</span>
                 </div>
-              </a>
-            `).join('')}
+              </a>`).join('')}
           </div>
-        </div>`
-      : '';
-
-    const googleMapsHTML = !isOnline && ev.endereco
-      ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <div class="detail-row-icon"><i class="icon-map"></i></div>
-            <strong>Localização no Mapa</strong>
-          </div>
-          <iframe 
-            width="100%" 
-            height="250" 
-            style="border:0; border-radius: 12px;" 
-            loading="lazy" 
-            allowfullscreen 
-            src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(ev.endereco)}">
-          </iframe>
         </div>`
       : '';
 
     document.getElementById("detail-body").innerHTML = `
-      <div class="detail-section">
-        ${ev.imagemLocal ? `
-          <div class="detail-image-wrap" style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
-            <img src="${ev.imagemLocal}" alt="Local do evento" style="width: 100%; height: 100%; object-fit: cover;">
+      <div class="ev-detail-wrap">
+
+        <!-- Cabeçalho colorido -->
+        <div class="ev-detail-header ${isOnline ? '' : 'ev-detail-header--presencial'}">
+          <div class="ev-detail-badges">
+            <span class="badge ${isOnline ? 'badge--online' : 'badge--presencial'}">
+              <i class="${locIcon}"></i> ${isOnline ? 'Online' : 'Presencial'}
+            </span>
+            <span class="badge ${categoryClass(ev.categoria)}">${ev.categoria}</span>
           </div>
-        ` : ''}
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-          <div>
-            <div class="detail-row">
-              <div class="detail-row-icon"><i class="icon-calendar"></i></div>
-              <div class="detail-row-content">
-                <strong>Data e Horário</strong>
-                <span>${formatDate(ev.data)}${ev.horario ? " às " + ev.horario : ""}</span>
-              </div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-row-icon" style="${isOnline ? "" : "background:#d4f7e8;color:#16a34a"}">
-                <i class="${locIcon}"></i>
-              </div>
-              <div class="detail-row-content">
-                <strong>${locLabel}</strong>
-                ${locValue}
-              </div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-row-icon"><i class="icon-tag"></i></div>
-              <div class="detail-row-content">
-                <strong>Categoria</strong>
-                <span>${ev.categoria} • ${isOnline ? "Online" : "Presencial"}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            ${ev.descricao ? `
-              <div class="detail-row">
-                <div class="detail-row-icon"><i class="icon-align-left"></i></div>
-                <div class="detail-row-content">
-                  <strong>Descrição</strong>
-                  <div class="detail-descricao">${ev.descricao}</div>
-                </div>
-              </div>
-            ` : ""}
+          <div class="ev-detail-date-block">
+            <i class="icon-calendar"></i>
+            <span>${formatDate(ev.data)}${ev.horario ? ' às ' + ev.horario : ''}</span>
           </div>
         </div>
 
-        ${googleMapsHTML}
-        ${membrosHTML}
-      </div>
-    `;
+        <!-- Grid de informações -->
+        <div class="ev-detail-grid">
 
-        const user = State.getCurrentUser();
+          <!-- Localização / Link -->
+          <div class="ev-detail-info-card">
+            <div class="ev-detail-info-icon" style="${isOnline ? '' : 'background:#d4f7e8;color:#16a34a'}">
+              <i class="${locIcon}"></i>
+            </div>
+            <div>
+              <div class="ev-detail-info-label">${isOnline ? 'Link da Reunião' : 'Endereço'}</div>
+              ${isOnline && ev.link
+                ? `<a href="${ev.link}" target="_blank" rel="noopener" class="ev-detail-link">${platformLabel(ev.link) || ev.link}</a>`
+                : `<span class="ev-detail-info-value">${ev.endereco || '—'}</span>`}
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          ${ev.descricao ? `
+          <div class="ev-detail-info-card ev-detail-info-card--full">
+            <div class="ev-detail-info-icon">
+              <i class="icon-align-left"></i>
+            </div>
+            <div>
+              <div class="ev-detail-info-label">Descrição</div>
+              <div class="ev-detail-descricao">${ev.descricao}</div>
+            </div>
+          </div>` : ''}
+
+        </div>
+
+        <!-- Participantes -->
+        ${membrosHTML}
+
+      </div>`;
+
+    const user = State.getCurrentUser();
     const userEmail = user ? user.email : 'anonimo';
     const isOwner = ev.criador_id === userEmail || ev.organizador_id === userEmail;
 
-    const editBtn = document.getElementById("detail-edit-btn");
+    const editBtn   = document.getElementById("detail-edit-btn");
     const deleteBtn = document.getElementById("detail-delete-btn");
 
     if (isOwner) {
-      editBtn.style.display = 'flex';
+      editBtn.style.display   = 'flex';
       deleteBtn.style.display = 'flex';
-      editBtn.onclick = () => { closeDetail(); openModal(ev.id); };
+      editBtn.onclick   = () => { closeDetail(); openModal(ev.id); };
       deleteBtn.onclick = () => { closeDetail(); deleteEvent(ev.id); };
     } else {
-      editBtn.style.display = 'none';
+      editBtn.style.display   = 'none';
       deleteBtn.style.display = 'none';
     }
   }
@@ -518,17 +587,16 @@
 
   /* ── Deletar ─────────────────────────────────────────────────── */
   async function deleteEvent(id) {
-    Layout.showToast("Evento excluído com sucesso!", "success");
+    if (!confirm('Deseja realmente excluir este evento?')) return;
     try {
       await removeEvent(id);
+      events = events.filter((e) => e.id !== id);
+      updateStats();
+      renderEvents();
+      showToast("Evento excluído com sucesso!", "success");
     } catch (err) {
       showToast("Erro ao excluir evento.", "error");
-      return;
     }
-    events = events.filter((e) => e.id !== id);
-    updateStats();
-    renderEvents();
-    showToast("Evento excluído.", "success");
   }
 
   /* ── Filtros ─────────────────────────────────────────────────── */

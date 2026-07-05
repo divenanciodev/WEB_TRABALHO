@@ -41,7 +41,7 @@
           <i class="icon-plus"></i> Novo Evento
         </button>
         <a href="perfil.html" class="me">
-          <img id="top-avatar" src="" alt="Avatar" />
+          <img id="top-avatar" src="assets/avatars/avatar.svg" alt="Avatar" />
           <span id="top-name">Olá</span>
         </a>
       </div>
@@ -90,6 +90,7 @@
         <button class="chip" data-filter="online">Online</button>
         <button class="chip" data-filter="presencial">Presencial</button>
         <button class="chip" data-filter="proximos">Próximos 7 dias</button>
+        <button class="chip chip--inscritos" data-filter="inscritos"><i class="icon-check-circle"></i> Meus Inscritos</button>
       </div>
       <div class="view-toggle">
         <button class="view-btn view-btn--active" id="view-grid" title="Grade"><i class="icon-layout-grid"></i></button>
@@ -162,11 +163,29 @@
         </div>
 
         <div class="form-group" id="campo-presencial" style="display:none">
-          <label for="event-endereco">Endereço <span class="req">*</span></label>
-          <div class="input-icon-wrap">
-            <i class="icon-map-pin"></i>
-            <input type="text" id="event-endereco" placeholder="Rua, número, cidade..." />
+          <label>Endereço <span class="req">*</span></label>
+          <!-- Busca por CEP -->
+          <div class="cep-row">
+            <div class="input-icon-wrap" style="flex:0 0 160px">
+              <i class="icon-map-pin"></i>
+              <input type="text" id="event-cep" placeholder="CEP (somente números)" maxlength="9" />
+            </div>
+            <button type="button" class="btn btn-ghost" id="btn-buscar-cep" style="height:44px;padding:0 14px;font-size:13px;">
+              <i class="icon-search"></i> Buscar
+            </button>
           </div>
+          <div id="cep-feedback" style="font-size:12px;color:var(--gray-500);margin:4px 0 8px;display:none"></div>
+          <input type="text" id="event-logradouro" placeholder="Rua / Avenida" style="margin-bottom:8px" />
+          <div class="form-row" style="gap:8px;margin-bottom:8px">
+            <input type="text" id="event-numero" placeholder="Número" style="flex:0 0 90px" />
+            <input type="text" id="event-complemento" placeholder="Complemento" />
+          </div>
+          <div class="form-row" style="gap:8px;margin-bottom:0">
+            <input type="text" id="event-bairro" placeholder="Bairro" />
+            <input type="text" id="event-cidade" placeholder="Cidade" />
+            <input type="text" id="event-uf" placeholder="UF" style="flex:0 0 60px" />
+          </div>
+          <input type="hidden" id="event-endereco" />
         </div>
 
         <!-- Data e hora -->

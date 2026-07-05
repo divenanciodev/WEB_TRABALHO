@@ -48,7 +48,7 @@
           <span class="dot" id="notif-dot" style="display:none"></span>
         </button>
         <a href="perfil.html" class="me">
-          <img id="top-avatar" src="" alt="" /><span id="top-name">Olá</span>
+          <img id="top-avatar" src="assets/avatars/avatar.svg" alt="" /><span id="top-name">Olá</span>
         </a>
       </div>
     </header>
@@ -98,11 +98,11 @@
           <div class="col">
             <div class="card">
               <div class="card-head">
-                <h3><i data-lucide="star"></i> Projetos em Destaque</h3>
+                <h3><i data-lucide="bar-chart-2"></i> Tecnologias dos Projetos</h3>
                 <a href="projetos.html" class="link">Ver Todos</a>
               </div>
-              <div id="featured-projects-list" style="display:flex;flex-direction:column;gap:12px">
-                <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando projetos...</p>
+              <div id="featured-projects-list">
+                <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando...</p>
               </div>
             </div>
           </div>
@@ -121,15 +121,17 @@
 
 
         <!-- DESENVOLVIMENTO: DESEMPENHO -->
-        <div class="profile-grid" style="margin-top: -24px;">
-          <div class="col">
-            <div class="card">
-              <div class="card-head">
-                <h3><i data-lucide="trending-up"></i> Seu Desempenho</h3>
-              </div>
-              <div id="creator-stats-container" style="display:flex;flex-direction:column;gap:12px">
-                <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando estatísticas...</p>
-              </div>
+        <div class="perf-card-wrap">
+          <div class="card perf-card">
+            <div class="card-head">
+              <h3><i data-lucide="trending-up"></i> Seu Desempenho</h3>
+              <button class="btn-download-pdf" id="btn-download-pdf" title="Baixar relatório em PDF">
+                <span class="btn-subscribe-shine"></span>
+                <i data-lucide="download"></i> Baixar PDF
+              </button>
+            </div>
+            <div id="creator-stats-container">
+              <p style="color:var(--gray-500);text-align:center;padding:20px">Carregando estatísticas...</p>
             </div>
           </div>
         </div>

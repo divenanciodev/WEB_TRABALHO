@@ -63,7 +63,10 @@ const State = {
 
   async fetchTable(table, orderColumn = 'createdAt') {
     const client = this._client();
-    if (!client) return [];
+    if (!client) {
+      console.warn(`[State] Cliente Supabase indisponível ao buscar ${table}`);
+      return [];
+    }
 
     const { data, error } = await client
       .from(table)
@@ -71,7 +74,7 @@ const State = {
       .order(orderColumn, { ascending: false });
 
     if (error) {
-      console.error(`[State] Erro ao buscar ${table}:`, error);
+      console.error(`[State] Erro ao buscar ${table}:`, error.message, error);
       return [];
     }
 
@@ -370,6 +373,10 @@ const State = {
     return this.deleteRow('comments', id);
   },
 
+  async getCommunityLinks() {
+    return this.fetchTable('community_links');
+  },
+
   async saveCommunityLink(link) {
     return this.saveRow('community_links', link);
   },
@@ -415,7 +422,30 @@ const State = {
   },
 
   async saveFolder(folder) {
-    return this.saveRow('folders', folder);
+    const client = this._client();
+    if (!client) throw new Error('Supabase indisponível');
+
+    const user = this.getCurrentUser();
+    const payload = {
+      id: folder.id,
+      nome: folder.nome,
+      proprietaria_id: folder.proprietaria_id,
+      author_id: user?.id || null,
+      createdAt: folder.createdAt || new Date().toISOString()
+    };
+
+    const { data, error } = await client
+      .from('folders')
+      .upsert(payload)
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      console.error('[State] Erro ao salvar pasta:', error);
+      throw error;
+    }
+
+    return data || payload;
   },
 
   async deleteFolder(id) {
@@ -586,7 +616,8 @@ window.toggleProjectSubscription = async (projectId, extraData = null) => {
     }
   }
 
-  if (typeof window.renderProjects === 'function') window.renderProjects();
+  if (typeof window.reloadAndRenderProjects === 'function') await window.reloadAndRenderProjects();
+  else if (typeof window.renderProjects === 'function') window.renderProjects();
   if (typeof window.renderFeaturedProjects === 'function') window.renderFeaturedProjects();
   if (typeof window.renderCreatorStats === 'function') window.renderCreatorStats();
   return true;
@@ -618,7 +649,7 @@ window.denyProjectRequest = (btnEl) => {
   }
 };
 
-window.toggleEventSubscription = async (eventId) => {
+window.toggleEventSubscription = async (eventId, extraData = null) => {
   const user = State.getCurrentUser();
   if (!user) {
     if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Você precisa estar logada para se inscrever.', 'error');
@@ -627,7 +658,12 @@ window.toggleEventSubscription = async (eventId) => {
   const client = State._client();
   if (!client) return false;
 
-  const { data: evento, error: fetchError } = await client.from('shetech_eventos').select('membros, author_id').eq('id', eventId).single();
+  const { data: evento, error: fetchError } = await client
+    .from('shetech_eventos')
+    .select('membros, author_id, author_email, criador_id, organizador_id, titulo')
+    .eq('id', eventId)
+    .single();
+
   if (fetchError || !evento) {
     if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao buscar evento.', 'error');
     return false;
@@ -638,23 +674,60 @@ window.toggleEventSubscription = async (eventId) => {
   }
 
   let membros = Array.isArray(evento.membros) ? evento.membros : [];
-  let isSubscribed = false;
-  if (membros.includes(user.id)) {
+  const alreadyIn = membros.includes(user.id);
+
+  if (alreadyIn) {
+    // Cancelar inscrição
     membros = membros.filter(m => m !== user.id);
+    const { error: updateError } = await client.from('shetech_eventos').update({ membros }).eq('id', eventId);
+    if (updateError) {
+      if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao cancelar inscrição.', 'error');
+      return false;
+    }
+    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Inscrição cancelada.', 'success');
   } else {
+    // Nova inscrição
     membros.push(user.id);
-    isSubscribed = true;
+    const { error: updateError } = await client.from('shetech_eventos').update({ membros }).eq('id', eventId);
+    if (updateError) {
+      if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao confirmar inscrição.', 'error');
+      return false;
+    }
+
+    // Notifica o criador do evento
+    const creatorEmail = evento.author_email || evento.criador_id || evento.organizador_id;
+    if (creatorEmail && creatorEmail !== user.email) {
+      let extraInfo = '';
+      if (extraData) {
+        extraInfo = `<div class="notif-details">
+          ${extraData.expectativa ? `<p><strong>Expectativa:</strong> ${extraData.expectativa}</p>` : ''}
+        </div>`;
+      }
+      const notifMsg = `<p class="notif-message">
+        <strong>${user.nome_completo || user.nome_usuario || user.email}</strong>
+        confirmou presença no seu evento
+        <strong>${evento.titulo || 'Evento'}</strong>.
+      </p>${extraInfo}`;
+      try {
+        await State.addNotification(creatorEmail, notifMsg);
+      } catch (err) {
+        console.warn('[toggleEventSubscription] Erro ao enviar notificação:', err);
+      }
+    }
+
+    // Modal de sucesso de inscrição
+    if (typeof Layout !== 'undefined' && Layout.showSuccessModal) {
+      Layout.showSuccessModal(
+        'Inscrição Confirmada! 🎉',
+        `Você está inscrita no evento <strong>${evento.titulo || 'Evento'}</strong>. Fique de olho nas notificações para novidades!`
+      );
+    } else if (typeof Layout !== 'undefined' && Layout.showToast) {
+      Layout.showToast('Inscrição confirmada! 🎉', 'success');
+    }
   }
 
-  const { error: updateError } = await client.from('shetech_eventos').update({ membros }).eq('id', eventId);
-  if (updateError) {
-    if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao atualizar inscrição.', 'error');
-    return false;
-  }
-
-  if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast(isSubscribed ? 'Inscrição realizada!' : 'Inscrição cancelada.', 'success');
-  
-  if (typeof window.renderEvents === 'function') window.renderEvents();
+  if (typeof window.reloadAndRenderEvents === 'function') await window.reloadAndRenderEvents();
+  else if (typeof window.renderEvents === 'function') window.renderEvents();
   if (typeof window.renderUpcomingEvents === 'function') window.renderUpcomingEvents();
   if (typeof window.renderCreatorStats === 'function') window.renderCreatorStats();
   return true;

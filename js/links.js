@@ -9,27 +9,68 @@ async function renderLinks() {
     cachedLinks = await State.getLinks(user.email);
     cachedFolders = await State.getFolders(user.email);
 
-    if (cachedFolders.length > 0) {
+    // ── Vista aberta de uma pasta ──────────────────────────────
+    if (currentFolderId !== null) {
+        const folder = cachedFolders.find(f => f.id === currentFolderId);
+        const folderLinks = cachedLinks.filter(l => l.folderId === currentFolderId);
+        const isCommunity = folder && folder.nome === State.COMMUNITY_FOLDER_NAME;
+
         foldersContainer.innerHTML = `
-            <div class="card folder-card ${!currentFolderId ? 'active' : ''}" onclick="filterByFolder(null)" style="cursor:pointer;text-align:center;border:${!currentFolderId ? '2px solid var(--pink)' : '1px solid var(--gray-200)'};background:${!currentFolderId ? 'var(--pink-soft)' : '#fff'}">
-                <i class="icon-folder" style="font-size:32px;color:var(--pink);display:block;margin:0 auto 8px;"></i>
-                <h4 style="margin:0;">Todos</h4>
-            </div>` + cachedFolders.map(folder => `
-            <div class="card folder-card ${currentFolderId === folder.id ? 'active' : ''}" onclick="filterByFolder(${folder.id})" style="cursor:pointer;text-align:center;position:relative;border:${currentFolderId === folder.id ? '2px solid var(--pink)' : '1px solid var(--gray-200)'};background:${currentFolderId === folder.id ? 'var(--pink-soft)' : '#fff'}">
-                <i class="icon-folder" style="font-size:32px;color:var(--pink);display:block;margin:0 auto 8px;"></i>
+            <div style="display:flex;align-items:center;gap:12px;grid-column:1/-1;">
+                <button onclick="closeFolder()" class="btn btn-outline" style="display:flex;align-items:center;gap:6px;padding:8px 16px;">
+                    <i class="icon-arrow-left" style="font-size:16px;"></i> Voltar
+                </button>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <i class="${isCommunity ? 'icon-users' : 'icon-folder'}" style="font-size:24px;color:var(--pink);"></i>
+                    <h2 style="margin:0;font-family:'Sora',sans-serif;font-size:1.25rem;">${folder ? folder.nome : 'Pasta'}</h2>
+                    <span style="font-size:13px;color:var(--gray-500);">(${folderLinks.length} link${folderLinks.length !== 1 ? 's' : ''})</span>
+                </div>
+            </div>`;
+
+        if (folderLinks.length === 0) {
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.alignItems = 'center';
+            container.style.minHeight = '250px';
+            container.innerHTML = `
+                <div class="card" style="max-width:400px;width:100%;text-align:center;">
+                    <i class="${isCommunity ? 'icon-users' : 'icon-folder'}" style="font-size:48px;color:var(--gray-300);margin-bottom:1rem;display:block;"></i>
+                    <p style="color:var(--gray-500);font-size:1rem;">Nenhum link nesta pasta ainda.</p>
+                    ${isCommunity
+                        ? '<p style="color:var(--gray-400);font-size:0.85rem;margin-top:8px;">Salve links na Comunidade e eles aparecerão aqui.</p>'
+                        : `<button class="btn btn-primary" onclick="openAddModal()" style="margin-top:1rem;">Adicionar link</button>`}
+                </div>`;
+            return;
+        }
+
+        container.style.display = 'grid';
+        container.innerHTML = renderLinkCards(folderLinks);
+        return;
+    }
+
+    // ── Vista padrão: pastas + links soltos ────────────────────
+    if (cachedFolders.length > 0) {
+        foldersContainer.innerHTML = cachedFolders.map(folder => {
+            const isCommunity = folder.nome === State.COMMUNITY_FOLDER_NAME;
+            const linkCount = cachedLinks.filter(l => l.folderId === folder.id).length;
+            const icon = isCommunity ? 'icon-users' : 'icon-folder';
+            return `
+            <div class="card folder-card" onclick="openFolder(${folder.id})" style="cursor:pointer;text-align:center;position:relative;border:1px solid var(--gray-200);background:#fff;transition:border-color .2s,box-shadow .2s;">
+                <i class="${icon}" style="font-size:32px;color:var(--pink);display:block;margin:0 auto 8px;"></i>
                 <h4 style="margin:0;">${folder.nome}</h4>
-                <div style="position:absolute;top:10px;right:10px;display:flex;gap:5px;">
+                <span style="font-size:11px;color:var(--gray-500);margin-top:4px;display:block;">${linkCount} link${linkCount !== 1 ? 's' : ''}</span>
+                ${!isCommunity ? `<div style="position:absolute;top:10px;right:10px;display:flex;gap:5px;">
                     <button onclick="event.stopPropagation(); editFolder(${folder.id})" style="font-size:12px;color:var(--gray-500);">✎</button>
                     <button onclick="event.stopPropagation(); deleteFolder(${folder.id})" style="font-size:12px;color:#ff4444;">🗑</button>
-                </div>
-            </div>`).join('');
+                </div>` : ''}
+            </div>`;
+        }).join('');
     } else {
         foldersContainer.innerHTML = '';
     }
 
-    const filteredLinks = currentFolderId
-        ? cachedLinks.filter(l => l.folderId === currentFolderId)
-        : cachedLinks;
+    // Links que não pertencem a nenhuma pasta
+    const looseLinks = cachedLinks.filter(l => !l.folderId);
 
     if (cachedLinks.length === 0) {
         container.style.display = 'flex';
@@ -45,14 +86,17 @@ async function renderLinks() {
         return;
     }
 
-    container.style.display = 'grid';
-
-    if (filteredLinks.length === 0 && currentFolderId) {
-        container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;"><p style="color:var(--gray-500);">Nenhum link nesta pasta.</p></div>';
-        return;
+    if (looseLinks.length > 0) {
+        container.style.display = 'grid';
+        container.innerHTML = renderLinkCards(looseLinks);
+    } else {
+        container.style.display = 'none';
+        container.innerHTML = '';
     }
+}
 
-    container.innerHTML = filteredLinks.map(link => `
+function renderLinkCards(links) {
+    return links.map(link => `
         <div class="card link-card">
             <div class="link-info">
                 <h4>${link.titulo}</h4>
@@ -80,8 +124,13 @@ function copyLinkToClipboard(url) {
     navigator.clipboard.writeText(url).then(() => Layout.showToast?.('Link copiado com sucesso!'));
 }
 
-function filterByFolder(id) {
-    currentFolderId = currentFolderId === id ? null : id;
+function openFolder(id) {
+    currentFolderId = id;
+    renderLinks();
+}
+
+function closeFolder() {
+    currentFolderId = null;
     renderLinks();
 }
 
@@ -207,6 +256,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof Layout !== 'undefined') {
         await Layout.init({ active: 'links', requireAuth: true });
     }
+    // Garantir que a pasta "Links da Comunidade" existe
+    await State.ensureCommunityFolder(user.email);
     await renderLinks();
     await updateFolderSelect();
 });

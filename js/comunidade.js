@@ -10,6 +10,18 @@ let activePostId = null;
 let memberRoleFilter = 'todos';
 let unsubscribeFns = [];
 
+function isUserOnline(user) {
+  // O usuário atual logado é sempre considerado online
+  const currentUser = State.getCurrentUser();
+  if (currentUser && (user.id === currentUser.id || user.email === currentUser.email)) return true;
+
+  // Quem atualizou o perfil nas últimas 24h é considerado online
+  const lastActivity = user.updatedAt || user.updated_at || user.createdAt || user.created_at;
+  if (!lastActivity) return false;
+  const diff = Date.now() - new Date(lastActivity).getTime();
+  return diff < 24 * 60 * 60 * 1000; // 24 horas em ms
+}
+
 function mapUserToMember(user, index) {
   return {
     id: user.id || (user.email ? user.email.replace(/[^a-zA-Z0-9]/g, '') : index + 1),
@@ -17,7 +29,7 @@ function mapUserToMember(user, index) {
     role: user.cargo || user.area || 'Membro SheTech',
     avatar: user.foto_perfil || 'assets/avatars/avatar.svg',
     skills: Array.isArray(user.habilidades) ? user.habilidades : [],
-    online: true,
+    online: isUserOnline(user),
     email: user.email || '',
     bio: user.bio || user.biografia || '',
     fullUser: user
@@ -114,14 +126,40 @@ async function loadPosts() {
 
 async function loadCommunityLinks() {
   const links = await State.getCommunityLinks();
-  allLinks = links.map(l => ({
-    id: l.id,
-    title: l.title || l.titulo,
-    url: l.url,
-    desc: l.descricao || l.desc || '',
-    category: l.category || l.categoria || 'Geral',
-    destaque: l.destaque || false
-  }));
+  const client = State._client();
+
+  // URLs que já estão vinculadas a posts no feed não devem aparecer na aba Links.
+  const postLinkUrls = new Set(
+    allPosts
+      .filter(p => p.link?.url)
+      .map(p => p.link.url.trim().toLowerCase())
+  );
+
+  // Remove silenciosamente do banco os community_links que são cópias de links de posts.
+  // Isso limpa entradas antigas que ficaram para trás.
+  if (client && postLinkUrls.size > 0) {
+    const orphans = links.filter(l => postLinkUrls.has((l.url || '').trim().toLowerCase()));
+    if (orphans.length > 0) {
+      const orphanIds = orphans.map(l => l.id);
+      // Não aguarda — operação de limpeza em background
+      client.from('community_links').delete().in('id', orphanIds).then(({ error }) => {
+        if (error) console.warn('[loadCommunityLinks] Limpeza parcial:', error.message);
+      });
+    }
+  }
+
+  // Exibe apenas links que não são duplicatas de posts do feed
+  allLinks = links
+    .filter(l => !postLinkUrls.has((l.url || '').trim().toLowerCase()))
+    .map(l => ({
+      id: l.id,
+      title: l.title || l.titulo,
+      url: l.url,
+      desc: l.descricao || l.desc || '',
+      category: l.category || l.categoria || 'Geral',
+      destaque: l.destaque || false
+    }));
+
   renderLinks();
 }
 
@@ -152,7 +190,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Layout.init({ active: 'comunidade' });
   }
 
-  await Promise.all([loadPosts(), loadCommunityLinks(), loadMembers()]);
+  // Posts primeiro — loadCommunityLinks depende de allPosts para filtrar duplicatas
+  await loadPosts();
+  await Promise.all([loadCommunityLinks(), loadMembers()]);
   setupRealtime();
 
   initSearch();
@@ -167,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function switchTab(tab) {
   currentTab = tab;
-  ['feed', 'links', 'members'].forEach(t => {
+  ['feed', 'members'].forEach(t => {
     const el = document.getElementById(`section-${t}`);
     const btn = document.getElementById(`tab-${t}`);
     const isActive = t === tab;
@@ -178,8 +218,6 @@ function switchTab(tab) {
     }
   });
 
-  // CORREÇÃO: garantir que os widgets da sidebar apareçam apenas na aba feed
-  // e atualizar sempre que a aba feed é exibida
   if (tab === 'feed') {
     updateSidebarWidgets();
   }
@@ -198,7 +236,14 @@ function renderFeed(posts) {
 
 function postHTML(post) {
   const user = State.getCurrentUser();
-  const isOwner = user && (post.author_email === user.email || post.author_id === user.id);
+
+  // Comparação robusta: normaliza para string e verifica id, email e nome
+  // Cobre posts antigos sem author_id, variações de tipo e posts salvos antes do login
+  const isOwner = user && (
+    (post.author_id    && String(post.author_id)    === String(user.id))    ||
+    (post.author_email && String(post.author_email) === String(user.email)) ||
+    (post.author       && user.nome_completo && post.author === user.nome_completo)
+  );
   const text = escapeHTML(post.text).replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
   return `
   <div class="post-card" id="post-${post.id}" data-author-email="${post.author_email}">
@@ -313,13 +358,17 @@ async function createPost() {
 
   try {
     await State.savePost(post);
-    
-    // Se houver um link, também salvar na comunidade_links se o usuário desejar (opcional)
-    // No fluxo atual, o usuário quer que apareça no feed.
-    
+
     field.innerText = '';
     clearMedia();
-    currentPostLink = null; // Limpa o link temporário
+    currentPostLink = null;
+    // Limpa a prévia do link no composer
+    const preview = document.getElementById('composer-link-preview');
+    if (preview) preview.style.display = 'none';
+
+    // Recarrega o feed imediatamente — não depende do realtime
+    await loadPosts();
+
     showToast('Post publicado! 🎉', 'success');
   } catch (err) {
     showToast('Erro ao publicar. Tente novamente.', 'error');
@@ -482,12 +531,12 @@ async function saveLink(event) {
   }
 
   try {
-    // Se estivermos no feed, guardamos o link para o post
     if (currentTab === 'feed') {
+      // Armazena o link e mostra a prévia no composer
       currentPostLink = link;
+      showComposerLinkPreview(link);
       showToast('Link anexado ao post!', 'success');
     } else {
-      // Se estivermos na aba de links, salvamos direto no banco de links da comunidade
       await State.saveCommunityLink(link);
       showToast('Link compartilhado com a comunidade!', 'success');
     }
@@ -497,23 +546,46 @@ async function saveLink(event) {
   }
 }
 
+function showComposerLinkPreview(link) {
+  const preview = document.getElementById('composer-link-preview');
+  if (!preview) return;
+  document.getElementById('composer-link-title').textContent = link.title || link.url;
+  document.getElementById('composer-link-url').textContent   = link.url;
+  preview.style.display = 'flex';
+}
+
+function removeComposerLink() {
+  currentPostLink = null;
+  const preview = document.getElementById('composer-link-preview');
+  if (preview) preview.style.display = 'none';
+  showToast('Link removido.', '');
+}
+
 async function saveLinkToMyLinks(id, btn) {
   const link = allLinks.find(l => l.id === id);
   const user = State.getCurrentUser();
   if (!link || !user) return;
 
-  await State.saveLink({
-    id: Date.now(),
-    titulo: link.title,
-    url: link.url,
-    descricao: link.desc || '',
-    categoria: link.category || 'Compartilhado',
-    proprietaria_id: user.email
-  });
+  try {
+    const folder = await State.ensureCommunityFolder(user.email);
 
-  btn.textContent = '✓ Salvo';
-  btn.disabled = true;
-  showToast('Link salvo na sua biblioteca! 📚', 'success');
+    await State.saveLink({
+      id: Date.now(),
+      titulo: link.title,
+      url: link.url,
+      descricao: link.desc || '',
+      categoria: link.category || 'Compartilhado',
+      folderId: folder ? folder.id : null,
+      proprietaria_id: user.email
+    });
+
+    btn.textContent = '✓ Salvo';
+    btn.disabled = true;
+    showToast('Link salvo na pasta "Links da Comunidade"!', 'success');
+  } catch (err) {
+    console.error('[saveLinkToMyLinks] Erro:', err);
+    showToast('Erro ao salvar link.', 'error');
+  }
 }
 
 async function savePostLinkToMyLinks(title, url, event) {
@@ -521,15 +593,23 @@ async function savePostLinkToMyLinks(title, url, event) {
   const user = State.getCurrentUser();
   if (!user) return;
 
-  await State.saveLink({
-    id: Date.now(),
-    titulo: title,
-    url,
-    descricao: '',
-    categoria: 'Compartilhado',
-    proprietaria_id: user.email
-  });
-  showToast('Link salvo na sua biblioteca! 📚', 'success');
+  try {
+    const folder = await State.ensureCommunityFolder(user.email);
+
+    await State.saveLink({
+      id: Date.now(),
+      titulo: title,
+      url,
+      descricao: '',
+      categoria: 'Compartilhado',
+      folderId: folder ? folder.id : null,
+      proprietaria_id: user.email
+    });
+    showToast('Link salvo na pasta "Links da Comunidade"!', 'success');
+  } catch (err) {
+    console.error('[savePostLinkToMyLinks] Erro:', err);
+    showToast('Erro ao salvar link.', 'error');
+  }
 }
 
 function renderMembers(members) {
@@ -607,8 +687,6 @@ function initSearch() {
     const q = input.value.toLowerCase().trim();
     if (currentTab === 'feed') {
       renderFeed(!q ? allPosts : allPosts.filter(p => p.text.toLowerCase().includes(q) || p.author.toLowerCase().includes(q)));
-    } else if (currentTab === 'links') {
-      renderLinks(!q ? allLinks : allLinks.filter(l => l.title.toLowerCase().includes(q) || l.url.includes(q)));
     } else {
       filterMembers(q);
     }
@@ -795,9 +873,34 @@ async function confirmDeletePost(id) {
     try {
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Excluindo...';
+
+      // Antes de excluir o post, remove o link associado da aba pública (community_links),
+      // mas NUNCA toca em "links" (tabela pessoal) — links salvos por usuárias são preservados.
+      const post = allPosts.find(p => p.id === id);
+      if (post?.link?.url) {
+        const client = State._client();
+        if (client) {
+          // Busca todas as entradas de community_links com a mesma URL
+          const { data: communityLinks } = await client
+            .from('community_links')
+            .select('id, url')
+            .eq('url', post.link.url);
+
+          if (communityLinks && communityLinks.length > 0) {
+            // Exclui todas — a tabela pessoal (links) não é afetada
+            const idsToDelete = communityLinks.map(l => l.id);
+            await client
+              .from('community_links')
+              .delete()
+              .in('id', idsToDelete);
+          }
+        }
+      }
+
       await State.deleteRow('posts', id);
       showToast('Postagem excluída.', 'success');
       loadPosts();
+      loadCommunityLinks(); // Atualiza a aba de links
       closeModal('confirm-delete-modal');
     } catch (err) {
       showToast('Erro ao excluir postagem.', 'error');
@@ -849,25 +952,55 @@ function renderComments(comments) {
 
   const currentUser = State.getCurrentUser();
 
+  // Monta um mapa rápido de id/email → avatar atual a partir dos membros carregados
+  const avatarMap = {};
+  allMembers.forEach(m => {
+    if (m.id)    avatarMap[String(m.id)]    = m.avatar;
+    if (m.email) avatarMap[m.email]         = m.avatar;
+  });
+  // Garante que o avatar do usuário logado está sempre atualizado
+  if (currentUser) {
+    const meAvatar = currentUser.foto_perfil || 'assets/avatars/avatar.svg';
+    if (currentUser.id)    avatarMap[String(currentUser.id)]    = meAvatar;
+    if (currentUser.email) avatarMap[currentUser.email]         = meAvatar;
+  }
+
+  const resolveAvatar = (c) => {
+    // 1. Tenta pelo id do autor
+    if (c.author_id && avatarMap[String(c.author_id)]) return avatarMap[String(c.author_id)];
+    // 2. Tenta pelo email do autor
+    if (c.author_email && avatarMap[c.author_email]) return avatarMap[c.author_email];
+    // 3. Usa o avatar salvo no comentário
+    if (c.avatar) return c.avatar;
+    // 4. Fallback
+    return 'assets/avatars/avatar.svg';
+  };
+
+  const isOwner = (c) => currentUser &&
+    (c.author_email === currentUser.email || c.author_id === currentUser.id);
+
   list.innerHTML = comments.map(c => {
-    const isOwner = currentUser && (c.author_email === currentUser.email || c.author_id === currentUser.id);
+    const avatar = resolveAvatar(c);
+    const safeId = c.author_id || (c.author_email || '').replace(/[^a-zA-Z0-9]/g, '');
     return `
-      <div class="comment-item" id="comment-${c.id}" data-author-email="${c.author_email}">
-        <img src="${c.avatar || 'assets/avatars/avatar.svg'}" alt="${c.author}" class="comment-avatar user-avatar-${c.author_id || c.author_email.replace(/[^a-zA-Z0-9]/g, '')}" />
+      <div class="comment-item" id="comment-${c.id}" data-author-email="${c.author_email || ''}">
+        <img src="${avatar}"
+             alt="${c.author || ''}"
+             class="comment-avatar user-avatar-${safeId}"
+             onerror="this.src='assets/avatars/avatar.svg'" />
         <div class="comment-content">
           <div class="comment-bubble">
-            <div class="comment-author">${c.author}</div>
+            <div class="comment-author">${c.author || 'Membro SheTech'}</div>
             <div class="comment-text">${escapeHTML(c.text)}</div>
           </div>
           <div class="comment-footer">
             <span class="comment-time">${formatPostTime(c.createdAt)}</span>
-            ${isOwner ? `<button class="comment-delete-btn" onclick="confirmDeleteComment(${c.id}, ${c.post_id})">Excluir</button>` : ''}
+            ${isOwner(c) ? `<button class="comment-delete-btn" onclick="confirmDeleteComment(${c.id}, ${c.post_id})">Excluir</button>` : ''}
           </div>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
-  
+
   // Scroll para o final
   list.scrollTop = list.scrollHeight;
 }
@@ -1103,41 +1236,79 @@ function renderTrendingWidget() {
 
 /**
  * Renderiza o widget "Membras Ativas" na sidebar do feed.
- * Mostra os membros mais recentes e seus perfis.
+ * Mostra até 8 membras com status online/offline real.
  */
 function renderActiveMembersWidget() {
   const container = document.getElementById('active-members-content');
   if (!container) return;
 
   if (!allMembers || allMembers.length === 0) {
-    container.innerHTML = '<p style="font-size:12px;color:var(--gray-500);padding:10px;">Nenhum membro encontrado.</p>';
+    container.innerHTML = `
+      <div class="active-members-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <p>Nenhuma membra encontrada.</p>
+      </div>`;
     return;
   }
 
-  // Pegar até 5 membros (excluindo o usuário atual)
   const currentUser = State.getCurrentUser();
-  const membersToShow = allMembers
-    .filter(m => currentUser ? m.email !== currentUser.email : true)
-    .slice(0, 5);
 
-  if (membersToShow.length === 0) {
-    container.innerHTML = '<p style="font-size:12px;color:var(--gray-500);padding:10px;">Seja a primeira membras a aparecer!</p>';
-    return;
+  // Ordena: online primeiro, depois offline — máximo 8
+  const sorted = [...allMembers].sort((a, b) => {
+    // Usuário atual sempre no topo
+    const aIsMe = currentUser && (a.email === currentUser.email || a.id === currentUser.id);
+    const bIsMe = currentUser && (b.email === currentUser.email || b.id === currentUser.id);
+    if (aIsMe) return -1;
+    if (bIsMe) return 1;
+    // Online antes de offline
+    if (a.online && !b.online) return -1;
+    if (!a.online && b.online) return 1;
+    return 0;
+  });
+
+  const membersToShow = sorted.slice(0, 8);
+
+  const onlineCount  = allMembers.filter(m => m.online).length;
+  const offlineCount = allMembers.length - onlineCount;
+
+  // Atualiza o contador no cabeçalho do widget, se existir
+  const headerCount = document.getElementById('active-members-count');
+  if (headerCount) {
+    headerCount.textContent = `${onlineCount} online`;
   }
 
-  container.innerHTML = membersToShow.map(m => `
-    <div class="active-member" style="display:flex;align-items:center;gap:9px;padding:8px;border-radius:8px;cursor:pointer;transition:background 0.2s;" onclick="viewProfile('${m.id}')">
-      <div class="member-thumb-wrap" style="position:relative;flex-shrink:0;">
-        <img src="${m.avatar || 'assets/avatars/avatar.svg'}" alt="${m.name}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #fff;display:block;" />
-        ${m.online ? '<span class="online-indicator" style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#10B981;border:2px solid var(--surface);"></span>' : ''}
+  container.innerHTML = membersToShow.map(m => {
+    const isMe = currentUser && (m.email === currentUser.email || m.id === currentUser.id);
+    const statusLabel = m.online ? 'Online' : 'Offline';
+    const statusCls   = m.online ? 'am-status--online' : 'am-status--offline';
+    const dotCls      = m.online ? 'am-dot--online'   : 'am-dot--offline';
+
+    return `
+    <div class="am-row" onclick="viewProfile('${m.id}')">
+      <div class="am-avatar-wrap">
+        <img
+          src="${m.avatar || 'assets/avatars/avatar.svg'}"
+          alt="${m.name}"
+          class="am-avatar"
+          onerror="this.src='assets/avatars/avatar.svg'"
+        />
+        <span class="am-dot ${dotCls}"></span>
       </div>
-      <div style="flex:1;min-width:0;">
-        <span class="active-name" style="display:block;font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</span>
-        <span class="active-role" style="font-size:11px;color:var(--gray-500);">${m.role || 'Membro'}</span>
+      <div class="am-info">
+        <span class="am-name">${m.name}${isMe ? ' <span class="am-you-badge">Você</span>' : ''}</span>
+        <span class="am-role">${m.role || 'Membro SheTech'}</span>
       </div>
-      <button class="follow-mini-btn" onclick="event.stopPropagation(); followMember('${m.id}', this)">Seguir</button>
-    </div>
-  `).join('');
+      <div class="am-right">
+        <span class="am-status ${statusCls}">${statusLabel}</span>
+        ${isMe ? '' : `<button class="am-follow-btn" onclick="event.stopPropagation(); followMember('${m.id}', this)">Seguir</button>`}
+      </div>
+    </div>`;
+  }).join('') + (allMembers.length > 8 ? `
+    <div class="am-show-more">
+      <button onclick="document.getElementById('tab-members')?.click()">
+        Ver todas as ${allMembers.length} membras →
+      </button>
+    </div>` : '');
 }
 
 /**

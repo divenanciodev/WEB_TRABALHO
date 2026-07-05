@@ -231,10 +231,20 @@
 
 .info-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   font-size: 13.5px;
   color: var(--gray-700);
+  /* evita que emails longos quebrem o card */
+  overflow-wrap: break-word;
+  word-break: break-all;
+  min-width: 0;
+}
+
+.info-item span {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .info-item i {
@@ -1061,3 +1071,171 @@
     display: none;
   }
 }
+
+/* ── BADGES DE STATUS (timeline + projetos) ──────── */
+.tl-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.status--concluido    { background: #e2e8f0; color: #475569; }
+.status--em-dev       { background: #dbeafe; color: #1d4ed8; }
+.status--planejamento { background: #fef9c3; color: #92400e; }
+.status--cancelado    { background: #fee2e2; color: #b91c1c; }
+.status--pausado      { background: #f3f4f6; color: #6b7280; }
+.status--ativo        { background: #d1fae5; color: #065f46; }
+.status--online       { background: #dbeafe; color: #1e40af; }
+.status--presencial   { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+
+/* ── BARRA DE PROGRESSO NA TIMELINE ─────────────── */
+.tl-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.tl-progress-bg {
+  flex: 1;
+  height: 6px;
+  background: var(--gray-100, #f3f4f6);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.tl-progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--pink, #ff3d8b), #673ab7);
+  transition: width .6s ease;
+}
+
+.tl-progress-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-500);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ── STATUS PILL NOS CARDS DE PROJETO (tab projetos) */
+.project-status-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+/* ── SHARE POPOVER (reutiliza classes da comunidade) */
+/* Se comunidade.css não estiver carregado aqui, definimos as classes localmente */
+.share-popover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: transparent;
+}
+
+.share-popover-container {
+  position: fixed;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid var(--gray-200, #e5e7eb);
+  border-radius: 16px;
+  padding: 18px 16px 14px;
+  width: 300px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.14);
+  animation: popover-in .18s ease;
+}
+
+@keyframes popover-in {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.share-popover-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink, #1a1a1f);
+  margin-bottom: 14px;
+}
+
+.share-options-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.share-option-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: var(--gray-700, #374151);
+  font-size: 10px;
+  font-weight: 600;
+  transition: transform .15s;
+}
+
+.share-option-item:hover { transform: translateY(-2px); }
+
+.share-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.share-icon-circle svg { width: 18px; height: 18px; }
+
+.share-icon-circle.whatsapp  { background: #d9f7e8; color: #25D366; }
+.share-icon-circle.facebook  { background: #dbeafe; color: #1877F2; }
+.share-icon-circle.x-twitter { background: #f3f4f6; color: #0f172a; }
+.share-icon-circle.linkedin  { background: #dbeafe; color: #0A66C2; }
+.share-icon-circle.email     { background: #fce4ec; color: #e91e63; }
+
+.share-url-box {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: var(--gray-100, #f3f4f6);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.share-url-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: var(--gray-700, #374151);
+  outline: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-copy-small {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  background: var(--pink, #ff3d8b);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+.btn-copy-small:hover { opacity: .85; }
