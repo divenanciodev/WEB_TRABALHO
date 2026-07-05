@@ -27,8 +27,8 @@ A **SheTech** surge como uma solução para conectar essas pessoas em uma comuni
 ### Evidências do Cenário Atual 
 <div align="center">
   <img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/Blue%20Coral%20and%20Peach%20Simple%20Budget%20Pie%20Chart%20Graph.png?raw=true" alt="Descrição da Imagem 1" width="45%">
-  <img src="<img width="1024" height="768" alt="image" src="https://github.com/user-attachments/assets/b75e186c-cd6b-4f2c-932a-fc5e1a4df392" />
-" alt="Descrição da Imagem 2" width="45%">
+  
+  <img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/Blue%20Coral%20and%20Peach%20Simple%20Budget%20Pie%20Chart%20Graph%20(1).png?raw=true" alt="Descrição da Imagem 2" width="45%">
   <p><i>Legenda: Representação visual dos desafios enfrentados por mulheres na tecnologia.</i></p>
 </div>
 
