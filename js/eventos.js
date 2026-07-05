@@ -201,7 +201,7 @@
               const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
               const icon = isSubscribed ? 'check' : 'user-plus';
               const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-              return \`<button class="\${btnClass}" onclick="event.stopPropagation(); window.toggleEventSubscription('\${ev.id}')"><i class="icon-\${icon}"></i> \${text}</button>\`;
+              return \`<button class="\${btnClass}" onclick="event.stopPropagation(); \${isSubscribed ? \`window.toggleEventSubscription('\${ev.id}')\` : \`window.openParticipacaoEventoModal('\${ev.id}')\` }"><i class="icon-\${icon}"></i> \${text}</button>\`;
             }
             return '';
           })()}
@@ -380,8 +380,15 @@
     if (!ev) return;
 
     detailModal.classList.add("modal-detail-overlay");
-    document.body.style.overflow = 'hidden'; // Prevenir scroll no fundo
+    document.body.style.overflow = 'hidden';
     document.getElementById("detail-title").textContent = ev.titulo;
+    document.getElementById("detail-body").innerHTML = '<p style="color:var(--gray-500);padding:12px 0;">Carregando detalhes...</p>';
+    detailModal.classList.add("open");
+
+    renderEventDetail(ev);
+  }
+
+  async function renderEventDetail(ev) {
 
     const isOnline = ev.tipo === "online";
     const locIcon = isOnline ? "icon-video" : "icon-map-pin";
@@ -390,20 +397,23 @@
       ? `<a href="${ev.link}" target="_blank" rel="noopener">${ev.link}</a>`
       : `<span>${ev.endereco}</span>`;
 
-    const membros = ev.membros || [];
-    const membrosHTML = membros.length > 0
+    const memberProfiles = await State.resolveMemberProfiles(ev.membros || []);
+    const membrosHTML = memberProfiles.length > 0
       ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
             <div class="detail-row-icon"><i class="icon-users"></i></div>
-            <strong>Membros Participantes (${membros.length})</strong>
+            <strong>Membros Participantes (${memberProfiles.length})</strong>
           </div>
-          <div class="members-list" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
-            ${membros.map(m => `
-              <div class="member-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px;">
-                <div style="font-weight: 600; color: var(--pink);">${m.nome}</div>
-                <div style="font-size: 12px; color: var(--gray-600);">${m.papel}</div>
-                <div style="font-size: 11px; color: var(--gray-500); margin-top: 4px;">Status: ${m.status}</div>
-              </div>
+          <div class="members-list" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+            ${memberProfiles.map((m) => `
+              <a href="${m.id ? `perfil.html?user=${encodeURIComponent(m.id)}` : '#'}" class="member-card" style="display:flex;align-items:flex-start;gap:10px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:12px;text-decoration:none;color:inherit;" onclick="event.stopPropagation()">
+                <img src="${m.avatar}" alt="${m.name}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
+                <div style="min-width:0;">
+                  <div style="font-weight:600;color:var(--pink);">${m.name}</div>
+                  <div style="font-size:12px;color:var(--gray-600);">${m.role}</div>
+                  ${m.bio ? `<div style="font-size:12px;color:var(--gray-700);margin-top:4px;line-height:1.4;">${m.bio}</div>` : ''}
+                </div>
+              </a>
             `).join('')}
           </div>
         </div>`
@@ -489,14 +499,12 @@
     if (isOwner) {
       editBtn.style.display = 'flex';
       deleteBtn.style.display = 'flex';
-      editBtn.onclick = () => { closeDetail(); openModal(id); };
-      deleteBtn.onclick = () => { closeDetail(); deleteEvent(id); };
+      editBtn.onclick = () => { closeDetail(); openModal(ev.id); };
+      deleteBtn.onclick = () => { closeDetail(); deleteEvent(ev.id); };
     } else {
       editBtn.style.display = 'none';
       deleteBtn.style.display = 'none';
     }
-
-    detailModal.classList.add("open");
   }
 
   function closeDetail() {

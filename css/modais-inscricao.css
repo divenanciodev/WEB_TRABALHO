@@ -1,0 +1,45 @@
+/* Estilos para os modais de inscrição e participação */
+.modal-inscricao-content {
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-inscricao-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: 15px;
+}
+
+.modal-inscricao-header h2 {
+    font-size: 1.5rem;
+    color: var(--pink-1);
+}
+
+.modal-inscricao-body .form-group {
+    margin-bottom: 15px;
+}
+
+.modal-inscricao-body label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.modal-inscricao-body input,
+.modal-inscricao-body textarea,
+.modal-inscricao-body select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.modal-inscricao-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--gray-200);
+}

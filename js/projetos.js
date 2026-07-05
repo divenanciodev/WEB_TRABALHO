@@ -61,6 +61,41 @@
     return "badge--" + statusKey(status);
   }
 
+  function buildMemberCardHTML(member) {
+    const skillsHtml = (member.skills || []).slice(0, 3)
+      .map((s) => `<span class="tech-pill project-member-skill">${s}</span>`)
+      .join("");
+    const profileUrl = member.id
+      ? `perfil.html?user=${encodeURIComponent(member.id)}`
+      : "#";
+
+    return `
+      <a href="${profileUrl}" class="project-member-card" onclick="event.stopPropagation()">
+        <img src="${member.avatar}" alt="${member.name}" class="project-member-avatar" />
+        <div class="project-member-info">
+          <span class="project-member-name">${member.name}</span>
+          <span class="project-member-role">${member.role}</span>
+          ${member.bio ? `<p class="project-member-bio">${member.bio}</p>` : ""}
+          ${member.extra ? `<p class="project-member-extra">${member.extra}</p>` : ""}
+          ${skillsHtml ? `<div class="project-member-skills">${skillsHtml}</div>` : ""}
+        </div>
+      </a>`;
+  }
+
+  function buildMembersSectionHTML(profiles) {
+    if (!profiles.length) return "";
+    return `
+      <div class="detail-row detail-row--members">
+        <div class="detail-row-members-header">
+          <div class="detail-row-icon"><i class="icon-users"></i></div>
+          <strong>Membros (${profiles.length})</strong>
+        </div>
+        <div class="project-members-list">
+          ${profiles.map(buildMemberCardHTML).join("")}
+        </div>
+      </div>`;
+  }
+
   /* ── Stats ──────────────────────────────────────────────────── */
   function updateStats() {
     document.getElementById("stat-total").textContent = projects.length;
@@ -131,7 +166,7 @@
       const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
       const icon = isSubscribed ? 'check' : 'user-plus';
       const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-      subscribeBtn = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')"><i class="icon-${icon}"></i> ${text}</button>`;
+      subscribeBtn = `<button class="${btnClass}" onclick="event.stopPropagation(); ${isSubscribed ? `window.toggleProjectSubscription('${p.id}')` : `window.openInscricaoProjetoModal('${p.id}')`}"><i class="icon-${icon}"></i> ${text}</button>`;
       linkBtns.push(subscribeBtn);
     }
     
@@ -371,13 +406,15 @@
   /* ── Modal de detalhes ───────────────────────────────────────── */
   const detailModal = document.getElementById("detail-modal");
 
-  function openDetail(id) {
+  async function openDetail(id) {
     const p = projects.find((x) => x.id === id);
     if (!p) return;
 
     detailModal.classList.add("modal-detail-overlay");
     document.body.style.overflow = 'hidden'; // Prevenir scroll no fundo
     document.getElementById("detail-title").textContent = p.titulo;
+    document.getElementById("detail-body").innerHTML = '<p style="color:var(--gray-500);padding:12px 0;">Carregando detalhes...</p>';
+    detailModal.classList.add("open");
 
     const isConcluido = p.status === "Concluído";
 
@@ -385,24 +422,8 @@
       .map((t) => `<span class="tech-pill">${t}</span>`)
       .join("") || "<span style='color:var(--gray-500);font-size:14px'>Nenhuma tecnologia informada</span>";
 
-    const membros = p.membros || [];
-    const membrosHTML = membros.length > 0
-      ? `<div class="detail-row" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <div class="detail-row-icon"><i class="icon-users"></i></div>
-            <strong>Membros (${membros.length})</strong>
-          </div>
-          <div class="members-list" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
-            ${membros.map(m => `
-              <div class="member-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px;">
-                <div style="font-weight: 600; color: var(--pink);">${m.nome || m}</div>
-                ${m.funcao ? `<div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">${m.funcao}</div>` : ''}
-                ${m.descricao ? `<div style="font-size: 13px; color: var(--gray-700); line-height: 1.4;">${m.descricao}</div>` : ''}
-              </div>
-            `).join('')}
-          </div>
-        </div>`
-      : '';
+    const memberProfiles = await State.resolveMemberProfiles(p.membros || []);
+    const membrosHTML = buildMembersSectionHTML(memberProfiles);
 
     document.getElementById("detail-body").innerHTML = `
       <div class="detail-section">

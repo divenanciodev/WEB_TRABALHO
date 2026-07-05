@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="vendor/lucide/lucide.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/eventos.css">
+  <link rel="stylesheet" href="css/modais-inscricao.css">
 </head>
 <body>
 
@@ -230,6 +231,37 @@
     </div>
   </div>
 
+  <!-- Modal de Participação em Evento -->
+  <div id="modal-participacao-evento" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content modal-inscricao-content">
+      <div class="modal-header">
+        <h2>Participar do Evento</h2>
+        <button class="modal-close" onclick="closeParticipacaoEventoModal()"><i class="icon-x"></i></button>
+      </div>
+      <form id="form-participacao-evento">
+        <input type="hidden" id="participacao-evento-id">
+        <div class="modal-inscricao-body">
+          <div class="form-group">
+            <label for="ev-nome">Nome Completo</label>
+            <input type="text" id="ev-nome" required placeholder="Seu nome">
+          </div>
+          <div class="form-group">
+            <label for="ev-email">E-mail</label>
+            <input type="email" id="ev-email" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label for="ev-expectativa">O que você espera aprender neste evento?</label>
+            <textarea id="ev-expectativa" rows="3" required placeholder="Compartilhe suas expectativas..."></textarea>
+          </div>
+        </div>
+        <div class="modal-inscricao-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeParticipacaoEventoModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Confirmar Presença</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -238,5 +270,6 @@
   <script src="js/app.js"></script>
   <script src="js/layout.js"></script>
   <script src="js/eventos.js"></script>
+  <script src="js/modais-inscricao.js"></script>
 </body>
 </html>

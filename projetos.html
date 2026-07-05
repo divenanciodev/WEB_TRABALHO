@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="vendor/lucide/lucide.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/projetos.css">
+  <link rel="stylesheet" href="css/modais-inscricao.css">
 </head>
 <body>
 
@@ -219,6 +220,41 @@
     </div>
   </div>
 
+  <!-- Modal de Inscrição em Projeto -->
+  <div id="modal-inscricao-projeto" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content modal-inscricao-content">
+      <div class="modal-header">
+        <h2>Inscrição no Projeto</h2>
+        <button class="modal-close" onclick="closeInscricaoProjetoModal()"><i class="icon-x"></i></button>
+      </div>
+      <form id="form-inscricao-projeto">
+        <input type="hidden" id="inscricao-projeto-id">
+        <div class="modal-inscricao-body">
+          <div class="form-group">
+            <label for="proj-nome">Nome Completo</label>
+            <input type="text" id="proj-nome" required placeholder="Seu nome">
+          </div>
+          <div class="form-group">
+            <label for="proj-email">E-mail</label>
+            <input type="email" id="proj-email" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label for="proj-motivo">Por que você quer participar deste projeto?</label>
+            <textarea id="proj-motivo" rows="3" required placeholder="Conte um pouco sobre seu interesse..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="proj-habilidades">Habilidades principais</label>
+            <input type="text" id="proj-habilidades" placeholder="Ex: React, UX Design, Python">
+          </div>
+        </div>
+        <div class="modal-inscricao-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeInscricaoProjetoModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Enviar Inscrição</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -227,5 +263,6 @@
   <script src="js/app.js"></script>
   <script src="js/layout.js"></script>
   <script src="js/projetos.js"></script>
+  <script src="js/modais-inscricao.js"></script>
 </body>
 </html>

@@ -138,6 +138,58 @@ const State = {
     return data;
   },
 
+  async resolveMemberProfiles(membros) {
+    if (!Array.isArray(membros) || membros.length === 0) return [];
+
+    const users = await this.getUsers();
+    const userMap = new Map(users.map((u) => [String(u.id), u]));
+
+    const extractId = (m) => {
+      if (typeof m === 'string') return m;
+      if (m && typeof m === 'object') return m.id || m.userId || null;
+      return null;
+    };
+
+    return membros.map((m) => {
+      const id = extractId(m);
+      const user = id ? userMap.get(String(id)) : null;
+
+      if (user) {
+        return {
+          id: user.id,
+          name: user.nome_completo || user.nome_usuario || 'Membro SheTech',
+          role: user.cargo || user.area || 'Membro SheTech',
+          avatar: user.foto_perfil || 'assets/avatars/avatar.svg',
+          bio: user.bio || user.biografia || '',
+          skills: Array.isArray(user.habilidades) ? user.habilidades : [],
+          extra: typeof m === 'object' ? (m.funcao || m.papel || m.descricao || '') : ''
+        };
+      }
+
+      if (typeof m === 'object' && (m.nome || m.name)) {
+        return {
+          id: id || '',
+          name: m.nome || m.name,
+          role: m.funcao || m.papel || 'Membro',
+          avatar: m.avatar || m.foto_perfil || 'assets/avatars/avatar.svg',
+          bio: m.descricao || m.bio || '',
+          skills: Array.isArray(m.habilidades) ? m.habilidades : [],
+          extra: m.status ? `Status: ${m.status}` : ''
+        };
+      }
+
+      return {
+        id: id || '',
+        name: 'Membro não encontrado',
+        role: 'Membro SheTech',
+        avatar: 'assets/avatars/avatar.svg',
+        bio: '',
+        skills: [],
+        extra: ''
+      };
+    });
+  },
+
   async getProjects() {
     return this.fetchTable('shetech_projetos');
   },
@@ -276,6 +328,10 @@ const State = {
     return this.deleteRow('shetech_projetos', id);
   },
 
+  async saveProject(project) {
+    return this.saveRow('shetech_projetos', project);
+  },
+
   async saveEvent(event) {
     return this.saveRow('shetech_eventos', event);
   },
@@ -366,6 +422,26 @@ const State = {
     return this.deleteRow('folders', id);
   },
 
+  COMMUNITY_FOLDER_NAME: 'Links da Comunidade',
+
+  async ensureCommunityFolder(email) {
+    if (!email) return null;
+
+    const folders = await this.getFolders(email);
+    const existing = folders.find((f) => f.nome === this.COMMUNITY_FOLDER_NAME);
+    if (existing) return existing;
+
+    return this.saveFolder({
+      id: Date.now(),
+      nome: this.COMMUNITY_FOLDER_NAME,
+      proprietaria_id: email
+    });
+  },
+
+  isCommunityFolder(folder) {
+    return folder?.nome === this.COMMUNITY_FOLDER_NAME;
+  },
+
   async getNotifications(email) {
     const client = this._client();
     if (!client || !email) return [];
@@ -385,12 +461,28 @@ const State = {
   },
 
   async addNotification(email, message) {
-    return this.saveRow('notifications', {
-      id: Date.now(),
-      destinataria_id: email,
-      mensagem: message,
-      lida: false
-    });
+    const client = this._client();
+    if (!client) throw new Error('Supabase indisponível');
+    if (!email) throw new Error('Destinatário da notificação inválido');
+
+    const { data, error } = await client
+      .from('notifications')
+      .insert({
+        id: Date.now(),
+        destinataria_id: email,
+        mensagem: message,
+        lida: false,
+        createdAt: new Date().toISOString()
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      console.error('[State] Erro ao enviar notificação:', error);
+      throw error;
+    }
+
+    return data;
   },
 
   async getMembersCount() {
@@ -424,7 +516,7 @@ const State = {
 
 window.State = State;
 
-window.toggleProjectSubscription = async (projectId) => {
+window.toggleProjectSubscription = async (projectId, extraData = null) => {
   const user = State.getCurrentUser();
   if (!user) {
     if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Você precisa estar logada para se inscrever.', 'error');
@@ -433,7 +525,11 @@ window.toggleProjectSubscription = async (projectId) => {
   const client = State._client();
   if (!client) return false;
 
-  const { data: project, error: fetchError } = await client.from('shetech_projetos').select('membros, author_id, author_email, titulo').eq('id', projectId).single();
+  const { data: project, error: fetchError } = await client
+    .from('shetech_projetos')
+    .select('membros, author_id, author_email, criador_id, proprietaria_id, titulo')
+    .eq('id', projectId)
+    .single();
   if (fetchError || !project) {
     if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao buscar projeto.', 'error');
     return false;
@@ -443,9 +539,12 @@ window.toggleProjectSubscription = async (projectId) => {
     return false;
   }
 
+  const creatorEmail = project.author_email || project.criador_id || project.proprietaria_id;
+
   let membros = Array.isArray(project.membros) ? project.membros : [];
-  if (membros.includes(user.id)) {
-    membros = membros.filter(m => m !== user.id);
+  const isMember = membros.some((m) => m === user.id || m?.id === user.id);
+  if (isMember) {
+    membros = membros.filter((m) => m !== user.id && m?.id !== user.id);
     const { error: updateError } = await client.from('shetech_projetos').update({ membros }).eq('id', projectId);
     if (updateError) {
       if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Erro ao cancelar inscrição.', 'error');
@@ -453,13 +552,37 @@ window.toggleProjectSubscription = async (projectId) => {
     }
     if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Inscrição cancelada.', 'success');
   } else {
+    if (!creatorEmail) {
+      if (typeof Layout !== 'undefined' && Layout.showToast) Layout.showToast('Não foi possível identificar o criador do projeto.', 'error');
+      return false;
+    }
+
     // Send request via notification
-    const reqMsg = `A usuária <strong>${user.nome_completo || user.nome_usuario || user.email}</strong> solicitou inscrição no seu projeto <strong>${project.titulo || 'Projeto'}</strong>.<br><br><div style="display:flex;gap:8px;" class="request-actions"><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;border-radius:6px;cursor:pointer;border:none;color:#fff;" onclick="window.acceptProjectRequest('${projectId}', '${user.id}', this)">Aceitar</button><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:6px;border:1px solid var(--gray-300);background:transparent;cursor:pointer;" onclick="window.denyProjectRequest(this)">Negar</button></div>`;
+    let extraInfo = '';
+    if (extraData) {
+      extraInfo = `<div class="notif-details">
+        ${extraData.motivo ? `<p><strong>Motivo:</strong> ${extraData.motivo}</p>` : ''}
+        ${extraData.habilidades ? `<p><strong>Habilidades:</strong> ${extraData.habilidades}</p>` : ''}
+      </div>`;
+    }
+
+    const reqMsg = `<p class="notif-message">A usuária <strong>${user.nome_completo || user.nome_usuario || user.email}</strong> solicitou inscrição no seu projeto <strong>${project.titulo || 'Projeto'}</strong>.</p>${extraInfo}<div class="request-actions"><button type="button" class="btn btn-primary" onclick="window.acceptProjectRequest('${projectId}', '${user.id}', this)">Aceitar</button><button type="button" class="btn" onclick="window.denyProjectRequest(this)">Negar</button></div>`;
     
-    await State.addNotification(project.author_email, reqMsg);
-    
+    try {
+      await State.addNotification(creatorEmail, reqMsg);
+    } catch (err) {
+      console.error('[toggleProjectSubscription] Erro ao enviar solicitação:', err);
+      if (typeof Layout !== 'undefined' && Layout.showToast) {
+        Layout.showToast('Erro ao enviar solicitação. Tente novamente.', 'error');
+      }
+      return false;
+    }
+
+    const successMsg = 'O criador do projeto receberá uma notificação para aprovar a sua participação.';
     if (typeof Layout !== 'undefined' && Layout.showSuccessModal) {
-      Layout.showSuccessModal('Solicitação Enviada!', 'O criador do projeto receberá uma notificação para aprovar a sua participação.');
+      Layout.showSuccessModal('Solicitação Enviada!', successMsg);
+    } else if (typeof Layout !== 'undefined' && Layout.showToast) {
+      Layout.showToast('Solicitação enviada!', 'success');
     }
   }
 
@@ -482,16 +605,16 @@ window.acceptProjectRequest = async (projectId, userId, btnEl) => {
     }
   }
 
-  const actionsDiv = btnEl.closest('.request-actions');
+  const actionsDiv = btnEl.closest('.request-actions') || btnEl.closest('.notif-actions');
   if (actionsDiv) {
-    actionsDiv.innerHTML = '<span style="color:var(--success);font-weight:500;"><i class="icon-check-circle"></i> Solicitação Aceita</span>';
+    actionsDiv.innerHTML = '<span class="notif-status notif-status--accepted"><i class="icon-check-circle"></i> Solicitação aceita</span>';
   }
 };
 
 window.denyProjectRequest = (btnEl) => {
-  const actionsDiv = btnEl.closest('.request-actions');
+  const actionsDiv = btnEl.closest('.request-actions') || btnEl.closest('.notif-actions');
   if (actionsDiv) {
-    actionsDiv.innerHTML = '<span style="color:var(--danger);font-weight:500;"><i class="icon-x-circle"></i> Solicitação Recusada</span>';
+    actionsDiv.innerHTML = '<span class="notif-status notif-status--denied"><i class="icon-x-circle"></i> Solicitação recusada</span>';
   }
 };
 

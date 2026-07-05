@@ -153,7 +153,7 @@ window.renderFeaturedProjects = async function() {
             const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
             const icon = isSubscribed ? 'check' : 'user-plus';
             const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-            btnHtml = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleProjectSubscription('${p.id}')"><i class="icon-${icon}"></i> ${text}</button>`;
+            btnHtml = `<button class="${btnClass}" onclick="event.stopPropagation(); ${isSubscribed ? `window.toggleProjectSubscription('${p.id}')` : `window.openInscricaoProjetoModal('${p.id}')`}"><i class="icon-${icon}"></i> ${text}</button>`;
         }
         return `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--gray-200); border-radius:8px; background:#fff;">
@@ -186,7 +186,7 @@ window.renderUpcomingEvents = async function() {
             const btnClass = isSubscribed ? 'card-link-btn card-link-btn--subscribed' : 'card-link-btn';
             const icon = isSubscribed ? 'check' : 'user-plus';
             const text = isSubscribed ? 'Inscrito' : 'Se inscrever';
-            btnHtml = `<button class="${btnClass}" onclick="event.stopPropagation(); window.toggleEventSubscription('${ev.id}')"><i class="icon-${icon}"></i> ${text}</button>`;
+            btnHtml = `<button class="${btnClass}" onclick="event.stopPropagation(); ${isSubscribed ? `window.toggleEventSubscription('${ev.id}')` : `window.openParticipacaoEventoModal('${ev.id}')`}"><i class="icon-${icon}"></i> ${text}</button>`;
         }
         return `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--gray-200); border-radius:8px; background:#fff;">
