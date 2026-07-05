@@ -14,11 +14,11 @@ Diante desse cenário, observa-se a necessidade de uma plataforma que promova in
 
 **Os principais problemas identificados são:**
 
-- Baixa representatividade feminina no mercado de tecnologia;
-- Poucas oportunidades de networking e colaboração entre mulheres interessadas em tecnologia;
-- Dificuldade em transformar aprendizado em experiência prática, devido à falta de equipes e projetos colaborativos;
-- Necessidade de maior inclusão digital para comunidades historicamente sub-representadas, como mulheres e povos indígenas presentes na região de Grajaú;
-- Ausência de um ambiente seguro para compartilhar conhecimento, desenvolver projetos e construir portfólio profissional.
+* Baixa representatividade feminina no mercado de tecnologia;
+* Poucas oportunidades de networking e colaboração entre mulheres interessadas em tecnologia;
+* Dificuldade em transformar aprendizado em experiência prática, devido à falta de equipes e projetos colaborativos;
+* Necessidade de maior inclusão digital para comunidades historicamente sub-representadas, como mulheres e povos indígenas presentes na região de Grajaú;
+* Ausência de um ambiente seguro para compartilhar conhecimento, desenvolver projetos e construir portfólio profissional.
 
 A **SheTech** surge como uma solução para conectar essas pessoas em uma comunidade colaborativa, oferecendo um ambiente para aprendizagem, criação de projetos, participação em eventos e fortalecimento da presença feminina e da diversidade na tecnologia.
 
