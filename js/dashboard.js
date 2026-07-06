@@ -73,7 +73,13 @@ async function renderRecentActivity() {
     const container = document.getElementById('recent-activity-list');
     if (!container) return;
 
-    const posts = (await State.getPosts()).slice(0, 3);
+    // Busca usuários para resolver avatares atualizados
+    const [postsRaw, users] = await Promise.all([
+        State.getPosts(),
+        State.getUsers()
+    ]);
+    
+    const posts = postsRaw.slice(0, 3);
 
     if (posts.length === 0) {
         container.innerHTML = `
@@ -85,16 +91,35 @@ async function renderRecentActivity() {
         return;
     }
 
-    container.innerHTML = posts.map(p => `
+    const currentUser = State.getCurrentUser();
+    container.innerHTML = posts.map(p => {
+        // Resolve o avatar mais atualizado
+        let currentAvatar = p.avatar || 'assets/avatars/avatar.svg';
+        let author = users.find(u => 
+            (p.author_id && String(u.id) === String(p.author_id)) || 
+            (p.author_email && u.email === p.author_email)
+        );
+
+        // Fallback para dados contaminados no dashboard
+        if (currentUser && author && (String(author.id) === String(currentUser.id)) && p.author !== currentUser.nome_completo) {
+            const realAuthor = users.find(u => (u.nome_completo || u.nome_usuario) === p.author);
+            if (realAuthor) author = realAuthor;
+        }
+
+        if (author && author.foto_perfil) {
+            currentAvatar = author.foto_perfil;
+        }
+
+        return `
         <div class="activity-row">
-            <img src="${p.avatar || 'assets/avatars/avatar.svg'}" alt="${p.author}" style="width:32px;height:32px;border-radius:50%;object-fit:cover" />
+            <img src="${currentAvatar}" alt="${p.author}" style="width:32px;height:32px;border-radius:50%;object-fit:cover" />
             <div style="flex:1">
                 <div style="font-weight:500;font-size:14px">${p.author}</div>
                 <div style="font-size:12px;color:var(--gray-500)">${p.text?.substring(0, 50)}...</div>
             </div>
             <div style="font-size:12px;color:var(--gray-500)">${p.time || 'Recente'}</div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 function setupQuickActions() {

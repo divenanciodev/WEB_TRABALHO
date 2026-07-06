@@ -97,8 +97,8 @@ const State = {
     const user = this.getCurrentUser();
     const payload = {
       ...item,
-      author_id: user?.id || item.author_id || null,
-      author_email: user?.email || item.author_email || null,
+      author_id: item.author_id || user?.id || null,
+      author_email: item.author_email || user?.email || null,
       createdAt: item.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

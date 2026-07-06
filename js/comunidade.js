@@ -76,6 +76,7 @@ function updateAllProfileIcons(user) {
   if (sidebarAvatar) sidebarAvatar.src = avatarUrl;
 
   // 4. Avatares em posts e comentários (global por classe)
+  // Nota: userIdClass é único para o usuário logado, então isso só deve afetar os seus próprios posts.
   document.querySelectorAll(`.${userIdClass}`).forEach(img => {
     img.src = avatarUrl;
   });
@@ -190,9 +191,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Layout.init({ active: 'comunidade' });
   }
 
-  // Posts primeiro — loadCommunityLinks depende de allPosts para filtrar duplicatas
+  // Membros primeiro para que o feed possa resolver os avatares corretamente
+  await loadMembers();
   await loadPosts();
-  await Promise.all([loadCommunityLinks(), loadMembers()]);
+  await loadCommunityLinks();
   setupRealtime();
 
   initSearch();
@@ -237,6 +239,29 @@ function renderFeed(posts) {
 function postHTML(post) {
   const user = State.getCurrentUser();
 
+  // Resolve o avatar mais atualizado a partir da lista de membros carregada
+  let currentAvatar = post.avatar || 'assets/avatars/avatar.svg';
+  if (allMembers && allMembers.length > 0) {
+    // 1. Tenta encontrar pelo ID ou Email
+    let author = allMembers.find(m => 
+      (post.author_id && String(m.id) === String(post.author_id)) || 
+      (post.author_email && m.email === post.author_email)
+    );
+
+    // 2. FALLBACK PARA DADOS CONTAMINADOS: 
+    // Se o autor encontrado for o usuário logado, mas o nome no post for diferente,
+    // tentamos encontrar o autor real pelo nome. Isso corrige posts antigos onde
+    // o ID do autor foi sobrescrito indevidamente.
+    if (user && author && (String(author.id) === String(user.id)) && post.author !== user.nome_completo) {
+      const realAuthor = allMembers.find(m => m.name === post.author);
+      if (realAuthor) author = realAuthor;
+    }
+
+    if (author && author.avatar) {
+      currentAvatar = author.avatar;
+    }
+  }
+
   // Comparação robusta: normaliza para string e verifica id, email e nome
   // Cobre posts antigos sem author_id, variações de tipo e posts salvos antes do login
   const isOwner = user && (
@@ -245,10 +270,12 @@ function postHTML(post) {
     (post.author       && user.nome_completo && post.author === user.nome_completo)
   );
   const text = escapeHTML(post.text).replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
+  const safeId = post.author_id || (post.author_email ? post.author_email.replace(/[^a-zA-Z0-9]/g, '') : 'default');
+  
   return `
   <div class="post-card" id="post-${post.id}" data-author-email="${post.author_email}">
     <div class="post-header">
-      <img src="${post.avatar}" alt="${post.author}" class="post-avatar user-avatar-${post.author_id || post.author_email.replace(/[^a-zA-Z0-9]/g, '')}" />
+      <img src="${currentAvatar}" alt="${post.author}" class="post-avatar user-avatar-${safeId}" />
       <div class="post-meta">
         <div class="post-author">${post.author}</div>
         <div class="post-info">
@@ -629,7 +656,7 @@ function memberCardHTML(m) {
   return `
   <div class="member-card" id="member-${m.id}">
     <div class="member-card-header">
-      <img src="${m.avatar}" alt="${m.name}" class="member-avatar" onclick="viewProfile('${m.id}')" style="cursor:pointer;" />
+      <img src="${m.avatar}" alt="${m.name}" class="member-avatar user-avatar-${m.id}" onclick="viewProfile('${m.id}')" style="cursor:pointer;" />
       ${m.online ? '<span class="online-badge"></span>' : ''}
     </div>
     <div class="member-card-body">
@@ -967,9 +994,21 @@ function renderComments(comments) {
 
   const resolveAvatar = (c) => {
     // 1. Tenta pelo id do autor
-    if (c.author_id && avatarMap[String(c.author_id)]) return avatarMap[String(c.author_id)];
-    // 2. Tenta pelo email do autor
-    if (c.author_email && avatarMap[c.author_email]) return avatarMap[c.author_email];
+    let avatar = null;
+    if (c.author_id && avatarMap[String(c.author_id)]) avatar = avatarMap[String(c.author_id)];
+    else if (c.author_email && avatarMap[c.author_email]) avatar = avatarMap[c.author_email];
+
+    // 2. FALLBACK PARA DADOS CONTAMINADOS:
+    // Se o ID/Email for do usuário logado mas o nome no comentário for diferente,
+    // buscamos o avatar pelo nome na lista de membros.
+    if (currentUser && c.author !== currentUser.nome_completo && 
+        (String(c.author_id) === String(currentUser.id) || c.author_email === currentUser.email)) {
+      const realAuthor = allMembers.find(m => m.name === c.author);
+      if (realAuthor) return realAuthor.avatar || 'assets/avatars/avatar.svg';
+    }
+
+    if (avatar) return avatar;
+
     // 3. Usa o avatar salvo no comentário
     if (c.avatar) return c.avatar;
     // 4. Fallback
