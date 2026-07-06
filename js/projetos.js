@@ -36,6 +36,26 @@
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   }
 
+  /**
+   * Normaliza o campo tecnologias de um projeto.
+   * Aceita string, array de strings, ou array de arrays (JSONB aninhado).
+   * Retorna sempre um array de strings limpas e únicas.
+   */
+  function normalizeTechs(raw) {
+    if (!raw) return [];
+    if (typeof raw === 'string') raw = raw.split(/[,;]+/);
+    if (!Array.isArray(raw)) raw = [raw];
+    const flat = raw.flat(Infinity);
+    const result = [];
+    flat.forEach(t => {
+      String(t ?? '').split(/[,;]+/).forEach(part => {
+        const key = part.trim();
+        if (key && !result.includes(key)) result.push(key);
+      });
+    });
+    return result;
+  }
+
   function catKey(cat) {
     return (cat || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
@@ -160,8 +180,9 @@
     card.dataset.id = p.id;
 
     const isConcluido = p.status === "Concluído";
-    const techsToShow = (p.tecnologias || []).slice(0, 3);
-    const extraCount = (p.tecnologias || []).length - techsToShow.length;
+    const tecnologias = normalizeTechs(p.tecnologias);
+    const techsToShow = tecnologias.slice(0, 3);
+    const extraCount = tecnologias.length - techsToShow.length;
 
     const techPills = techsToShow
       .map((t) => `<span class="tech-pill">${t}</span>`)
@@ -292,7 +313,7 @@
       document.getElementById("project-repo").value       = p.repo || "";
       document.getElementById("project-demo").value       = p.demo || "";
       document.getElementById("project-descricao").value  = p.descricao || "";
-      techTags = [...(p.tecnologias || [])];
+      techTags = normalizeTechs(p.tecnologias);
       renderTechTags();
     }
 
@@ -385,7 +406,7 @@
           showToast("Você não tem permissão para editar este projeto.", "error");
           return;
         }
-        projects[idx] = { ...projects[idx], titulo, categoria, status, progresso, repo, demo, descricao, tecnologias: [...techTags] };
+        projects[idx] = { ...projects[idx], titulo, categoria, status, progresso, repo, demo, descricao, tecnologias: normalizeTechs(techTags) };
         showToast("Projeto atualizado!", "success");
       }
     } else {
@@ -398,7 +419,7 @@
         repo, 
         demo, 
         descricao, 
-        tecnologias: [...techTags],
+        tecnologias: normalizeTechs(techTags),
         criador_id: userEmail,
         proprietaria_id: userEmail
       });
@@ -433,7 +454,7 @@
 
     const isConcluido = p.status === "Concluído";
 
-    const techBadges = (p.tecnologias || [])
+    const techBadges = normalizeTechs(p.tecnologias)
       .map((t) => `<span class="tech-pill">${t}</span>`)
       .join("") || "<span style='color:var(--gray-500);font-size:14px'>Nenhuma tecnologia informada</span>";
 
@@ -524,19 +545,44 @@
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);
   detailModal.addEventListener("click", (e) => { if (e.target === detailModal) closeDetail(); });
 
-  /* ── Deletar ─────────────────────────────────────────────────── */
-  async function deleteProject(id) {
-    Layout.showToast("Projeto excluído com sucesso!", "success");
+  /* ── Modal de confirmação de exclusão ───────────────────────── */
+  const confirmModal = document.getElementById("modal-confirmar-exclusao");
+  let pendingDeleteId = null;
+
+  function openConfirmDelete(id) {
+    const p = projects.find((x) => x.id === id);
+    if (!p) return;
+    pendingDeleteId = id;
+    document.getElementById("confirm-project-name").textContent = p.titulo;
+    confirmModal.classList.add("open");
+  }
+
+  function closeConfirmDelete() {
+    confirmModal.classList.remove("open");
+    pendingDeleteId = null;
+  }
+
+  document.getElementById("confirm-cancel-btn").addEventListener("click", closeConfirmDelete);
+  confirmModal.addEventListener("click", (e) => { if (e.target === confirmModal) closeConfirmDelete(); });
+
+  document.getElementById("confirm-delete-btn").addEventListener("click", async () => {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    closeConfirmDelete();
     try {
       await removeProject(id);
+      projects = projects.filter((p) => p.id !== id);
+      updateStats();
+      renderProjects();
+      showToast("Projeto excluído com sucesso!", "success");
     } catch (err) {
       showToast("Erro ao excluir projeto.", "error");
-      return;
     }
-    projects = projects.filter((p) => p.id !== id);
-    updateStats();
-    renderProjects();
-    showToast("Projeto excluído.", "success");
+  });
+
+  /* ── Deletar ─────────────────────────────────────────────────── */
+  function deleteProject(id) {
+    openConfirmDelete(id);
   }
 
   /* ── Filtros ─────────────────────────────────────────────────── */
@@ -580,7 +626,7 @@
 
   /* ── Esc fecha modais ────────────────────────────────────────── */
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal(); closeDetail(); }
+    if (e.key === "Escape") { closeModal(); closeDetail(); closeConfirmDelete(); }
   });
 
   /* ── Toast ───────────────────────────────────────────────────── */

@@ -652,6 +652,87 @@
 
 .btn-danger:hover { background: #fee2e2; border-color: #f87171; }
 
+/* ── Modal de confirmação de exclusão ──────────────────────── */
+.modal--confirm {
+  background: rgba(14, 14, 16, .55);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content--confirm {
+  max-width: 420px;
+  width: 90%;
+  height: auto;
+  max-height: 90vh;
+  border-radius: var(--radius);
+  padding: 36px 32px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: modal-in .22s ease;
+}
+
+.confirm-icon-wrap {
+  margin-bottom: 20px;
+}
+
+.confirm-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: #fef2f2;
+  color: #dc2626;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  margin: 0 auto;
+}
+
+.confirm-title {
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.confirm-desc {
+  font-size: 14px;
+  color: var(--gray-500);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  max-width: 320px;
+}
+
+.confirm-desc strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.confirm-actions .btn {
+  flex: 1;
+  max-width: 160px;
+}
+
+.btn-danger-solid {
+  background: #dc2626;
+  color: #fff;
+  border: 1px solid #dc2626;
+  box-shadow: 0 4px 14px -4px rgba(220, 38, 38, .4);
+}
+
+.btn-danger-solid:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  box-shadow: 0 6px 18px -4px rgba(220, 38, 38, .5);
+}
+
 /* ── Modal de detalhes ─────────────────────────────────────── */
 .detail-section { display: flex; flex-direction: column; gap: 16px; }
 

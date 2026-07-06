@@ -259,6 +259,25 @@
   <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <!-- Modal de Confirmação de Exclusão -->
+  <div id="modal-confirmar-exclusao" class="modal modal--confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title">
+    <div class="modal-content modal-content--confirm">
+      <div class="confirm-icon-wrap">
+        <div class="confirm-icon">
+          <i class="icon-trash-2"></i>
+        </div>
+      </div>
+      <h2 id="confirm-delete-title" class="confirm-title">Excluir Projeto</h2>
+      <p class="confirm-desc">Tem certeza que deseja excluir o projeto <strong id="confirm-project-name"></strong>? Esta ação não pode ser desfeita.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" id="confirm-cancel-btn">Cancelar</button>
+        <button class="btn btn-danger-solid" id="confirm-delete-btn">
+          <i class="icon-trash-2"></i> Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/app.js"></script>

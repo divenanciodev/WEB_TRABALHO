@@ -152,9 +152,26 @@ window.renderFeaturedProjects = async function() {
     // Conta quantas vezes cada tecnologia aparece nos projetos
     const techCount = {};
     allProjects.forEach(p => {
-        (p.tecnologias || []).forEach(t => {
-            const key = (t || '').trim();
-            if (key) techCount[key] = (techCount[key] || 0) + 1;
+        // Normaliza tecnologias: achata arrays aninhados, split em strings, limpa espaços
+        let rawTechs = p.tecnologias || [];
+        if (typeof rawTechs === 'string') {
+            rawTechs = rawTechs.split(/[,;]+/);
+        }
+        if (!Array.isArray(rawTechs)) rawTechs = [rawTechs];
+
+        // Achata caso seja array de arrays (ex: [["React","Python"]])
+        const flat = rawTechs.flat(Infinity);
+
+        flat.forEach(t => {
+            // Cada item pode ainda ser uma string com vírgulas (ex: "React, Python")
+            const parts = String(t ?? '').split(/[,;]+/);
+            parts.forEach(part => {
+                const key = part.trim().replace(/[\u0000-\u001F\u007F-\u009F\u00AD\u200B-\u200D\uFEFF]/g, '');
+                // Ignora strings vazias, "null", "undefined" e variantes
+                if (key && key !== 'null' && key !== 'undefined' && /\S/.test(key)) {
+                    techCount[key] = (techCount[key] || 0) + 1;
+                }
+            });
         });
     });
 
@@ -167,8 +184,10 @@ window.renderFeaturedProjects = async function() {
         });
     }
 
-    // Ordena por contagem, pega top 8
+    // Ordena por contagem, pega top 8 — filtra entradas sem label visível
+    console.log('[Dashboard] techCount raw:', JSON.stringify(techCount));
     const sorted = Object.entries(techCount)
+        .filter(([k]) => k && /\S/.test(k) && k !== 'null' && k !== 'undefined')
         .sort((a, b) => b[1] - a[1])
         .slice(0, 8);
 
@@ -331,9 +350,23 @@ window.renderCreatorStats = async function() {
     // Tecnologias consolidadas dos projetos envolvidos
     const techCount = {};
     allMyProjects.forEach(p => {
-        (p.tecnologias || []).forEach(t => {
-            const k = (t || '').trim();
-            if (k) techCount[k] = (techCount[k] || 0) + 1;
+        // Normaliza tecnologias: achata arrays aninhados, split em strings, limpa espaços
+        let rawTechs = p.tecnologias || [];
+        if (typeof rawTechs === 'string') {
+            rawTechs = rawTechs.split(/[,;]+/);
+        }
+        if (!Array.isArray(rawTechs)) rawTechs = [rawTechs];
+
+        const flat = rawTechs.flat(Infinity);
+
+        flat.forEach(t => {
+            const parts = String(t ?? '').split(/[,;]+/);
+            parts.forEach(part => {
+                const k = part.trim().replace(/[\u0000-\u001F\u007F-\u009F\u00AD\u200B-\u200D\uFEFF]/g, '');
+                if (k && k !== 'null' && k !== 'undefined' && /\S/.test(k)) {
+                    techCount[k] = (techCount[k] || 0) + 1;
+                }
+            });
         });
     });
     const topTechs = Object.entries(techCount).sort((a,b) => b[1]-a[1]).slice(0, 5);
@@ -367,8 +400,11 @@ window.renderCreatorStats = async function() {
             <div class="perf-projects-grid">
                 ${allMyProjects.map(p => {
                     const isOwner = p.author_id === currentUser.id;
-                    const techs = (p.tecnologias || []).slice(0,3).map(t => `<span class="perf-tech-pill">${t}</span>`).join('');
-                    const extra = (p.tecnologias || []).length > 3 ? `<span class="perf-tech-pill perf-tech-more">+${(p.tecnologias||[]).length-3}</span>` : '';
+                    const rawTechs = p.tecnologias || [];
+                    const techArr = (typeof rawTechs === 'string' ? rawTechs.split(',') : Array.isArray(rawTechs) ? rawTechs : [])
+                        .map(t => String(t || '').trim()).filter(Boolean);
+                    const techPills = techArr.slice(0,3).map(t => `<span class="perf-tech-pill">${t}</span>`).join('');
+                    const extra = techArr.length > 3 ? `<span class="perf-tech-pill perf-tech-more">+${techArr.length-3}</span>` : '';
                     return `
                     <div class="perf-project-card">
                         <div class="perf-project-header">
@@ -386,7 +422,7 @@ window.renderCreatorStats = async function() {
                             </div>
                             <span class="perf-progress-label">${p.progresso||0}%</span>
                         </div>
-                        ${techs || extra ? `<div class="perf-tech-row">${techs}${extra}</div>` : ''}
+                        ${techPills || extra ? `<div class="perf-tech-row">${techPills}${extra}</div>` : ''}
                     </div>`;
                 }).join('')}
             </div>

@@ -585,9 +585,30 @@
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);
   detailModal.addEventListener("click", (e) => { if (e.target === detailModal) closeDetail(); });
 
-  /* ── Deletar ─────────────────────────────────────────────────── */
-  async function deleteEvent(id) {
-    if (!confirm('Deseja realmente excluir este evento?')) return;
+  /* ── Modal de confirmação de exclusão ───────────────────────── */
+  const confirmModal = document.getElementById("modal-confirmar-exclusao");
+  let pendingDeleteId = null;
+
+  function openConfirmDelete(id) {
+    const ev = events.find((e) => e.id === id);
+    if (!ev) return;
+    pendingDeleteId = id;
+    document.getElementById("confirm-event-name").textContent = ev.titulo;
+    confirmModal.classList.add("open");
+  }
+
+  function closeConfirmDelete() {
+    confirmModal.classList.remove("open");
+    pendingDeleteId = null;
+  }
+
+  document.getElementById("confirm-cancel-btn").addEventListener("click", closeConfirmDelete);
+  confirmModal.addEventListener("click", (e) => { if (e.target === confirmModal) closeConfirmDelete(); });
+
+  document.getElementById("confirm-delete-btn").addEventListener("click", async () => {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    closeConfirmDelete();
     try {
       await removeEvent(id);
       events = events.filter((e) => e.id !== id);
@@ -597,6 +618,11 @@
     } catch (err) {
       showToast("Erro ao excluir evento.", "error");
     }
+  });
+
+  /* ── Deletar ─────────────────────────────────────────────────── */
+  function deleteEvent(id) {
+    openConfirmDelete(id);
   }
 
   /* ── Filtros ─────────────────────────────────────────────────── */
@@ -640,7 +666,7 @@
 
   /* ── Tecla Esc fecha modais ──────────────────────────────────── */
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal(); closeDetail(); }
+    if (e.key === "Escape") { closeModal(); closeDetail(); closeConfirmDelete(); }
   });
 
   /* ── Toast ───────────────────────────────────────────────────── */
