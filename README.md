@@ -60,13 +60,13 @@ O projeto utiliza uma stack moderna focada em performance e escalabilidade:
   <p><i>Legenda: Representação visual da arquitetura do sistema. </i></p>
 </div>
   <br>
-  * O que cada um controla:
-  * Frontend (Interface do Usuário): Responsável pela interação direta com a usuária, construído com HTML, CSS e JavaScript..
-  * Backend (FastAPI): Atua como a camada de lógica de negócios e comunicação com o banco de dados, além de integrar APIs externas.
-  * Banco de Dados/BaaS (Supabase): Gerencia a persistência dos dados, autenticação de usuários e segurança em nível de linha, com capacidades de tempo real.
+  - **O que cada um controla:**
+      - **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, construído com HTML, CSS e JavaScript..
+      - **Backend (FastAPI):** Atua como a camada de lógica de negócios e comunicação com o banco de dados, além de integrar APIs externas.
+      - **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários e segurança em nível de linha, com capacidades de tempo real.
   <br>
   
-  **2.2. Fluxo de Interação do Usuário**
+  - **2.2. Fluxo de Interação do Usuário**
   O fluxo de interação da usuária com a plataforma segue um padrão bem definido, garantindo uma experiência intuitiva e responsiva. Desde o acesso inicial até a     interação com as funcionalidades, o sistema é projetado para ser dinâmico e em tempo real.
   <div align="center">
 
