@@ -80,6 +80,7 @@ A arquitetura da plataforma **SheTech** é modular, dividida em três componente
   <p><i>Legenda: Representação visual do fluxo do sistema. </i></p>
 </div>
   O diagrama acima ilustra a sequência de eventos desde o acesso da usuária até a interação com o backend e o banco de dados, destacando a comunicação entre os componentes do sistema.
+
 ---
 
 ## 3. Demonstração da Aplicação 💻
