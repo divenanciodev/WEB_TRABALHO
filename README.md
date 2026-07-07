@@ -52,19 +52,25 @@ O projeto utiliza uma stack moderna focada em performance e escalabilidade:
   - **ViaCEP API:** Automação de endereços para eventos presenciais.
   - **Supabase Realtime:** Atualização instantânea de dados na interface.
 
-  **2.1. Visão Geral da Arquitetura**
-  A arquitetura da plataforma SheTech é modular, dividida em três componentes principais: Frontend, Backend e Banco de Dados/BaaS. Esta estrutura permite uma     clara separação de responsabilidades e facilita a manutenção e escalabilidade do sistema.
-  <div align="center">
+### 2.1 Visão Geral da Arquitetura
 
-  <img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/GRAFICO01.png?raw=true" alt="Grafico da arquitetura" width="45%">
-  <p><i>Legenda: Representação visual da arquitetura do sistema. </i></p>
+A arquitetura da plataforma **SheTech** é modular, dividida em três componentes principais: **Frontend**, **Backend** e **Banco de Dados/BaaS**. Essa estrutura permite uma clara separação de responsabilidades e facilita a manutenção e a escalabilidade do sistema.
+
+<div align="center">
+
+<img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/GRAFICO01.png?raw=true" alt="Gráfico da arquitetura" width="45%">
+
+<i>Legenda: Representação visual da arquitetura do sistema.</i>
+
 </div>
-  <br>
-  - **O que cada um controla:**
-      - **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, construído com HTML, CSS e JavaScript..
-      - **Backend (FastAPI):** Atua como a camada de lógica de negócios e comunicação com o banco de dados, além de integrar APIs externas.
-      - **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários e segurança em nível de linha, com capacidades de tempo real.
-  <br>
+
+#### O que cada componente controla
+
+- **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, desenvolvido em HTML, CSS e JavaScript.
+
+- **Backend (FastAPI):** Responsável pela lógica de negócios, autenticação, validações e comunicação com o banco de dados.
+
+- **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários, armazenamento de arquivos, políticas RLS e atualizações em tempo real.
   
   - **2.2. Fluxo de Interação do Usuário**
   O fluxo de interação da usuária com a plataforma segue um padrão bem definido, garantindo uma experiência intuitiva e responsiva. Desde o acesso inicial até a     interação com as funcionalidades, o sistema é projetado para ser dinâmico e em tempo real.
