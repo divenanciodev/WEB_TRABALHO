@@ -34,22 +34,8 @@ A **SheTech** surge como uma solução para conectar essas pessoas em uma comuni
 
 ---
 
-## 2. Demonstração da Aplicação 💻
 
-A plataforma oferece uma experiência completa de rede social técnica:
-
-| Funcionalidade | Descrição |
-| :--- | :--- |
-| **Dashboard Personalizado** | Visão geral de conexões, projetos ativos e estatísticas da comunidade em tempo real. |
-| **Feed da Comunidade** | Espaço para postagens, compartilhamento de links úteis, curtidas e comentários. |
-| **Gestão de Projetos** | Listagem de projetos onde as usuárias podem se inscrever ou recrutar colaboradoras. |
-| **Eventos e Workshops** | Agenda de eventos (online e presenciais) com sistema de inscrição integrado. |
-| **Perfis Detalhados** | Exibição de bio, habilidades técnicas, links sociais (GitHub, LinkedIn) e portfólio. |
-| **Sistema de Notificações** | Alertas sobre novas conexões, inscrições em projetos e interações no feed. |
-
----
-
-## 3. Tecnologias Utilizadas 🛠️
+## 2. Arquitetura e Tecnologias Utilizadas 🛠️
 
 O projeto utiliza uma stack moderna focada em performance e escalabilidade:
 
@@ -66,8 +52,51 @@ O projeto utiliza uma stack moderna focada em performance e escalabilidade:
   - **ViaCEP API:** Automação de endereços para eventos presenciais.
   - **Supabase Realtime:** Atualização instantânea de dados na interface.
 
+### 2.1 Visão Geral da Arquitetura
+
+A arquitetura da plataforma **SheTech** é modular, dividida em três componentes principais: **Frontend**, **Backend** e **Banco de Dados/BaaS**. Essa estrutura permite uma clara separação de responsabilidades e facilita a manutenção e a escalabilidade do sistema.
+
+<div align="center">
+
+<img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/GRAFICO01.png?raw=true" alt="Gráfico da arquitetura" width="45%">
+
+<i>Legenda: Representação visual da arquitetura do sistema.</i>
+
+</div>
+
+#### O que cada componente controla
+
+- **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, desenvolvido em HTML, CSS e JavaScript.
+
+- **Backend (FastAPI):** Responsável pela lógica de negócios, autenticação, validações e comunicação com o banco de dados.
+
+- **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários, armazenamento de arquivos, políticas RLS e atualizações em tempo real.
+  
+  - **2.2. Fluxo de Interação do Usuário**
+  O fluxo de interação da usuária com a plataforma segue um padrão bem definido, garantindo uma experiência intuitiva e responsiva. Desde o acesso inicial até a     interação com as funcionalidades, o sistema é projetado para ser dinâmico e em tempo real.
+  <div align="center">
+
+  <img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/imagemfluxo.png?raw=true" alt="Grafico do fluxo do sistema" width="45%">
+  <p><i>Legenda: Representação visual do fluxo do sistema. </i></p>
+</div>
+  O diagrama acima ilustra a sequência de eventos desde o acesso da usuária até a interação com o backend e o banco de dados, destacando a comunicação entre os componentes do sistema.
+
 ---
 
+## 3. Demonstração da Aplicação 💻
+
+A plataforma oferece uma experiência completa de rede social técnica:
+
+| Funcionalidade | Descrição |
+| :--- | :--- |
+| **Dashboard Personalizado** | Visão geral de conexões, projetos ativos e estatísticas da comunidade em tempo real. |
+| **Feed da Comunidade** | Espaço para postagens, compartilhamento de links úteis, curtidas e comentários. |
+| **Gestão de Projetos** | Listagem de projetos onde as usuárias podem se inscrever ou recrutar colaboradoras. |
+| **Eventos e Workshops** | Agenda de eventos (online e presenciais) com sistema de inscrição integrado. |
+| **Perfis Detalhados** | Exibição de bio, habilidades técnicas, links sociais (GitHub, LinkedIn) e portfólio. |
+| **Sistema de Notificações** | Alertas sobre novas conexões, inscrições em projetos e interações no feed. |
+
+---
 ## 4. Principais Desafios Encontrados 🧠
 
 Durante o desenvolvimento, os maiores desafios técnicos foram:
