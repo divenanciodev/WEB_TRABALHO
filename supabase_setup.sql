@@ -1,8 +1,3 @@
--- ============================================================
--- SheTech — Schema completo Supabase (projeto gkwlqkfkqlzfwnpvkrsn)
--- Execute no SQL Editor: https://supabase.com/dashboard/project/gkwlqkfkqlzfwnpvkrsn/sql
--- ============================================================
-
 -- USUÁRIOS / PERFIS
 CREATE TABLE IF NOT EXISTS public.users (
     id              UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
