@@ -49,7 +49,7 @@ A plataforma oferece uma experiência completa de rede social técnica:
 
 ---
 
-## 3. Tecnologias Utilizadas 🛠️
+## 3. Arquitetura e Tecnologias Utilizadas 🛠️
 
 O projeto utiliza uma stack moderna focada em performance e escalabilidade:
 
@@ -66,6 +66,28 @@ O projeto utiliza uma stack moderna focada em performance e escalabilidade:
   - **ViaCEP API:** Automação de endereços para eventos presenciais.
   - **Supabase Realtime:** Atualização instantânea de dados na interface.
 
+  **3.1. Visão Geral da Arquitetura**
+  A arquitetura da plataforma SheTech é modular, dividida em três componentes principais: Frontend, Backend e Banco de Dados/BaaS. Esta estrutura permite uma     clara separação de responsabilidades e facilita a manutenção e escalabilidade do sistema.
+  <div align="center">
+
+  <img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/GRAFICO01.png?raw=true" alt="Descrição da Imagem 2" width="45%">
+  <p><i>Legenda: Representação visual da arquitetura do sistema. </i></p>
+</div>
+  - **O que cada um controla:**
+  - **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, construído com HTML, CSS e JavaScript..
+  - **Backend (FastAPI):** Atua como a camada de lógica de negócios e comunicação com o banco de dados, além de integrar APIs externas.
+  - **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários e segurança em nível de linha, com capacidades de tempo real.
+  <br>
+  
+  **3.2. Fluxo de Interação do Usuário**
+  O fluxo de interação da usuária com a plataforma segue um padrão bem definido, garantindo uma experiência intuitiva e responsiva. Desde o acesso inicial até a     interação com as funcionalidades, o sistema é projetado para ser dinâmico e em tempo real.
+  <div align="center">
+
+  <img src="<img width="965" height="812" alt="image" src="https://github.com/user-attachments/assets/6e4e1f19-21dc-4145-9bfc-d09c58e24b91" />
+" alt="Descrição da Imagem 2" width="45%">
+  <p><i>Legenda: Representação visual do fluxo do sistema. </i></p>
+</div>
+  O diagrama acima ilustra a sequência de eventos desde o acesso da usuária até a interação com o backend e o banco de dados, destacando a comunicação entre os componentes do sistema.
 ---
 
 ## 4. Principais Desafios Encontrados 🧠
