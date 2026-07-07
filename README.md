@@ -59,10 +59,11 @@ O projeto utiliza uma stack moderna focada em performance e escalabilidade:
   <img src="https://github.com/divenanciodev/web-trabalho-oficial/blob/main/assets/GRAFICO01.png?raw=true" alt="Grafico da arquitetura" width="45%">
   <p><i>Legenda: Representação visual da arquitetura do sistema. </i></p>
 </div>
-  - **O que cada um controla:**
-  - **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, construído com HTML, CSS e JavaScript..
-  - **Backend (FastAPI):** Atua como a camada de lógica de negócios e comunicação com o banco de dados, além de integrar APIs externas.
-  - **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários e segurança em nível de linha, com capacidades de tempo real.
+  <br>
+  * **O que cada um controla:**
+  * **Frontend (Interface do Usuário):** Responsável pela interação direta com a usuária, construído com HTML, CSS e JavaScript..
+  * **Backend (FastAPI):** Atua como a camada de lógica de negócios e comunicação com o banco de dados, além de integrar APIs externas.
+  * **Banco de Dados/BaaS (Supabase):** Gerencia a persistência dos dados, autenticação de usuários e segurança em nível de linha, com capacidades de tempo real.
   <br>
   
   **2.2. Fluxo de Interação do Usuário**
